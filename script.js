@@ -115,13 +115,27 @@ function refreshAllItems() {
         return 0;
       });
     } else if (sortState.column == 't1') { // Sort by type combinations
-      filteredItems.sort((a, b) => {
-        let aa = a.t1*18 + ('t2' in a ? a.t2 : 0);
-        let bb = b.t1*18 + ('t2' in b ? b.t2 : 0);
-        if (aa < bb) return sortState.ascending ? -1 : 1;
-        if (aa > bb) return sortState.ascending ? 1 : -1;
-        return 0;
-      });
+      if (lockedFilters.some((thisLockedFID) => thisLockedFID < fidThreshold[0])) {
+        filteredItems.sort((a, b) => { // If there are type filters, do enhanced sort
+          let aa = (a.t1+1)*(2*!lockedFilters.includes(a.t1));
+          if ('t2' in a) {aa += (a.t2*2+1)*!lockedFilters.includes(a.t2)}
+          let bb = (b.t1+1)*(2*!lockedFilters.includes(b.t1));
+          if ('t2' in b) {bb += (b.t2*2+1)*!lockedFilters.includes(b.t2)}
+          if (aa < bb) return sortState.ascending ? -1 : 1;
+          if (aa > bb) return sortState.ascending ? 1 : -1;
+          return 0;
+        });
+      } else {
+        filteredItems.sort((a, b) => { // If there are no type filters
+          let aa = (a.t1)*(18*!lockedFilters.includes(a.t1));
+          if ('t2' in a) {aa += (a.t2)*!lockedFilters.includes(a.t2)}
+          let bb = (b.t1)*(18*!lockedFilters.includes(b.t1));
+          if ('t2' in b) {bb += (b.t2)*!lockedFilters.includes(b.t2)}
+          if (aa < bb) return sortState.ascending ? -1 : 1;
+          if (aa > bb) return sortState.ascending ? 1 : -1;
+          return 0;
+        });
+      }
     } else {
       let effectiveSort = sortState.column;
       if (lockedFilters.some((f) => f == fidThreshold[5])) { // If flipped mode
@@ -368,9 +382,9 @@ function showMoveSplash(fid) {
         splashMoveTags.innerHTML += `<p>${procChance}${procToDesc[thisProc[1]]}${procStages}</p>`;
       });
       if (thisDesc[9].includes(60)) {splashMoveTags.innerHTML += "<p>User Atk maxed</p>";};
-      if (thisDesc[9].includes(0)) {splashMoveTags.innerHTML += "<p>High Critical Ratio</p>";};
-      if (thisDesc[9].includes(1)) {splashMoveTags.innerHTML += "<p>Guaranteed Critical Hit</p>";};
-      if (thisDesc[9].includes(2)) {splashMoveTags.innerHTML += "<p>User Critical Rate +1</p>";};
+      if (thisDesc[9].includes(0))  {splashMoveTags.innerHTML += "<p>High Critical Ratio</p>";};
+      if (thisDesc[9].includes(1))  {splashMoveTags.innerHTML += "<p>Guaranteed Critical Hit</p>";};
+      if (thisDesc[9].includes(2))  {splashMoveTags.innerHTML += "<p>User Critical Rate +1</p>";};
       if (thisDesc[9].includes(35)) {splashMoveTags.innerHTML += "<p>Costs 50% of HP</p>";};
       if (thisDesc[9].includes(59)) {splashMoveTags.innerHTML += "<p>Costs 33% of HP</p>";};
       if (thisDesc[9].includes(34)) {splashMoveTags.innerHTML += "<p>Recoil 50% of HP</p>";};
@@ -388,11 +402,11 @@ function showMoveSplash(fid) {
       if (thisDesc[9].includes(41)) {splashMoveTags.innerHTML += "<p>Heals by target's Atk</p>";};
       if (thisDesc[9].includes(42)) {splashMoveTags.innerHTML += "<p>Heals 50% damage dealt</p>";};
       if (thisDesc[9].includes(13)) {splashMoveTags.innerHTML += "<p>Triage gives +3 priority</p>";};
-      if (thisDesc[9].includes(5)) {splashMoveTags.innerHTML += "<p>No effect on Grass/Overcoat</p>";};
+      if (thisDesc[9].includes(5))  {splashMoveTags.innerHTML += "<p>No effect on Grass/Overcoat</p>";};
       if (thisDesc[9].includes(55)) {splashMoveTags.innerHTML += "<p>No seeding on Grass Types</p>";};
-      if (thisDesc[9].includes(7)) {splashMoveTags.innerHTML += "<p>Boosted by Sharpness</p>";};
-      if (thisDesc[9].includes(8)) {splashMoveTags.innerHTML += "<p>Boosted by Iron Fist</p>";};
-      if (thisDesc[9].includes(9)) {splashMoveTags.innerHTML += "<p>Triggers Dancer ability</p>";};
+      if (thisDesc[9].includes(7))  {splashMoveTags.innerHTML += "<p>Boosted by Sharpness</p>";};
+      if (thisDesc[9].includes(8))  {splashMoveTags.innerHTML += "<p>Boosted by Iron Fist</p>";};
+      if (thisDesc[9].includes(9))  {splashMoveTags.innerHTML += "<p>Triggers Dancer ability</p>";};
       if (thisDesc[9].includes(10)) {splashMoveTags.innerHTML += "<p>No effect on Bulletproof</p>";};
       if (thisDesc[9].includes(11)) {splashMoveTags.innerHTML += "<p>Boosted by Mega Launcher</p>";};
       if (thisDesc[9].includes(12)) {splashMoveTags.innerHTML += "<p>Boosted by Strong Jaw</p>";};
@@ -421,7 +435,7 @@ function showMoveSplash(fid) {
       if (thisDesc[9].includes(57)) {splashMoveTags.innerHTML += "<p>Target can't switch out</p>";};
       if (thisDesc[9].includes(58)) {splashMoveTags.innerHTML += "<p>User & Target can't switch out</p>";};
       if (thisDesc[9].includes(49)) {splashMoveTags.innerHTML += "<p>No effect on Bosses</p>";};
-      if (thisDesc[9].includes(4)) {splashMoveTags.innerHTML += "<p>Makes Contact</p>";};
+      if (thisDesc[9].includes(4))  {splashMoveTags.innerHTML += "<p>Makes Contact</p>";};
       if (thisDesc[9].includes(51)) {splashMoveTags.innerHTML += "<p style='color:rgb(240, 230, 140);'>Partially Implemented</p>";};
       if (thisDesc[9].includes(50)) {splashMoveTags.innerHTML += "<p style='color:rgb(239, 131, 131);'>Not Implemented</p>";};
       splashContent.appendChild(splashMoveTags);
