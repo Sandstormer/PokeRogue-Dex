@@ -24,6 +24,7 @@ let isMobile = false;
 let filteredItems = null;
 let shinyState = 0;   // Global state of shiny   (0,1,2,3)
 let abilityState = 0; // Global state of ability (0,1,2,3)
+let showFamily = 0;
 
 // Set up the header columns
 let headerColumns = [];
@@ -52,17 +53,11 @@ function refreshAllItems() {
     li.replaceWith(li.cloneNode(true)); // Clones without listeners
   });
   while (itemList.firstChild) {
-      itemList.firstChild.remove();
+    itemList.firstChild.remove();
   }
-
   filteredItems = items;
-  if (shinyState > 1) { // Only show items that have that tier of shiny
-    filteredItems = filteredItems.filter(item => item.sh >= shinyState);
-  }
-  if (abilityState == 2) {
-    filteredItems = filteredItems.filter(item => 'ha' in item)
-  }
-  if (query.length > 0) { // Only show items that match the query
+  // Filter from query ==============
+  if (query.length > 0) {
     filteredItems = filteredItems.filter(item =>
       item.sp.toLowerCase().replace(/\s+/g, '').includes(query) ||
       fidToSearch[item.t1].includes(query) ||
@@ -73,6 +68,25 @@ function refreshAllItems() {
       ([0,3].includes(abilityState) && fidToSearch[item.pa]?.includes(query)) ||
       item.dex.toString().includes(query)
   );}
+  // Show entire evolutionary line ==============
+  if (showFamily && query.length > 0 && filteredItems.length < 10) {
+    let starterRows = [];
+    filteredItems.forEach((thisItem) => {
+      if (!starterRows.includes(thisItem.sr)) {starterRows.push(thisItem.sr);}
+    });
+    if (starterRows.length < 4) {
+      let allRelatives = items.filter((thisItem) => starterRows.includes(thisItem.sr) && !filteredItems.includes(thisItem));
+      filteredItems.push(...allRelatives);
+    }
+  }
+  // Filter from headers ==============
+  if (shinyState > 1) { // Only show items that have that tier of shiny
+    filteredItems = filteredItems.filter(item => item.sh >= shinyState);
+  }
+  if (abilityState == 2) {
+    filteredItems = filteredItems.filter(item => 'ha' in item)
+  }
+  // Filter from locked filters ==============
   if (lockedFilters.length > 0) {
     filteredItems = filteredItems.filter(item => // Search for filters with their fid as key
       lockedFilterGroups.every(thisGroup =>      // All groups, but some from each group
@@ -102,7 +116,7 @@ function refreshAllItems() {
       showMoveLearn.push(thisLockedFID);
     }
   });
-  // Sort items if a column is specified
+  // Sort items if a column is specified ==============
   if (sortState.column) {
     if (sortState.column == 'moves') {
       filteredItems.sort((a, b) => { // Sort by source of moves
@@ -363,7 +377,7 @@ function showMoveSplash(fid) {
     splashContent.appendChild(splashMoveRow);
     splashContent.innerHTML += `<hr>${thisDesc[0]}`; // Show move description
     if (thisDesc[1]) { // If there is a custom description
-      splashContent.innerHTML += `<br><span style="color:rgb(145, 145, 145);"> ${thisDesc[1]}</span>`;
+      splashContent.innerHTML += `<p style="color:rgb(145, 145, 145); margin:0px; margin-top:8px;"> ${thisDesc[1]}</p>`;
     }
     // Add all tags for priority, targets, procs, contact, other
     if (thisDesc[7] || thisDesc[8] || thisDesc[9]) {
@@ -737,6 +751,7 @@ window.addEventListener("resize", () => {
 });
 searchBox.addEventListener('input', (event) => { // Typing in search box ***************
   tabSelect = -1;
+  showFamily = 1;
   // for (let index = 0; index < 50; index++) { // Slow down the performance for benchmarking
     displaySuggestions();
     refreshAllItems();
@@ -748,8 +763,13 @@ document.addEventListener('keydown', (event) => {
     splashScreen.classList.remove("show");
     searchBox.focus(); // Focus the search box on any key press
   }
-  if (event.key == "Enter" && filterToEnter != null) {
-    lockFilter(filterToEnter); // Hit 'Enter' to lock the first filter
+  if (event.key == "Enter") {
+    showFamily = 0;
+    if (filterToEnter) {
+      lockFilter(filterToEnter); // Hit 'Enter' to lock the first filter
+    } else {
+      refreshAllItems(); // Refresh without family shown
+    }
   }
   if (event.key == "PageDown" || event.key == "PageUp") {
     // for (let index = 0; index < 50; index++) { // Slow down the performance for benchmarking
