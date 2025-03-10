@@ -59,7 +59,7 @@ function refreshAllItems() {
   // Filter from query ==============
   if (query.length > 0) {
     filteredItems = filteredItems.filter(item =>
-      item.sp.toLowerCase().replace(/\s+/g, '').includes(query) ||
+      speciesNames[item.row].toLowerCase().replace(/\s+/g, '').includes(query) ||
       fidToSearch[item.t1].includes(query) ||
       fidToSearch[item.t2]?.includes(query) ||
       ([0,1].includes(abilityState) && fidToSearch[item.a1].includes(query)) ||
@@ -263,7 +263,7 @@ function renderMoreItems() {
     
     const specColumn = document.createElement('div'); // Show species name
     specColumn.className = 'item-column';
-    specColumn.innerHTML = '<b>' + item.sp + '</b>';
+    specColumn.innerHTML = '<b>' + speciesNames[item.row] + '</b>';
     
     const typeColumn = document.createElement('div'); // Show both types
     typeColumn.className = 'item-column';
@@ -309,6 +309,7 @@ function renderMoreItems() {
         // Show the move name, with click event for splash screen
         const clickableRow = document.createElement('div');  clickableRow.className = 'clickable-name';
         if (name == 'e4') { clickableRow.style.color = 'rgb(240, 230, 140)'; }
+        // clickableRow.style.color = typeColors[fidToDesc[item[name]][2]];
         clickableRow.innerHTML = fidToName[item[name]];
         clickableRow.addEventListener('click', () => {showMoveSplash(item[name]);});
         moveColumn.appendChild(clickableRow);
