@@ -1,6 +1,6 @@
 // script.js
 // Imports: items, fidThreshold, fidToName, fidToDesc, typeColors
-
+// Lang: headerNames, warningText, menuText, tagDesc, fidToCategory, procToDesc, fidToDesc, speciesNames, fidToName, fidToSearch
 const itemList = document.getElementById('itemList');
 const searchBox = document.getElementById('searchBox');
 const pageTitle = document.getElementById('page-title');
@@ -11,9 +11,9 @@ const suggestions = document.getElementById("suggestions");
 const splashScreen = document.getElementById("splashScreen");
 const splashContent = document.getElementById("splashContent");
 const openMenuButton = document.getElementById("menu-img");
-const possibleFID = [...Array(fidThreshold[fidThreshold.length-2]).keys()];
+const possibleFID = [...Array(fidThreshold[fidThreshold.length-1]).keys()];
 const possibleSID = [...Array(items.length-1).keys()];
-let increment = 1; // Number of items to load at a time
+let increment = 10; // Number of items to load at a time
 let renderLimit = 0; // Start with no items
 let showMoveLearn = []; // Filtered moves to show sources
 let filterToEnter = null;
@@ -50,22 +50,19 @@ let currentTarget = null; // Track current sorted column
 function refreshAllItems() {
   // console.log('Refreshing all items');
   const query = searchBox.value.toLowerCase().replace(/\s+/g, '');
+
   // itemList.innerHTML = ""; // Clear existing items
-  itemList.querySelectorAll('li').forEach(li => {
-    li.replaceWith(li.cloneNode(true)); // Clones without listeners
-  });
-  while (itemList.firstChild) {
-    itemList.firstChild.remove();
-  }
+  itemList.querySelectorAll('li').forEach(li => li.replaceWith(li.cloneNode(true))); // Clones without listeners
+  while (itemList.firstChild) itemList.firstChild.remove();
 
   filteredItemIDs = possibleSID;
   // Filter from query ==============
   if (query.length > 0) {
     filteredItemIDs = filteredItemIDs.filter((ID) => 
-      speciesNames[items[ID].row].toLowerCase().replace(/\s+/g, '').includes(query) ||
-      fidToSearch[items[ID].t1].includes(query) ||
+      speciesNames[items[ID].row].toLowerCase().replace(/\s+/g,'').includes(query) ||
+      fidToSearch[items[ID].t1]?.includes(query) ||
       fidToSearch[items[ID].t2]?.includes(query) ||
-      ([0,1].includes(abilityState) && fidToSearch[items[ID].a1].includes(query)) ||
+      ([0,1].includes(abilityState) && fidToSearch[items[ID].a1]?.includes(query)) ||
       ([0,1].includes(abilityState) && fidToSearch[items[ID].a2]?.includes(query)) ||
       ([0,2].includes(abilityState) && fidToSearch[items[ID].ha]?.includes(query)) ||
       ([0,3].includes(abilityState) && fidToSearch[items[ID].pa]?.includes(query)) ||
@@ -75,7 +72,6 @@ function refreshAllItems() {
   if (abilityState == 2) filteredItemIDs = filteredItemIDs.filter(ID => 'ha' in items[ID])
   // Only show items that have that tier of shiny
   if (shinyState > 1)    filteredItemIDs = filteredItemIDs.filter(ID => items[ID].sh >= shinyState);
-  
   // Filter from locked filters ==============
   if (lockedFilters.length > 0) {
     filteredItemIDs = filteredItemIDs.filter(ID => // Search for filters with their fid as key
@@ -491,7 +487,7 @@ function fidToColor(fid) {
   if (fid < fidThreshold[5]) { return ['rgb(216, 143, 205)', 'rgb(255, 255, 255)']; }
   if (fid < fidThreshold[6]) { return ['rgb(255, 255, 255)', 'rgb(239, 131, 131)']; }
   if (fid < fidThreshold[7]) { return ['rgb(255, 255, 255)',    eggTierColors(fid) ]; }
-  else { return ['rgb(255, 255, 255)', 'rgb(140, 130, 240)']; }
+  else return ['rgb(255, 255, 255)', 'rgb(140, 130, 240)']; 
 }
 function abToColor(name) {
   if (name == 'a1') { return (abilityState==0||abilityState==1 ? 'rgb(255, 255, 255)' : 'rgb(145,145,145)') }
