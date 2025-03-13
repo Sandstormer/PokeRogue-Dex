@@ -319,6 +319,7 @@ h1 > div:nth-child(2){
     width: 15px;
     height: 18px;
     margin-right: -2px;
+    object-fit: none;
     cursor: pointer;
     /* outline: 1px solid red; */
   }
@@ -348,6 +349,7 @@ h1 > div:nth-child(2){
 .item-column {
   align-items: center;
   text-align: center;
+  font-weight: bold;
   padding: 0 0px;
   /* outline: 1px solid red; */
 }

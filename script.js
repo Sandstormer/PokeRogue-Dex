@@ -11,7 +11,8 @@ const suggestions = document.getElementById("suggestions");
 const splashScreen = document.getElementById("splashScreen");
 const splashContent = document.getElementById("splashContent");
 const openMenuButton = document.getElementById("menu-img");
-const possibleFID = [...Array(fidThreshold[fidThreshold.length-1]).keys()];
+const possibleFID = [...Array(fidThreshold[fidThreshold.length-2]).keys()];
+const possibleSID = [...Array(items.length-1).keys()];
 let increment = 1; // Number of items to load at a time
 let renderLimit = 0; // Start with no items
 let showMoveLearn = []; // Filtered moves to show sources
@@ -20,11 +21,12 @@ let tabSelect = 0;
 let lockedFilters = []; // List of all locked filters
 let lockedFilterMods = []; // List of filter mods objects
 let lockedFilterGroups = [[]]; // Grouped together for OR
+let pinnedRows = []; // List of pinned row numbers
 let isMobile = false;
-let filteredItems = null;
+let filteredItemIDs = null;
 let shinyState = 0;   // Global state of shiny   (0,1,2,3)
 let abilityState = 0; // Global state of ability (0,1,2,3)
-let showFamily = 0;
+let offerFamilies = [];
 
 // Set up the header columns
 let headerColumns = [];
@@ -55,133 +57,125 @@ function refreshAllItems() {
   while (itemList.firstChild) {
     itemList.firstChild.remove();
   }
-  filteredItems = items;
+
+  filteredItemIDs = possibleSID;
   // Filter from query ==============
   if (query.length > 0) {
-    filteredItems = filteredItems.filter(item =>
-      speciesNames[item.row].toLowerCase().replace(/\s+/g, '').includes(query) ||
-      fidToSearch[item.t1].includes(query) ||
-      fidToSearch[item.t2]?.includes(query) ||
-      ([0,1].includes(abilityState) && fidToSearch[item.a1].includes(query)) ||
-      ([0,1].includes(abilityState) && fidToSearch[item.a2]?.includes(query)) ||
-      ([0,2].includes(abilityState) && fidToSearch[item.ha]?.includes(query)) ||
-      ([0,3].includes(abilityState) && fidToSearch[item.pa]?.includes(query)) ||
-      item.dex.toString().includes(query)
+    filteredItemIDs = filteredItemIDs.filter((ID) => 
+      speciesNames[items[ID].row].toLowerCase().replace(/\s+/g, '').includes(query) ||
+      fidToSearch[items[ID].t1].includes(query) ||
+      fidToSearch[items[ID].t2]?.includes(query) ||
+      ([0,1].includes(abilityState) && fidToSearch[items[ID].a1].includes(query)) ||
+      ([0,1].includes(abilityState) && fidToSearch[items[ID].a2]?.includes(query)) ||
+      ([0,2].includes(abilityState) && fidToSearch[items[ID].ha]?.includes(query)) ||
+      ([0,3].includes(abilityState) && fidToSearch[items[ID].pa]?.includes(query)) ||
+      items[ID].dex.toString().includes(query)
   );}
-  // Show entire evolutionary line ==============
-  if (showFamily && query.length > 0 && filteredItems.length < 10) {
-    let starterRows = [];
-    filteredItems.forEach((thisItem) => {
-      if (!starterRows.includes(thisItem.sr)) {starterRows.push(thisItem.sr);}
-    });
-    if (starterRows.length < 4) {
-      let allRelatives = items.filter((thisItem) => starterRows.includes(thisItem.sr) && !filteredItems.includes(thisItem));
-      filteredItems.push(...allRelatives);
-    }
-  }
   // Filter from headers ==============
-  if (shinyState > 1) { // Only show items that have that tier of shiny
-    filteredItems = filteredItems.filter(item => item.sh >= shinyState);
-  }
-  if (abilityState == 2) {
-    filteredItems = filteredItems.filter(item => 'ha' in item)
-  }
+  if (abilityState == 2) filteredItemIDs = filteredItemIDs.filter(ID => 'ha' in items[ID])
+  // Only show items that have that tier of shiny
+  if (shinyState > 1)    filteredItemIDs = filteredItemIDs.filter(ID => items[ID].sh >= shinyState);
+  
   // Filter from locked filters ==============
   if (lockedFilters.length > 0) {
-    filteredItems = filteredItems.filter(item => // Search for filters with their fid as key
+    filteredItemIDs = filteredItemIDs.filter(ID => // Search for filters with their fid as key
       lockedFilterGroups.every(thisGroup =>      // All groups, but some from each group
         thisGroup.some(thisLockedFID => {
           if (abilityState != 0 && thisLockedFID >= fidThreshold[0] && thisLockedFID < fidThreshold[1]) {
-            if (abilityState == 1) {
-              return item?.[thisLockedFID] == 309 || item?.[thisLockedFID] == 310
-            } else if (abilityState == 2) {
-              return item?.[thisLockedFID] == 311
-            } else if (abilityState == 3) {
-              return item?.[thisLockedFID] == 312
-            }
+            if (abilityState == 1)      { return items[ID]?.[thisLockedFID] == 309 || items[ID]?.[thisLockedFID] == 310 } 
+            else if (abilityState == 2) { return items[ID]?.[thisLockedFID] == 311 }
+            else if (abilityState == 3) { return items[ID]?.[thisLockedFID] == 312 }
           }
-          if (thisLockedFID  <  fidThreshold[2]) return thisLockedFID in item; // Type/Ability/Move filters
-          if (thisLockedFID  <  fidThreshold[3]) return item.ge === thisLockedFID - fidThreshold[2] + 1; // Gen filters
-          if (thisLockedFID  <  fidThreshold[4]) return item.co === thisLockedFID - fidThreshold[3] + 1; // Cost filters
-          if (thisLockedFID === fidThreshold[4]) return item.fe === 1; // Gender filter
+          if (thisLockedFID  <  fidThreshold[2]) return thisLockedFID in items[ID]; // Type/Ability/Move filters
+          if (thisLockedFID  <  fidThreshold[3]) return items[ID].ge === thisLockedFID - fidThreshold[2] + 1; // Gen filters
+          if (thisLockedFID  <  fidThreshold[4]) return items[ID].co === thisLockedFID - fidThreshold[3] + 1; // Cost filters
+          if (thisLockedFID === fidThreshold[4]) return items[ID].fe === 1; // Gender filter
           if (thisLockedFID === fidThreshold[5]) return true; // Flipped stat filter
-          if (thisLockedFID  <  fidThreshold[7]) return item.et === thisLockedFID - fidThreshold[6]; // Egg tier filter
+          if (thisLockedFID  <  fidThreshold[7]) return items[ID].et === thisLockedFID - fidThreshold[6]; // Egg tier filter
+          if (thisLockedFID  <  fidThreshold[8]) return fidToName[thisLockedFID] === speciesNames[items[ID].sr]; // Family filter
           console.warn('Filter error');
-          return thisLockedFID in item;
-    }))) 
-  }
+          return thisLockedFID in items[ID];
+        }))) 
+      }
+  // Add moves to track in the move column  ==============
   showMoveLearn = [];
-  lockedFilters.forEach(thisLockedFID => { // Add moves to track in the move column
-    if (fidToCategory(thisLockedFID) == "Move") { 
-      showMoveLearn.push(thisLockedFID);
-    }
+  lockedFilters.forEach(thisLockedFID => {
+    if (fidToCategory(thisLockedFID) == "Move") showMoveLearn.push(thisLockedFID);
   });
+  // Remove the pinned items for now ==============
+  if (pinnedRows) filteredItemIDs = filteredItemIDs.filter((thisID) => !pinnedRows.includes(thisID));
+
+  // Show entire evolutionary line ==============
+  // offerFamilies = [];
+  // if (filteredItems.length < 10) {
+  //   filteredItems.forEach((ID) => { // Assemble the list of families
+  //     if (!offerFamilies.includes(items[ID].sr)) {offerFamilies.push(items[ID].sr);}
+  //   });
+  // }
+    // if (starterRows.length == 1) { // If there are less than 4 families
+    //   offerFamilies = starterRows[0];
+      // let allRelatives = items.filter((thisItem) => starterRows.includes(thisItem.sr) && !filteredItems.includes(thisItem));
+      // if (lockedFilters.includes(fidThreshold[8]-1)) {
+      //   filteredItems.push(...allRelatives); // Add relatives if filter is locked
+      // } else if (allRelatives.length > 0) { // Else show the suggestion
+      //   offerFamily = 1;
+      // }
+    // }
+
   // Sort items if a column is specified ==============
   if (sortState.column) {
-    if (sortState.column == 'moves') {
-      filteredItems.sort((a, b) => { // Sort by source of moves
-        const getLearnLevel = (item) => 
-          showMoveLearn.reduce((total, move) => total + (move in item ? item[move] : 500), 0);
-        const learnLevelA = getLearnLevel(a);
-        const learnLevelB = getLearnLevel(b);
-        if (learnLevelA < learnLevelB) return sortState.ascending ? -1 : 1;
-        if (learnLevelA > learnLevelB) return sortState.ascending ? 1 : -1;
-        return 0;
-      });
-    } else if (sortState.column == 't1') { // Sort by type combinations
-      if (lockedFilters.some((thisLockedFID) => thisLockedFID < fidThreshold[0])) {
-        filteredItems.sort((a, b) => { // If there are type filters, do enhanced sort
-          let aa = (a.t1+1)*(2*!lockedFilters.includes(a.t1));
-          if ('t2' in a) {aa += (a.t2*2+1)*!lockedFilters.includes(a.t2)}
-          let bb = (b.t1+1)*(2*!lockedFilters.includes(b.t1));
-          if ('t2' in b) {bb += (b.t2*2+1)*!lockedFilters.includes(b.t2)}
-          if (aa < bb) return sortState.ascending ? -1 : 1;
-          if (aa > bb) return sortState.ascending ? 1 : -1;
-          return 0;
-        });
-      } else {
-        filteredItems.sort((a, b) => { // If there are no type filters
-          let aa = (a.t1)*(18*!lockedFilters.includes(a.t1));
-          if ('t2' in a) {aa += (a.t2)*!lockedFilters.includes(a.t2)}
-          let bb = (b.t1)*(18*!lockedFilters.includes(b.t1));
-          if ('t2' in b) {bb += (b.t2)*!lockedFilters.includes(b.t2)}
-          if (aa < bb) return sortState.ascending ? -1 : 1;
-          if (aa > bb) return sortState.ascending ? 1 : -1;
-          return 0;
-        });
+    filteredItemIDs.sort((a, b) => {
+      // const aValue = a-2000*pinnedRows.includes(a); const bValue = b-2000*pinnedRows.includes(b);
+      let aValue = a; let bValue = b; // Set default attribute of row number
+      if (sortState.column == 'moves') { // Sort by source of moves
+        const getLearnLevel = (ID) => 
+          showMoveLearn.reduce((total, move) => total + (move in items[ID] ? items[ID][move] : 500), 0);
+        aValue = getLearnLevel(a);
+        bValue = getLearnLevel(b);
+      } else if (sortState.column == 't1') { // Sort by type combinations
+        const typeMult = (lockedFilters.some((fid) => fid < fidThreshold[0]) ? 2 : 36 );
+        const aEntry = items[a]; const bEntry = items[b];
+        aValue = (aEntry.t1+1)*(typeMult*!lockedFilters.includes(aEntry.t1));
+        bValue = (bEntry.t1+1)*(typeMult*!lockedFilters.includes(bEntry.t1));
+        if ('t2' in aEntry) {aValue += (aEntry.t2*2+1)*!lockedFilters.includes(aEntry.t2)}
+        if ('t2' in bEntry) {bValue += (bEntry.t2*2+1)*!lockedFilters.includes(bEntry.t2)}
+      } else if (sortState.column == 'sp') { // Sort by species names alphabetically
+        aValue = speciesNames[a]; bValue = speciesNames[b];
+      } else if (sortState.column != 'row') { // If anything other than row number
+        let effectiveSort = sortState.column;
+        if (lockedFilters.some((f) => f == fidThreshold[5])) { // If flipped mode
+          if (sortState.column == 'hp')  {effectiveSort = 'spe';}
+          if (sortState.column == 'atk') {effectiveSort = 'spd';}
+          if (sortState.column == 'def') {effectiveSort = 'spa';}
+          if (sortState.column == 'spa') {effectiveSort = 'def';}
+          if (sortState.column == 'spd') {effectiveSort = 'atk';}
+          if (sortState.column == 'spe') {effectiveSort = 'hp' ;}
+        }
+        aValue = items[a][effectiveSort]; bValue = items[b][effectiveSort];
       }
-    } else {
-      let effectiveSort = sortState.column;
-      if (lockedFilters.some((f) => f == fidThreshold[5])) { // If flipped mode
-        if (sortState.column == 'hp')  {effectiveSort = 'spe';}
-        if (sortState.column == 'atk') {effectiveSort = 'spd';}
-        if (sortState.column == 'def') {effectiveSort = 'spa';}
-        if (sortState.column == 'spa') {effectiveSort = 'def';}
-        if (sortState.column == 'spd') {effectiveSort = 'atk';}
-        if (sortState.column == 'spe') {effectiveSort = 'hp' ;}
-      }
-      filteredItems.sort((a, b) => { // Sort by other attribute
-        if (a[effectiveSort] < b[effectiveSort]) return sortState.ascending ? -1 : 1;
-        if (a[effectiveSort] > b[effectiveSort]) return sortState.ascending ? 1 : -1;
-        return 0;
-      });
-    }
+      if (aValue < bValue) return sortState.ascending ? -1 : 1;
+      if (aValue > bValue) return sortState.ascending ? 1 : -1;
+      return 0;
+    });
   }
+
+  // Add pinned rows, they are not sorted ==============
+  if (pinnedRows) {
+    let rowsToAdd = pinnedRows.filter((ID) => (!filteredItemIDs.includes(ID)));
+    filteredItemIDs = [...rowsToAdd, ...filteredItemIDs];
+  }
+
   // Render the first few items
   renderLimit = 0;
   renderMoreItems();
-  if (filteredItems.length == 0) { // No pokemon
+  if (filteredItemIDs.length == 0) { // No pokemon
     const helpMessage = document.createElement('div');  helpMessage.className = 'item-help-message';
     helpMessage.innerHTML = '<hr>';
-    if (shinyState > 1) {
-      helpMessage.innerHTML += '<b><span style="color:rgb(140, 130, 240);">Restricted to Pokemon that have shiny variants.</b><br><br></span>';
-    }
-    if (abilityState > 0) {
-      helpMessage.innerHTML += '<b><span style="color:rgb(140, 130, 240);">Abilities are restricted to only ' + (abilityState == 1 ? 'Main' : (abilityState == 2 ? 'Hidden' : 'Passive'))+ ' Abilities.</b><br><br></span>';
-    }
+    if (shinyState > 1) helpMessage.innerHTML += '<b><span style="color:rgb(140, 130, 240);">Restricted to Pokemon that have shiny variants.</b><br><br></span>';
+    if (abilityState > 0) helpMessage.innerHTML += '<b><span style="color:rgb(140, 130, 240);">Abilities are restricted to only ' + (abilityState == 1 ? 'Main' : (abilityState == 2 ? 'Hidden' : 'Passive'))+ ' Abilities.</b><br><br></span>';
     if (suggestions.innerHTML === '') { // No suggestions
       if (lockedFilters.length == 0) { // No locked filters
-        helpMessage.innerHTML += '<b>There are no Pokemon or filters that match the search term' + (shinyState > 1 ? ' and have shiny variants.</b>' : '.</b><br>Please check your spelling and try again.');
+        helpMessage.innerHTML += '<b>There are no Pokemon or filters' + (isMobile ? '<br>' : ' ') + 'that match the search term' + (shinyState > 1 ? ' and have shiny variants.</b>' : '.</b><br>Please check your spelling and try again.');
       } else {
         if (query === '') {
           helpMessage.innerHTML += '<b>There are no Pokemon that match the filters.</b><br>Remove filters, or change the connections to "OR".';
@@ -205,70 +199,86 @@ function refreshAllItems() {
 function renderMoreItems() {
   // console.log('Rendering more items');
   renderLimit += increment;
-  let slicedItems = filteredItems.slice(renderLimit-increment,renderLimit)
-  slicedItems.forEach((item, index) => { // Generate each list item dynamically
+  let slicedItemIDs = filteredItemIDs.slice(renderLimit-increment,renderLimit)
+  slicedItemIDs.forEach((thisID, index) => { // Generate each list item dynamically
     const li = document.createElement('li'); // Entry of one Pokemon
+    const item = items[thisID]; // Grab the actual item from its ID
     // Create each column and set its text
     
     // Show image of the pokemon
-    const pokeImg = document.createElement('img');  pokeImg.className = 'item-image';  pokeImg.stars = [];
-    pokeImg.shinyOverride = shinyState;  pokeImg.femOverride = lockedFilters.some((f) => f == fidThreshold[4]);
+    const pokeImg = document.createElement('img');  pokeImg.className = 'item-image';  
+    pokeImg.stars = []; // Keep a list of stars that can change the pokemon image
+    pokeImg.shinyOverride = (items[thisID].sh >= shinyState ? shinyState : (shinyState > 0)*1);  
+    pokeImg.femOverride = (items[thisID].fe ? lockedFilters.some((f) => f == fidThreshold[4]) : 0);
     pokeImg.src = `images/${item.img}_${pokeImg.shinyOverride}${(pokeImg.femOverride ? 'f' : '')}.png`; 
     
     // Create the dex column, with stars and pin only on desktop
     const dexColumn = document.createElement('div');  dexColumn.className = 'item-column';
     const starColumn = document.createElement('div'); starColumn.className = 'item-column';
     const pinColumn = document.createElement('div');  pinColumn.className = 'item-column';
-    const pinImg = document.createElement('img');     pinImg.className = 'pin-img';   pinImg.src = 'ui/pin.png';
-    const femImg = document.createElement('img');     femImg.className = 'pin-img';   femImg.src = `ui/fem${(pokeImg.femOverride ? 'on' : 'off')}.png`;
+    const pinImg = document.createElement('img');     pinImg.className = 'pin-img';   
+    const femImg = document.createElement('img');     femImg.className = 'pin-img';   
+    pinImg.src = `ui/pin${pinnedRows.includes(thisID)?'on':'off'}.png`; femImg.src = `ui/fem${(pokeImg.femOverride?'on':'off')}.png`;
+    pinImg.addEventListener('mouseover', () => {pinImg.src = `ui/pinhover.png`;});
+    pinImg.addEventListener('mouseout',  () => {pinImg.src = `ui/pin${(pinnedRows.includes(thisID) ? 'on' : 'off')}.png`;});
+    pinImg.addEventListener('click', () => { // Add click event to the pin button
+      if (pinnedRows.includes(thisID)) { // Remove this pokemon from the pins
+        pinnedRows = pinnedRows.filter((thisPin) => (thisPin != thisID));
+        pinImg.src = 'ui/pinoff.png';
+      } else { // Add this pokemon to the pins
+        pinnedRows.push(thisID);
+        pinImg.src = 'ui/pinon.png';
+      }
+    });
     if (item.fe == 1) {
+      femImg.addEventListener('mouseover', () => {femImg.src = `ui/femon.png`;});
+      femImg.addEventListener('mouseout',  () => {femImg.src = `ui/fem${(pokeImg.femOverride ? 'on' : 'off')}.png`;});
       femImg.addEventListener('click', () => { // Add click event to the fem button
         pokeImg.femOverride = 1-pokeImg.femOverride; // Flip the fem state
         pokeImg.src = `images/${item.img}_${pokeImg.shinyOverride}${(pokeImg.femOverride ? 'f' : '')}.png`; 
         femImg.src = `ui/fem${(pokeImg.femOverride ? 'on' : 'off')}.png`;
       });
-      femImg.addEventListener('mouseover', () => {femImg.src = `ui/femon.png`;});
-      femImg.addEventListener('mouseout',  () => {femImg.src = `ui/fem${(pokeImg.femOverride ? 'on' : 'off')}.png`;});
     }
     for (let i = 1; i < 4; i++) { // Create up to 3 shiny stars
       if (item.sh >= i) {
         const starImg = document.createElement('img'); starImg.className = 'star-img';
-        starImg.src = `ui/shiny${i}${(shinyState==i ? '' : 'g')}.png`;
+        starImg.src = `ui/shiny${i}${(pokeImg.shinyOverride==i ? '' : 'g')}.png`;
+        starImg.addEventListener('mouseover', () => {starImg.src = `ui/shiny${i}.png`;});
+        starImg.addEventListener('mouseout',  () => {starImg.src = `ui/shiny${i}${(pokeImg.shinyOverride==i ? '' : 'g')}.png`;});
         starImg.addEventListener('click', () => { // Add click events to all the stars, changing the poke image
           pokeImg.stars.forEach((thisStar) => thisStar.src = 'ui/shiny1g.png');
           pokeImg.shinyOverride = (pokeImg.shinyOverride==i ? 0 : i);
           pokeImg.src = `images/${item.img}_${pokeImg.shinyOverride}${(pokeImg.femOverride ? 'f' : '')}.png`;  
           starImg.src = `ui/shiny${i}${(pokeImg.shinyOverride==i ? '' : 'g')}.png`;
         });
-        starImg.addEventListener('mouseover', () => {starImg.src = `ui/shiny${i}.png`;});
-        starImg.addEventListener('mouseout',  () => {starImg.src = `ui/shiny${i}${(pokeImg.shinyOverride==i ? '' : 'g')}.png`;});
         pokeImg.stars.push(starImg);
       }
     }
     if (isMobile) { // Append to three different columns on mobile
       pinColumn.appendChild(pinImg);
-      dexColumn.innerHTML = '<b><a href="https://wiki.pokerogue.net/pokedex:' + item.dex + '" target="_blank">#' + item.dex + '</a></b><br>';
+      dexColumn.innerHTML = '<a href="https://wiki.pokerogue.net/pokedex:' + item.dex + '" target="_blank">#' + item.dex + '</a><br>';
       pokeImg.stars.forEach((thisStar) => starColumn.appendChild(thisStar));
       if (item.fe == 1) {
         femImg.className = 'star-img';
         starColumn.appendChild(femImg);
       }
     } else { // Append all to the dex column on desktop
-      dexColumn.appendChild(item.fe == 1 ? femImg : pinImg);
+      dexColumn.appendChild(pinImg);
+      if (item.fe == 1) {dexColumn.appendChild(femImg);}
       const dexText = document.createElement('div');
-      dexText.innerHTML = '<b><a href="https://wiki.pokerogue.net/pokedex:' + item.dex + '" target="_blank">#' + item.dex + '</a></b><br>';
+      dexText.innerHTML = '<a href="https://wiki.pokerogue.net/pokedex:' + item.dex + '" target="_blank">#' + item.dex + '</a><br>';
       dexColumn.appendChild(dexText);
       pokeImg.stars.forEach((thisStar) => dexColumn.appendChild(thisStar));
     }
     
     const specColumn = document.createElement('div'); // Show species name
     specColumn.className = 'item-column';
-    specColumn.innerHTML = '<b>' + speciesNames[item.row] + '</b>';
+    specColumn.innerHTML = speciesNames[item.row];
     
     const typeColumn = document.createElement('div'); // Show both types
     typeColumn.className = 'item-column';
-    typeColumn.innerHTML = '<p style="color:' + typeColors[item.t1] + '; margin: 0; font-weight: bold;">' + fidToName[item.t1] + '</p>';
-    if ('t2' in item) { typeColumn.innerHTML += '<p style="color:' + typeColors[item.t2] + '; margin: 0; font-weight: bold;">'    + fidToName[item.t2] + '</p>'; } 
+    typeColumn.innerHTML = '<p style="color:' + typeColors[item.t1] + '; margin: 0;">' + fidToName[item.t1] + '</p>';
+    if ('t2' in item) { typeColumn.innerHTML += '<p style="color:' + typeColors[item.t2] + '; margin: 0;">' + fidToName[item.t2] + '</p>'; } 
     
     // Show all four abilities
     const abilityColumn = document.createElement('div'); abilityColumn.className = 'item-column';
@@ -288,7 +298,7 @@ function renderMoreItems() {
       if (thisMove in item && numMovesShown < 2) { 
         numMovesShown += 1;
         let source = item[thisMove];
-        if (source == -1) {sourceText = '<span style="color:rgb(240, 173, 131);">Memory';}
+        if (source == -1) {sourceText = '<span style="color:rgb(251, 173, 124);">Memory';}
         else if (source == 0) {sourceText = '<span style="color:rgb(131, 182, 239);">Evolution';}
         else if (source == 201) {sourceText = '<span style="color:rgb(255, 255, 255);">Egg Move';}
         else if (source == 202) {sourceText = '<span style="color:rgb(240, 230, 140);">Rare Egg Move';}
@@ -318,22 +328,22 @@ function renderMoreItems() {
 
     const costColumn = document.createElement('div'); // Show the cost, colored by the egg tier
           costColumn.className = 'item-column'; costColor = eggTierColors(item.et);
-          costColumn.innerHTML = `<b>Cost<br><span style="color:${costColor};">${item.co}</span></b>`;  
+          costColumn.innerHTML = `Cost<br><span style="color:${costColor};">${item.co}</span>`;  
     let flipped = lockedFilters.includes(fidThreshold[5]);                
     const bstColumn = document.createElement('div');  bstColumn.className = 'item-column'; // Create the stats columns
-           bstColumn.innerHTML = '<b>BST<br>' + item.bst +'</b>';
+           bstColumn.innerHTML = 'BST<br>' + item.bst +'';
     const hpColumn = document.createElement('div');   hpColumn.className = 'item-column';  
-          hpColumn.innerHTML  = '<b>HP<br>'  + (flipped ? item.spe : item.hp)  +'</b>';
+          hpColumn.innerHTML  = 'HP<br>'  + (flipped ? item.spe : item.hp)  +'';
     const atkColumn = document.createElement('div');  atkColumn.className = 'item-column'; 
-          atkColumn.innerHTML = '<b>Atk<br>' + (flipped ? item.spd : item.atk) +'</b>';    
+          atkColumn.innerHTML = 'Atk<br>' + (flipped ? item.spd : item.atk) +'';    
     const defColumn = document.createElement('div');  defColumn.className = 'item-column'; 
-          defColumn.innerHTML = '<b>Def<br>' + (flipped ? item.spa : item.def) +'</b>';    
+          defColumn.innerHTML = 'Def<br>' + (flipped ? item.spa : item.def) +'';    
     const spaColumn = document.createElement('div');  spaColumn.className = 'item-column'; 
-          spaColumn.innerHTML = '<b>SpA<br>' + (flipped ? item.def : item.spa) +'</b>';    
+          spaColumn.innerHTML = 'SpA<br>' + (flipped ? item.def : item.spa) +'';    
     const spdColumn = document.createElement('div');  spdColumn.className = 'item-column'; 
-          spdColumn.innerHTML = '<b>SpD<br>' + (flipped ? item.atk : item.spd) +'</b>';    
+          spdColumn.innerHTML = 'SpD<br>' + (flipped ? item.atk : item.spd) +'';    
     const speColumn = document.createElement('div');  speColumn.className = 'item-column'; 
-          speColumn.innerHTML = '<b>Spe<br>' + (flipped ? item.hp : item.spe)  +'</b>';
+          speColumn.innerHTML = 'Spe<br>' + (flipped ? item.hp : item.spe)  +'';
 
     const row1 = document.createElement('div'); row1.className = 'row'; let row2 = row1;
     if (isMobile) {
@@ -365,6 +375,9 @@ function showMoveSplash(fid) {
   splashContent.innerHTML = `<b>${fidToName[fid]}</b><hr>`; // Name header
   if (fid<fidThreshold[1]) { // For abilities
     splashContent.innerHTML = `<b>${fidToName[fid]}</b><hr>${thisDesc[0]}`;
+    if (thisDesc[1]) { // If there is a custom description
+      splashContent.innerHTML += `<p style="color:rgb(145, 145, 145); margin:0px; margin-top:8px;">${thisDesc[1]}</p>`;
+    }
   } else { // For moves
     const splashMoveRow = document.createElement('div');  splashMoveRow.className = 'splash-move-row';
     const splashMoveCol1 = document.createElement('div');
@@ -378,7 +391,7 @@ function showMoveSplash(fid) {
     splashContent.appendChild(splashMoveRow);
     splashContent.innerHTML += `<hr>${thisDesc[0]}`; // Show move description
     if (thisDesc[1]) { // If there is a custom description
-      splashContent.innerHTML += `<p style="color:rgb(145, 145, 145); margin:0px; margin-top:8px;"> ${thisDesc[1]}</p>`;
+      splashContent.innerHTML += `<p style="color:rgb(145, 145, 145); margin:0px; margin-top:8px;">${thisDesc[1]}</p>`;
     }
     // Add all tags for priority, targets, procs, contact, other
     if (thisDesc[7] || thisDesc[8] || thisDesc[9]) {
@@ -389,7 +402,7 @@ function showMoveSplash(fid) {
         {splashMoveTags.innerHTML += `<p style="color:rgb(239, 131, 131);">Priority: ${thisDesc[7]}</p>`;};
       }
       if (thisDesc[9].includes(20)) {splashMoveTags.innerHTML += '<p style="color:rgb(216, 143, 205);">Targets: Random Enemy</p>';};
-      if (thisDesc[9].includes(21)) {splashMoveTags.innerHTML += '<p style="color:rgb(240, 173, 131);">Targets: All Enemies</p>';};
+      if (thisDesc[9].includes(21)) {splashMoveTags.innerHTML += '<p style="color:rgb(251, 173, 124);">Targets: All Enemies</p>';};
       if (thisDesc[9].includes(22)) {splashMoveTags.innerHTML += '<p style="color:rgb(239, 131, 131);">Targets: Entire Field</p>';};
       thisDesc[8].forEach((thisProc) => {
         const procChance = ((thisProc[0] == '-1') ? '' : `${thisProc[0]}% `);
@@ -466,7 +479,8 @@ function fidToCategory(fid) {
   if (fid < fidThreshold[4]) { return 'Cost'; }
   if (fid < fidThreshold[5]) { return 'Gender'; }
   if (fid < fidThreshold[6]) { return 'Mode'; }
-  else { return 'Egg Tier'; }
+  if (fid < fidThreshold[7]) { return 'Egg Tier'; }
+  else { return 'Related To'; }
 }
 function fidToColor(fid) {
   if (fid < fidThreshold[0]) { return ['rgb(255, 255, 255)', typeColors[fid]]; }
@@ -476,7 +490,8 @@ function fidToColor(fid) {
   if (fid < fidThreshold[4]) { return ['rgb(240, 230, 140)', 'rgb(255, 255, 255)']; }
   if (fid < fidThreshold[5]) { return ['rgb(216, 143, 205)', 'rgb(255, 255, 255)']; }
   if (fid < fidThreshold[6]) { return ['rgb(255, 255, 255)', 'rgb(239, 131, 131)']; }
-  else { return ['rgb(255, 255, 255)', eggTierColors(fid)]; }
+  if (fid < fidThreshold[7]) { return ['rgb(255, 255, 255)',    eggTierColors(fid) ]; }
+  else { return ['rgb(255, 255, 255)', 'rgb(140, 130, 240)']; }
 }
 function abToColor(name) {
   if (name == 'a1') { return (abilityState==0||abilityState==1 ? 'rgb(255, 255, 255)' : 'rgb(145,145,145)') }
@@ -503,20 +518,24 @@ function displaySuggestions() { // Get search query and clear the list
       let searchableName = fidToName[fid]; // Search via category for later categories
       if (fid >= fidThreshold[2]) { searchableName = `${fidToCategory(fid)}${fidToName[fid]}`; }
       // Contains the search query and is not already locked
-      return searchableName.toLowerCase().replace(/\s+/g, '').includes(query) 
-          && !lockedFilters.some((f) => f == fid);
+      if (fid < fidThreshold[7]) {
+        return searchableName.toLowerCase().replace(/\s+/g, '').includes(query) 
+            && !lockedFilters.some((f) => f == fid);
+      } else { // For family filters
+        return offerFamilies.some((thisFam) => speciesNames[thisFam] === fidToName[fid])
+      }
   });
-  // Erase the list of suggestions if it is too large 
-  if (matchingFID.length > 20) { matchingFID = []; } 
+   
+  if (matchingFID.length > 20) matchingFID = []; // Erase the list of suggestions if it is too large
   
-  // (If there are no locked filters, the list is already presorted)
   if (lockedFilters.length > 0) { // If there is at least one locked filter, re-sort the list
-  // Count how many hits each suggestion has
+    // (If there are no locked filters, the list is already presorted)
+    // Count how many hits each suggestion has
 
-  // Sort the list of suggestions based on hits in the item list (but still by type/ability/move)
+    // Sort the list of suggestions based on hits in the item list (but still by type/ability/move)
 
-  // Remove suggestions that have no matches?
-  // Not implemented yet...
+    // Remove suggestions that have no matches?
+    // Not implemented yet...
   }
 
   // Highlight a suggestion if tab is hit
@@ -527,7 +546,7 @@ function displaySuggestions() { // Get search query and clear the list
   matchingFID.forEach((fid) => { // Create the suggestion tag elements
     let newSugg = document.createElement('div');  newSugg.className = 'suggestion';
     newSugg.innerHTML = `<span style="color:${fidToColor(fid)[0]};">${fidToCategory(fid)}: 
-                         <span style="color:${fidToColor(fid)[1]};">${fidToName[fid]}</span></span>`;  
+                         <span style="color:${fidToColor(fid)[1]};">${fidToName[fid]}</span></span>`;
     newSugg.addEventListener("click", () => lockFilter(fid))
     if (filterToEnter == fid && tabSelect != -1) {newSugg.style.borderColor = 'rgb(140, 130, 240)';}
     suggestions.appendChild(newSugg);
@@ -548,12 +567,13 @@ function lockFilter(newLockFID) {
     }
     const filterTag = document.createElement("span"); filterTag.className = "filter-tag";
     const img = document.createElement('img');        img.src = 'ui/lock.png';    filterTag.appendChild(img);
-    filterTag.innerHTML = filterTag.innerHTML + `${fidToCategory(newLockFID)}: ${fidToName[newLockFID]}`;
+    filterTag.innerHTML += `${fidToCategory(newLockFID)}: ${fidToName[newLockFID]}`;
     filterTag.addEventListener("click", () => removeFilter(newLockFID, filterTag, filterMod));
     filterContainer.appendChild(filterTag);
+    // Clear the search bar after locking, except with family filter
+    searchBox.value = ""; 
     // Refresh suggestions and items
-    searchBox.value = ""; // Clear the search bar after locking
-    updateFilterGroups();   displaySuggestions();   refreshAllItems();
+    updateFilterGroups();   refreshAllItems();   displaySuggestions();
     if (fidToCategory(newLockFID) === 'Move' && sortState.column === 'row') {
       updateHeader(headerColumns[5]);
     } else {
@@ -575,7 +595,7 @@ function removeFilter(fidToRemove, filterTag, filterModToRemove) {
   lockedFilterMods = lockedFilterMods.filter( (f) => f != filterModToRemove ); // Remove from the mod list
   if (filterModToRemove) {filterModToRemove.remove();} // Remove the actual mod element
   // Refresh suggestions and items
-  updateFilterGroups();   displaySuggestions();   refreshAllItems();
+  updateFilterGroups();   refreshAllItems();   displaySuggestions();
   // Reset the sorting if there aren't any more locked moves
   if (sortState.column === 'moves' && !lockedFilters.some((f) => fidToCategory(f) == 'Move')) { 
     updateHeader(headerColumns[0]); 
@@ -608,8 +628,8 @@ function toggleOR(filterMod) { // Click a filter to toggle it between AND and OR
   filterMod.toggleOR = 1 - filterMod.toggleOR;
   filterMod.innerHTML = (filterMod.toggleOR ? 'OR' : '&');
   updateFilterGroups();
-  displaySuggestions();
   refreshAllItems();
+  displaySuggestions();
 }
 
 // Event function for the header row - Clicking on the header row to sort ***************
@@ -667,8 +687,8 @@ function updateHeader(clickTarget = null, ignoreFlip = false) {
     }
   }
   // Update the display
-  displaySuggestions();
   refreshAllItems();
+  displaySuggestions();
 }
 
 function adjustLayout(headerTarget = null, forceAdjust = false) {
@@ -752,10 +772,9 @@ window.addEventListener("resize", () => {
 });
 searchBox.addEventListener('input', (event) => { // Typing in search box ***************
   tabSelect = -1;
-  showFamily = 1;
   // for (let index = 0; index < 50; index++) { // Slow down the performance for benchmarking
-    displaySuggestions();
-    refreshAllItems();
+  refreshAllItems();
+  displaySuggestions();
   // }
 });
 document.addEventListener('keydown', (event) => { 
@@ -764,13 +783,8 @@ document.addEventListener('keydown', (event) => {
     splashScreen.classList.remove("show");
     searchBox.focus(); // Focus the search box on any key press
   }
-  if (event.key == "Enter") {
-    showFamily = 0;
-    if (filterToEnter) {
-      lockFilter(filterToEnter); // Hit 'Enter' to lock the first filter
-    } else {
-      refreshAllItems(); // Refresh without family shown
-    }
+  if (event.key == "Enter" && filterToEnter) {
+    lockFilter(filterToEnter); // Hit 'Enter' to lock the first filter
   }
   if (event.key == "PageDown" || event.key == "PageUp") {
     // for (let index = 0; index < 50; index++) { // Slow down the performance for benchmarking
@@ -783,8 +797,8 @@ document.addEventListener('keydown', (event) => {
       splashScreen.classList.remove("show");
     } else if (searchBox.value.length > 0) { // If there is text in the search box
       searchBox.value = ''
-      displaySuggestions();
       refreshAllItems();
+      displaySuggestions();
     } else if (lockedFilters.length > 0) { // If there is a locked filter
       const lastFilter = lockedFilters[lockedFilters.length - 1];
       const filterTags = document.querySelectorAll(".filter-tag");
