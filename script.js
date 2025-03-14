@@ -1,6 +1,7 @@
 // script.js
 // Imports: items, fidThreshold, fidToName, fidToDesc, typeColors
-// Lang: headerNames, warningText, menuText, tagDesc, fidToCategory, procToDesc, fidToDesc, speciesNames, fidToName, fidToSearch
+// Lang: headerNames, warningText, menuText, tagDesc, fidToCategory, 
+//       procToDesc, fidToDesc, speciesNames, fidToName, fidToSearch
 const itemList = document.getElementById('itemList');
 const searchBox = document.getElementById('searchBox');
 const pageTitle = document.getElementById('page-title');
