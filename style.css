@@ -167,50 +167,51 @@ h1 > div:nth-child(2){
   #header-container {
     align-items: center;
     justify-content: space-between;
-    padding: 10px;
+    padding: 5px;
+    padding-top: 10px;
+    padding-bottom: 10px;
     border: 1px solid #ffffff;
     border-radius: 4px;
-    min-width: 978px;
-    max-width: 978px;
+    min-width: 988px;
+    max-width: 988px;
     height: 36px;
     font-weight: bold;
     background-color: #151019;
   }
   .header-row {
     display: grid;
-    align-items: center;
-    text-align: center;
-    gap: 10px;
+    gap: 0px;
     height: 36px;
-    cursor: pointer;
     /* outline: 1px solid red; */
   }
   .header-row:first-child {
-    grid-template-columns: 45px 87px 2fr 64px 2.5fr 2.5fr 0.7fr repeat(7, 0.5fr);
+    grid-template-columns: 50px 107px 120px 79px 2.5fr 2.5fr 0.8fr repeat(7, 0.65fr);
   }
   #itemList li {
     align-items: center;
     justify-content: space-between;
-    padding: 10px;
-    padding-top: 5px;
-    padding-bottom: 5px;
+    padding: 5px;
     border: 1px solid #ffffff;
     margin-bottom: 5px;
     border-radius: 4px;
     background-color: #151019;
     max-height: 82px;
-    min-width: 978px;
-    max-width: 978px;
+    min-width: 988px;
+    max-width: 988px;
   }
   .row {
     display: grid;
     align-items: center;
     text-align: center;
-    gap: 10px;
+    gap: 0px;
     /* outline: 1px solid red; */
   }
   .row:first-child {
-    grid-template-columns: 45px 87px 2fr 64px 2.5fr 2.5fr 0.7fr repeat(7, 0.5fr);
+    grid-template-columns: 50px 107px 120px 79px 2.5fr 2.5fr 0.8fr repeat(7, 0.65fr);
+  }
+  .item-image {
+    margin-left: 0px;
+    margin-right: 0px;
   }
   .pin-img {
     margin: 0px;
@@ -266,18 +267,17 @@ h1 > div:nth-child(2){
     display: grid;
     align-items: center;
     text-align: center;
-    gap: 5px;
+    gap: 0px;
     width: 100%;
     height: 36px;
     cursor: pointer;
     /* outline: 1px solid red; */
   }
   .header-row:first-child {
-    gap: 0px;
     grid-template-columns: 50px 60px 1.18fr 1.1fr 1.4fr;
   }
   .header-row:last-child {
-    grid-template-columns: 64px 43px repeat(7, 0.5fr);
+    grid-template-columns: 69px 48px repeat(7, 0.5fr);
   }
   #itemList li {
     align-items: center; /* Center items vertically */
@@ -292,7 +292,7 @@ h1 > div:nth-child(2){
     max-height: 168px;
   }
   .row {
-    align-items: center; /* Center items vertically */
+    align-items: center;
     text-align: center;
     display: grid;
     gap: 0px;
@@ -302,7 +302,6 @@ h1 > div:nth-child(2){
     grid-template-columns: 50px 60px 1fr 16px;
     margin-bottom: 9px;
     max-height: 18px;
-    /* background-color: #201925;   */
   }
   .row:nth-child(2) {
     grid-template-columns: 0.5fr 2fr 2fr;
@@ -310,9 +309,12 @@ h1 > div:nth-child(2){
     max-height: 72px;
   }
   .row:last-child {
-    grid-template-columns: 64px 43px repeat(7, 0.5fr);
+    grid-template-columns: 69px 48px repeat(7, 0.5fr);
     max-height: 36px;
-    gap: 5px; /* Spacing between columns */
+  }
+  .item-image {
+    margin-left: -10px;
+    margin-right: -15px;
   }
   .pin-img {
     margin: 0px;
@@ -344,13 +346,14 @@ h1 > div:nth-child(2){
   padding: 0 0px;
   min-height: 36px;
   line-height: 1.125;
+  cursor: pointer;
   /* outline: 1px solid red; */
 }
 .item-column {
   align-items: center;
   text-align: center;
   font-weight: bold;
-  padding: 0 0px;
+  /* padding: 0 0px; */
   /* outline: 1px solid red; */
 }
 #itemList li:nth-child(odd) {
@@ -371,11 +374,8 @@ h1 > div:nth-child(2){
 .item-image {
   width: 117px; 
   height: 82px; 
-  margin-right: -15px;
-  margin-left: -10px;
   margin-top: -5px;
   margin-bottom: -5px;
-  border-radius: 4px; 
   object-fit:none;
   /* outline: 1px solid red; */
 }

@@ -645,7 +645,7 @@ function updateHeader(clickTarget = null, ignoreFlip = false) {
     headerColumns[5].textDef = '<span style="color:rgb(140, 130, 240);">' 
                              + (isMobile ? 'Moves' : 'Filtered Moves') + '</span>';
   } else {
-    headerColumns[5].textDef = (isMobile ? 'Egg Moves' : 'Egg Moves');
+    headerColumns[5].textDef = headerNames[5];
   }
   if (sortAttribute == 'shiny') { // Toggle the global shiny state
     shinyState = (shinyState == 0 ? 3 : shinyState-1);
@@ -685,7 +685,7 @@ function updateHeader(clickTarget = null, ignoreFlip = false) {
         }
       }
       sortState.target = clickTarget; // Draw arrow on new target
-      clickTarget.innerHTML = clickTarget.textDef + '<br><span style="color:rgb(140, 130, 240); font-family: serif;">' + (sortState.ascending ? "&#9650;" : "&#9660;") + '</span>';
+      clickTarget.innerHTML = clickTarget.textDef + '<span style="color:rgb(140, 130, 240); font-family: serif;">' + (sortState.ascending ? "&#9650;" : "&#9660;") + '</span>';
     }
   }
   // Update the display
