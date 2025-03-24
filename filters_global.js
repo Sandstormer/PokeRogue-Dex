@@ -27,6 +27,7 @@ const fidThreshold = [
 1174,
 1175,
 1180,
+1595,
 ];
 const fidToProc = [
 [12,0,40,100,35,0,[],[4]],

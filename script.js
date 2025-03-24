@@ -1,7 +1,12 @@
 // script.js
-// Imports: items, fidThreshold, fidToName, fidToDesc, typeColors
-// Lang: headerNames, warningText, menuText, tagDesc, catToName, 
-//       procToDesc, fidToDesc, speciesNames, fidToName
+// pokedex_data.js: items
+// filters_global.js: typeColors, fidThreshold, fidToProc
+// lang/en.js: headerNames, altText, catToName, fidToDesc, speciesNames, fidToName, helpMenuText
+  // headerNames = ['Dex','Shiny','Species','Types','Abilities','Egg Moves','Cost','BST','HP','Atk','Def','SpA','SpD','Spe'];
+  // altText = ['Moves','(Main Only)','(Hidden Only)','(Passive Only)','Search','Pow','Acc','PP'];
+  // catToName = ['Type','Ability','Move','Generation','Cost','Gender','Mode','Egg Tier'];
+// TBD: procToDesc, warningText, menuText, tagDesc
+    
 const itemList = document.getElementById('itemList');
 const searchBox = document.getElementById('searchBox');
 const pageTitle = document.getElementById('page-title');
@@ -11,7 +16,13 @@ const filterContainer = document.getElementById("filter-container");
 const suggestions = document.getElementById("suggestions");
 const splashScreen = document.getElementById("splashScreen");
 const splashContent = document.getElementById("splashContent");
-const openMenuButton = document.getElementById("menu-img");
+const openHelpButton = document.getElementById("help-img");
+const openLangButton = document.getElementById("lang-img");
+const sortAttributes = ['row','shiny','sp','type','ab','moves','co','bst','hp','atk','def','spa','spd','spe'];
+const possibleFID = [...Array(fidThreshold[fidThreshold.length-1]).keys()];
+const possibleSID = [...Array(items.length).keys()];
+const supportedLangs = ["en","fr","ko"];//"it","es-ES","pt-BR","de","zh-CN","ja"];
+const LanguageNames  = ["English","Français","한국어 (Hangugeo)"];//"Italiano","Español (España)","Português (Brasil)","Deutsch","简体中文 (Jiǎntǐ Zhōngwén)","日本語 (Nihongo)"];
 let increment = 10;     // Number of items to load at a time
 let renderLimit = 0;    // Start with no items
 let showMoveLearn = []; // Filtered moves to show sources
@@ -26,38 +37,64 @@ let filteredItemIDs = null; // List of all displayed row numbers
 let shinyState = 0;   // Global state of shiny   (0,1,2,3)
 let abilityState = 0; // Global state of ability (0,1,2,3)
 let sortState = { column: null, ascending: true, target: null }; // Track the current sort state
-let offerFamilies = [];
 
-// Import language files
+procToDesc = [
+  "User Atk","User Def","User SpAtk","User SpDef","User Speed","User Accuracy","User Evasion",
+  "Atk","Def","SpAtk","SpDef","Speed","Accuracy","Evasion",
+  "Applies Poison","Applies Toxic","Applies Sleep","Applies Freeze","Applies Paralysis","Applies Burn","Applies Confuse",
+  "Flinch","User Atk/Def/SpA/SpD/Spe","Poison/Para/Sleep","Burn/Para/Freeze"];
+  
+// Perform initial display with detected language
+let pageLang = detectLanguage();
+console.log(pageLang);
+loadAndApplyLanguage(pageLang);
 
-const catToName = ['Type','Ability','Move','Generation','Cost','Gender','Mode','Egg Tier'];
-const headerNames = ['Dex', 'Shiny', 'Species', 'Types', 'Abilities', 'Egg Moves', 'Cost', 'BST', 'HP', 'Atk', 'Def', 'SpA', 'SpD', 'Spe'];
+function detectLanguage() { // Try to load the language from local storage or browser
+  const langFromStorage = localStorage.getItem("preferredLang");
+  if (langFromStorage && supportedLangs.includes(langFromStorage)) return langFromStorage 
+  if (navigator.language) { // Detect language from browser
+    const lang = navigator.language; const langOpt = [lang, lang.slice(0,5), lang.slice(0,2), lang.split('-')[0]];
+    langOpt.forEach((thisLang) => { if (supportedLangs.includes(thisLang)) return thisLang });
+  }
+  return "en"; // Use English if no other language can be found
+}
+function loadAndApplyLanguage(lang) {
+  pageLang = lang; // Remember the current language
+  
+  const oldScript = document.querySelector(`script[src^="lang/"]`);
+  if (oldScript) oldScript.remove(); // Remove existing script if it exists
 
-// Initialize some arrays
-const fidToSearch = fidToName.map(str => str.toLowerCase().replace(/\s+/g,''));
-const possibleFID = [...Array(fidThreshold[fidThreshold.length-1]).keys()];
-const possibleSID = [...Array(items.length).keys()];
-
-// Set up the header columns
-let headerColumns = [];
-const sortAttributes = ['row', 'shiny', 'sp', 't1', 'ab', 'moves', 'co', 'bst', 'hp', 'atk', 'def', 'spa', 'spd', 'spe'];
-headerNames.forEach((thisHeaderName, index) => {
-  const newColumn = document.createElement('div');
-  newColumn.innerHTML = thisHeaderName;  newColumn.textDef = thisHeaderName;
-  newColumn.className = 'header-column'; newColumn.sortattr = sortAttributes[index];
-  newColumn.addEventListener('click', () => updateHeader(newColumn) );
-  headerColumns.push(newColumn); // Push the column element into the array
-});
-openMenuButton.addEventListener('mouseover', () => openMenuButton.src = `ui/menu${(isMobile?18:30)}h.png`);
-openMenuButton.addEventListener('mouseout',  () => openMenuButton.src = `ui/menu${(isMobile?18:30)}.png` );       
-
-// Perform initial display of items, and initial sort by row number
-adjustLayout(headerColumns[0],true);
-searchBox.focus();
+  // Import the language file
+  const script = document.createElement("script"); script.src = `lang/${lang}.js`;
+  script.onload = () => {
+    console.log(`${lang}.js loaded successfully`);
+    
+    // Initialize some arrays
+    fidToSearch = fidToName.map(str => str.toLowerCase().replace(/[.’'\s-]/g,''));
+    searchBox.placeholder = `${altText[4]} ${headerNames[2]} / ${headerNames[3]} / ${headerNames[4]} / ${altText[0]} ...`;
+    
+    // Set up the header columns
+    headerColumns = [];
+    headerNames.forEach((thisHeaderName, index) => {
+      const newColumn = document.createElement('div');
+      newColumn.innerHTML = thisHeaderName;  newColumn.textDef = thisHeaderName;
+      newColumn.className = 'header-column'; newColumn.sortattr = sortAttributes[index];
+      newColumn.addEventListener('click', () => updateHeader(newColumn));
+      headerColumns.push(newColumn); // Push the column element into the array
+    });      
+    
+    // Display items, and initial sort by row number
+    adjustLayout(headerColumns[0],true);
+    // searchBox.focus();
+  }
+  script.onerror = (e) => console.warn(`Failed to load ${lang}.js`, e);
+  document.head.appendChild(script);
+  console.log(`Attempting to load: ${script.src}`);
+}
 
 function refreshAllItems() { // Display items based on query and locked filters **************************
   // console.log('Refreshing all items');
-  const query = searchBox.value.toLowerCase().replace(/[.'-\s]/g,'');
+  const query = searchBox.value.toLowerCase().replace(/[.’'\s-]/g,'');
 
   // itemList.innerHTML = ""; // Clear existing items
   itemList.querySelectorAll('li').forEach(li => li.replaceWith(li.cloneNode(true))); // Clones without listeners
@@ -67,7 +104,7 @@ function refreshAllItems() { // Display items based on query and locked filters 
   // Filter from query ==============
   if (query.length > 0) {
     filteredItemIDs = filteredItemIDs.filter((thisID) => 
-      speciesNames[thisID].toLowerCase().replace(/\s+/g,'').includes(query) ||
+      speciesNames[thisID].toLowerCase().replace(/[.’'\s-]/g,'').includes(query) ||
       fidToSearch[items[thisID].t1]?.includes(query) ||
       fidToSearch[items[thisID].t2]?.includes(query) ||
       ([0,1].includes(abilityState) && fidToSearch[items[thisID].a1]?.includes(query)) ||
@@ -77,18 +114,18 @@ function refreshAllItems() { // Display items based on query and locked filters 
       items[thisID].dex.toString().includes(query)
   );}
   // Filter from headers ==============
-  if (abilityState == 2) filteredItemIDs = filteredItemIDs.filter(thisID => 'ha' in items[thisID])
+  if (abilityState == 2) filteredItemIDs = filteredItemIDs.filter(thisID => 'ha' in items[thisID]);
   // Only show items that have that tier of shiny
   if (shinyState > 1)    filteredItemIDs = filteredItemIDs.filter(thisID => items[thisID].sh >= shinyState);
   // Filter from locked filters ==============
   if (lockedFilters.length > 0) {
     filteredItemIDs = filteredItemIDs.filter(thisID => // Search for filters with their fid as key
-      lockedFilterGroups.every(thisGroup =>      // All groups, but some from each group
+      lockedFilterGroups.every(thisGroup => // Match at least one filter from each group
         thisGroup.some(thisLockedFID => {
           if (abilityState != 0 && thisLockedFID >= fidThreshold[0] && thisLockedFID < fidThreshold[1]) {
-            if (abilityState == 1)      { return items[thisID]?.[thisLockedFID] == 309 || items[thisID]?.[thisLockedFID] == 310 } 
-            else if (abilityState == 2) { return items[thisID]?.[thisLockedFID] == 311 }
-            else if (abilityState == 3) { return items[thisID]?.[thisLockedFID] == 312 }
+            if (abilityState == 1)      return items[thisID]?.[thisLockedFID] == 309 || items[thisID]?.[thisLockedFID] == 310
+            else if (abilityState == 2) return items[thisID]?.[thisLockedFID] == 311
+            else if (abilityState == 3) return items[thisID]?.[thisLockedFID] == 312
           }
           if (thisLockedFID  <  fidThreshold[2]) return thisLockedFID in items[thisID]; // Type/Ability/Move filters
           if (thisLockedFID  <  fidThreshold[3]) return items[thisID].ge === thisLockedFID - fidThreshold[2] + 1; // Gen filters
@@ -96,7 +133,7 @@ function refreshAllItems() { // Display items based on query and locked filters 
           if (thisLockedFID === fidThreshold[4]) return items[thisID].fe === 1; // Gender filter
           if (thisLockedFID === fidThreshold[5]) return true; // Flipped stat filter
           if (thisLockedFID  <  fidThreshold[7]) return items[thisID].et === thisLockedFID - fidThreshold[6]; // Egg tier filter
-          if (thisLockedFID  <  fidThreshold[8]) return fidToName[thisLockedFID] === speciesNames[items[thisID].sr]; // Family filter
+          if (thisLockedFID  <  fidThreshold[8]) return items[thisID]?.fa === thisLockedFID; // Family filter
           console.warn('Filter error');
           return thisLockedFID in items[thisID];
         }))) 
@@ -104,27 +141,10 @@ function refreshAllItems() { // Display items based on query and locked filters 
   // Add moves to track in the move column  ==============
   showMoveLearn = [];
   lockedFilters.forEach(thisLockedFID => {
-    if (fidToCategory(thisLockedFID) == "Move") showMoveLearn.push(thisLockedFID);
+    if (thisLockedFID >= fidThreshold[1] && thisLockedFID < fidThreshold[2]) showMoveLearn.push(thisLockedFID);
   });
   // Remove the pinned items for now ==============
   if (pinnedRows) filteredItemIDs = filteredItemIDs.filter((thisID) => !pinnedRows.includes(thisID));
-
-  // Show entire evolutionary line ==============
-  // offerFamilies = [];
-  // if (filteredItems.length < 10) {
-  //   filteredItems.forEach((ID) => { // Assemble the list of families
-  //     if (!offerFamilies.includes(items[ID].sr)) {offerFamilies.push(items[ID].sr);}
-  //   });
-  // }
-    // if (starterRows.length == 1) { // If there are less than 4 families
-    //   offerFamilies = starterRows[0];
-      // let allRelatives = items.filter((thisItem) => starterRows.includes(thisItem.sr) && !filteredItems.includes(thisItem));
-      // if (lockedFilters.includes(fidThreshold[8]-1)) {
-      //   filteredItems.push(...allRelatives); // Add relatives if filter is locked
-      // } else if (allRelatives.length > 0) { // Else show the suggestion
-      //   offerFamily = 1;
-      // }
-    // }
 
   // Sort items if a column is specified ==============
   if (sortState.column) {
@@ -136,7 +156,7 @@ function refreshAllItems() { // Display items based on query and locked filters 
           showMoveLearn.reduce((total, move) => total + (move in items[ID] ? items[ID][move] : 500), 0);
         aValue = getLearnLevel(a);
         bValue = getLearnLevel(b);
-      } else if (sortState.column == 't1') { // Sort by type combinations
+      } else if (sortState.column == 'type') { // Sort by type combinations
         const typeMult = (lockedFilters.some((fid) => fid < fidThreshold[0]) ? 2 : 36 );
         const aEntry = items[a]; const bEntry = items[b];
         aValue = (aEntry.t1+1)*(typeMult*!lockedFilters.includes(aEntry.t1));
@@ -197,7 +217,7 @@ function refreshAllItems() { // Display items based on query and locked filters 
       }
     }
   helpMessage.innerHTML += '<br><span style="color:rgb(145, 145, 145);">Click to see the instructions.</span><hr>'
-  helpMessage.addEventListener('click', () => openMenu());
+  helpMessage.addEventListener('click', () => openHelpMenu());
   itemList.appendChild(helpMessage)
   }
 }
@@ -206,7 +226,7 @@ function renderMoreItems() { // Create each list item, with rows and columns of 
   // console.log('Rendering more items');
   renderLimit += increment;
   let slicedItemIDs = filteredItemIDs.slice(renderLimit-increment,renderLimit)
-  slicedItemIDs.forEach((thisID, index) => { // Generate each list item dynamically
+  slicedItemIDs.forEach((thisID) => { // Generate each list item dynamically
     const li = document.createElement('li'); // Entry of one Pokemon
     const item = items[thisID]; // Grab the actual item from its ID
     
@@ -261,7 +281,7 @@ function renderMoreItems() { // Create each list item, with rows and columns of 
     }
     if (isMobile) { // Append to three different columns on mobile
       pinColumn.appendChild(pinImg);
-      dexColumn.innerHTML = '<a href="https://wiki.pokerogue.net/pokedex:' + item.dex + '" target="_blank">#' + item.dex + '</a><br>';
+      dexColumn.innerHTML = `<a href="https://wiki.pokerogue.net/pokedex:${item.dex}" target="_blank">#${item.dex}</a><br>`;
       pokeImg.stars.forEach((thisStar) => starColumn.appendChild(thisStar));
       if (item.fe == 1) {
         femImg.className = 'star-img';
@@ -269,9 +289,9 @@ function renderMoreItems() { // Create each list item, with rows and columns of 
       }
     } else { // Append all to the dex column on desktop
       dexColumn.appendChild(pinImg);
-      if (item.fe == 1) {dexColumn.appendChild(femImg);}
+      if (item.fe == 1) dexColumn.appendChild(femImg);
       const dexText = document.createElement('div');
-      dexText.innerHTML = '<a href="https://wiki.pokerogue.net/pokedex:' + item.dex + '" target="_blank">#' + item.dex + '</a><br>';
+      dexText.innerHTML = `<a href="https://wiki.pokerogue.net/pokedex:${item.dex}" target="_blank">#${item.dex}</a><br>`;
       dexColumn.appendChild(dexText);
       pokeImg.stars.forEach((thisStar) => dexColumn.appendChild(thisStar));
     }
@@ -282,8 +302,8 @@ function renderMoreItems() { // Create each list item, with rows and columns of 
     
     const typeColumn = document.createElement('div'); // Show both types
     typeColumn.className = 'item-column';
-    typeColumn.innerHTML = '<p style="color:' + typeColors[item.t1] + '; margin: 0;">' + fidToName[item.t1] + '</p>';
-    if ('t2' in item) { typeColumn.innerHTML += '<p style="color:' + typeColors[item.t2] + '; margin: 0;">' + fidToName[item.t2] + '</p>'; } 
+    typeColumn.innerHTML = `<p style="color:${typeColors[item.t1]}; margin: 0;">${fidToName[item.t1]}</p>`;
+    if ('t2' in item) typeColumn.innerHTML += `<p style="color:${typeColors[item.t2]}; margin: 0;">${fidToName[item.t2]}</p>`;
     
     // Show all four abilities
     const abilityColumn = document.createElement('div'); abilityColumn.className = 'item-column';
@@ -303,14 +323,14 @@ function renderMoreItems() { // Create each list item, with rows and columns of 
       if (thisMove in item && numMovesShown < 2) { 
         numMovesShown += 1;
         let source = item[thisMove];
-        if (source == -1) {sourceText = '<span style="color:rgb(251, 173, 124);">Memory';}
-        else if (source == 0) {sourceText = '<span style="color:rgb(131, 182, 239);">Evolution';}
-        else if (source == 201) {sourceText = '<span style="color:rgb(255, 255, 255);">Egg Move';}
-        else if (source == 202) {sourceText = '<span style="color:rgb(240, 230, 140);">Rare Egg Move';}
-        else if (source == 203) {sourceText = '<span style="color:rgb(255, 255, 255);">Common TM';}
-        else if (source == 204) {sourceText = '<span style="color:rgb(131, 182, 239);">Great TM';}
-        else if (source == 205) {sourceText = '<span style="color:rgb(240, 230, 140);">Ultra TM';}
-        else {sourceText = `<span style="color:rgb(255, 255, 255);">Lv ${item[thisMove]}`;}
+        if (source == -1) {sourceText = `<span style="color:rgb(251, 173, 124);">${altText[9]}`;}
+        else if (source == 0) {sourceText = `<span style="color:rgb(131, 182, 239);">${altText[10]}`;}
+        else if (source == 201) {sourceText = `<span style="color:rgb(255, 255, 255);">${altText[11]}`;}
+        else if (source == 202) {sourceText = `<span style="color:rgb(240, 230, 140);">${altText[12]}`;}
+        else if (source == 203) {sourceText = `<span style="color:rgb(255, 255, 255);">${altText[13]} ${altText[16]}`;}
+        else if (source == 204) {sourceText = `<span style="color:rgb(131, 182, 239);">${altText[14]} ${altText[16]}`;}
+        else if (source == 205) {sourceText = `<span style="color:rgb(240, 230, 140);">${altText[15]} ${altText[16]}`;}
+        else {sourceText = `<span style="color:rgb(255, 255, 255);">${altText[17]} ${item[thisMove]}`;}
         // Show the move name, with click event for splash screen
         const clickableRow = document.createElement('div');  clickableRow.className = 'clickable-name';
         clickableRow.innerHTML = `<p style="color:rgb(140, 130, 240); margin: 0;"> 
@@ -323,8 +343,8 @@ function renderMoreItems() { // Create each list item, with rows and columns of 
       ['e1','e2','e3','e4'].forEach((name) => {
         // Show the move name, with click event for splash screen
         const clickableRow = document.createElement('div');  clickableRow.className = 'clickable-name';
-        if (name == 'e4') { clickableRow.style.color = 'rgb(240, 230, 140)'; }
-        // clickableRow.style.color = typeColors[fidToDesc[item[name]][2]];
+        if (name == 'e4') clickableRow.style.color = 'rgb(240, 230, 140)';
+        // clickableRow.style.color = typeColors[fidToProc[item[name]-fidThreshold[1]][0]];
         clickableRow.innerHTML = fidToName[item[name]];
         clickableRow.addEventListener('click', () => showMoveSplash(item[name]));
         moveColumn.appendChild(clickableRow);
@@ -352,7 +372,6 @@ function renderMoreItems() { // Create each list item, with rows and columns of 
 
     const row1 = document.createElement('div'); row1.className = 'row'; let row2 = row1;
     if (isMobile) {
-      // row1.style.backgroundColor = (index%2 == 0 ? '#151019' : '#252129');
       row1.appendChild(dexColumn);      row1.appendChild(starColumn); 
       row1.appendChild(specColumn);     row1.appendChild(pinColumn);
       const row2 = document.createElement('div'); row2.className = 'row'; li.appendChild(row1);
@@ -379,30 +398,26 @@ function showMoveSplash(fid) {
   const thisDesc = fidToDesc[fid-fidThreshold[0]];
   splashContent.innerHTML = `<b>${fidToName[fid]}</b><hr>`; // Name header
   if (fid<fidThreshold[1]) { // For abilities
-    splashContent.innerHTML = `<b>${fidToName[fid]}</b><hr>${thisDesc[0]}`;
-    if (thisDesc[1]) { // If there is a custom description
-      splashContent.innerHTML += `<p style="color:rgb(145, 145, 145); margin:0px; margin-top:8px;">${thisDesc[1]}</p>`;
-    }
+    splashContent.innerHTML = `<b>${fidToName[fid]}</b><hr>${thisDesc}<br>`;
+    // if (thisDesc[1]) { // If there is a custom description
+    //   splashContent.innerHTML += `<p style="color:rgb(145, 145, 145); margin:0px; margin-top:8px;">${thisDesc[1]}</p>`;
+    // }
   } else { // For moves
     const thisProcLine = fidToProc[fid-fidThreshold[1]];
     const splashMoveRow = document.createElement('div');  splashMoveRow.className = 'splash-move-row';
-    // Show first column with type and damage category
-    const splashMoveCol1 = document.createElement('div');
-    splashMoveCol1.innerHTML = `<span style="color:${typeColors[thisProcLine[0]]};">${fidToName[thisProcLine[0]]}</span><br><img src="ui/cat${thisProcLine[1]}.png"></img>`;
-    splashMoveRow.appendChild(splashMoveCol1);
-    // Show another three columns with Power, Accuracy, PP
-    ['Pow','Acc','PP'].forEach((attName,index) => { 
+    altText.slice(4,8).forEach((attName,index) => { // Show type and damage category, then Power, Accuracy, PP
       const splashMoveCol = document.createElement('div');
-      splashMoveCol.innerHTML = `${attName}<br>${(thisProcLine[2+index]==-1 ? '-' : thisProcLine[2+index])}`;
+      if (!index) splashMoveCol.innerHTML = `<span style="color:${typeColors[thisProcLine[0]]};">${fidToName[thisProcLine[0]]}</span><br><img src="ui/cat${thisProcLine[1]}.png"></img>`;
+      else splashMoveCol.innerHTML = `${attName}<br>${(thisProcLine[1+index]==-1 ? '-' : thisProcLine[1+index])}`;
       splashMoveRow.appendChild(splashMoveCol);
     });
     splashContent.appendChild(splashMoveRow);
-    splashContent.innerHTML += `<hr>${thisDesc[0]}`; // Show move description
-    if (thisDesc[1]) { // If there is a custom description
-      splashContent.innerHTML += `<p style="color:rgb(145, 145, 145); margin:0px; margin-top:8px;">${thisDesc[1]}</p>`;
-    }
+    splashContent.innerHTML += `<hr>${thisDesc}`; // Show move description
+    // if (thisDesc[1]) { // If there is a custom description
+    //   splashContent.innerHTML += `<p style="color:rgb(145, 145, 145); margin:0px; margin-top:8px;">${thisDesc[1]}</p>`;
+    // }
     // Add all tags for priority, targets, procs, contact, other
-    if (thisProcLine[5] || thisProcLine[6] || thisProcLine[7]) {
+    if (thisProcLine[5] || thisProcLine[6] || thisProcLine[7]||1) {
       const splashMoveTags = document.createElement('div');  splashMoveTags.className = 'splash-move-tags';
       if (thisProcLine[5] > 0) { // If non-zero priority
         {splashMoveTags.innerHTML += `<p style="color:rgb(143, 214, 154);">Priority: +${thisProcLine[5]}</p>`;};
@@ -414,7 +429,7 @@ function showMoveSplash(fid) {
       if (thisProcLine[7].includes(22)) {splashMoveTags.innerHTML += '<p style="color:rgb(239, 131, 131);">Targets: Entire Field</p>';};
       thisProcLine[6].forEach((thisProc) => { // Procs for stats, status, flinch, etc.
         const procChance = ((thisProc[0] == '-1') ? '' : `${thisProc[0]}% `);
-        const procStages = ((thisProc[2] == '0') ? '' : ` ${(thisProc[2] > 0 ? '+' : '')}${thisProc[2]} `);
+        const procStages = ((thisProc[2] == '0') ? '' : ` ${(thisProc[2] > 0 ? '+' : '')}${thisProc[2]}`);
         splashMoveTags.innerHTML += `<p>${procChance}${procToDesc[thisProc[1]]}${procStages}</p>`;
       });
       if (thisProcLine[7].includes(60)) {splashMoveTags.innerHTML += "<p>User Atk maxed</p>";};
@@ -477,6 +492,12 @@ function showMoveSplash(fid) {
       splashContent.appendChild(splashMoveTags);
     }
   }
+  if (!lockedFilters.includes(fid)) { // Button to add ability/move directly to filters
+    const splashButton = document.createElement('div'); splashButton.className = 'splash-button'; 
+    splashButton.innerHTML = `<span>${altText[8]}</span>`;  
+    splashButton.addEventListener("click", () => { lockFilter(fid); splashScreen.classList.remove("show"); });
+    splashContent.appendChild(splashButton);
+  }
   splashScreen.classList.add("show"); // Make it visible
 }
 function fidToCategory(fid) {
@@ -513,47 +534,54 @@ function eggTierColors(fid) {
 
 // Display the filter suggestions *************************
 function displaySuggestions() { // Get search query and clear the list
-  const query = searchBox.value.toLowerCase().replace(/[.'-\s]/g,'');
-  let matchingFID = [];   filterToEnter = null;   suggestions.innerHTML = '';
-  // Filter suggestions based on query and exclude already locked filters
-  matchingFID = possibleFID.filter((fid) => {
-      let searchableName = fidToSearch[fid];
-      if (fid >= fidThreshold[2]) { // Search via category for later categories
-        searchableName = `${fidToCategory(fid).toLowerCase().replace(/\s+/g,'')}${searchableName}`; 
-      }
-      // Contains the search query and is not already locked
-      if (fid < fidThreshold[7]) {
+  filterToEnter = null;   suggestions.innerHTML = '';
+  const query = searchBox.value.toLowerCase().replace(/[.’'\s-]/g,'');
+  if (query.length) {
+    // Decide which family filters to show
+    let filteredSID = possibleSID.filter((ID) => speciesNames[ID].toLowerCase().replace(/[.’'\s-]/g,'').includes(query));
+    if (filteredSID.length > 20) filteredSID = [];
+    let offerFamilies = [...new Set(filteredSID.map(ID => items[ID].fa))];
+    if (offerFamilies.length > 4) offerFamilies = [];
+
+    let matchingFID = [];   
+    // Filter suggestions based on query and exclude already locked filters
+    matchingFID = possibleFID.filter((fid) => {
+        let searchableName = fidToSearch[fid];
+        if (fid >= fidThreshold[2] && fid < fidThreshold[7]) {
+          // Search via category for later categories
+          searchableName = `${fidToCategory(fid).toLowerCase().replace(/[.’'\s-]/g,'')}${searchableName}`;  
+        } else if (fid >= fidThreshold[7] && offerFamilies.includes(fid)) {
+          return true;
+        }
+        // Suggest if it contains the search query and is not already locked
         return searchableName.includes(query) && !lockedFilters.some((f) => f == fid);
-      } else { // For family filters
-        return offerFamilies.some((thisFam) => speciesNames[thisFam] === fidToName[fid])
-      }
-  });
-   
-  if (matchingFID.length > 20) matchingFID = []; // Erase the list of suggestions if it is too large
-  
-  if (lockedFilters.length > 0) { // If there is at least one locked filter, re-sort the list
-    // (If there are no locked filters, the list is already presorted)
-    // Count how many hits each suggestion has
+    });
+    if (matchingFID.length > 20) matchingFID = []; // Erase the list of suggestions if it is too large
+    
+    if (lockedFilters.length > 0) { // If there is at least one locked filter, re-sort the list
+      // (If there are no locked filters, the list is already presorted)
+      // Count how many hits each suggestion has
 
-    // Sort the list of suggestions based on hits in the item list (but still by type/ability/move)
+      // Sort the list of suggestions based on hits in the item list (but still by type/ability/move)
 
-    // Remove suggestions that have no matches?
-    // Not implemented yet...
+      // Remove suggestions that have no matches?
+      // Not implemented yet...
+    }
+
+    // Highlight a suggestion if tab is hit
+    if (matchingFID.length > 0) {
+      if (tabSelect > matchingFID.length-1) {tabSelect -= matchingFID.length;}
+      filterToEnter = matchingFID[(tabSelect == -1 ? 0 : tabSelect)];
+    } 
+    matchingFID.forEach((fid) => { // Create the suggestion tag elements
+      let newSugg = document.createElement('div');  newSugg.className = 'suggestion';
+      newSugg.innerHTML = `<span style="color:${fidToColor(fid)[0]}; display:inline;">${fidToCategory(fid)}: 
+                           <span style="color:${fidToColor(fid)[1]}; display:inline;">${fidToName[fid]}</span></span>`;
+      newSugg.addEventListener("click", () => lockFilter(fid));
+      if (filterToEnter == fid && tabSelect != -1) newSugg.style.borderColor = 'rgb(140, 130, 240)';
+      suggestions.appendChild(newSugg);
+    });
   }
-
-  // Highlight a suggestion if tab is hit
-  if (matchingFID.length > 0) {
-    if (tabSelect > matchingFID.length-1) {tabSelect -= matchingFID.length;}
-    filterToEnter = matchingFID[(tabSelect == -1 ? 0 : tabSelect)];
-  } 
-  matchingFID.forEach((fid) => { // Create the suggestion tag elements
-    let newSugg = document.createElement('div');  newSugg.className = 'suggestion';
-    newSugg.innerHTML = `<span style="color:${fidToColor(fid)[0]};">${fidToCategory(fid)}: 
-                         <span style="color:${fidToColor(fid)[1]};">${fidToName[fid]}</span></span>`;
-    newSugg.addEventListener("click", () => lockFilter(fid))
-    if (filterToEnter == fid && tabSelect != -1) {newSugg.style.borderColor = 'rgb(140, 130, 240)';}
-    suggestions.appendChild(newSugg);
-  });
 }
 
 // Lock a filter *************************
@@ -563,8 +591,9 @@ function lockFilter(newLockFID) {
     // console.log(newLockFID); console.log(fidToName[newLockFID]);
     let filterMod = null;
     if (lockedFilters.length > 1) {
-      filterMod = document.createElement("span"); filterMod.innerHTML = '&';
-      filterMod.className = "filter-mod";         filterMod.toggleOR = 0;
+      const famOR = (newLockFID >= fidThreshold[7] && lockedFilters[lockedFilters.length-2] >= fidThreshold[7]);
+      filterMod = document.createElement("span"); filterMod.toggleOR = famOR;
+      filterMod.className = "filter-mod";         filterMod.innerHTML = (famOR?'OR':'&');
       filterMod.addEventListener("click", () => toggleOR(filterMod));
       lockedFilterMods.push(filterMod); filterContainer.appendChild(filterMod);
     }
@@ -577,7 +606,7 @@ function lockFilter(newLockFID) {
     searchBox.value = ""; 
     // Refresh suggestions and items
     updateFilterGroups();   refreshAllItems();
-    if (fidToCategory(newLockFID) === 'Move' && sortState.column === 'row') {
+    if (newLockFID >= fidThreshold[1] && newLockFID < fidThreshold[2] && sortState.column === 'row') {
       updateHeader(headerColumns[5]);
     } else {
       if (lockedFilters.length == 1 && sortState.column === 'moves') {
@@ -600,7 +629,7 @@ function removeFilter(fidToRemove, filterTag, filterModToRemove) {
   // Refresh suggestions and items
   updateFilterGroups();   refreshAllItems();
   // Reset the sorting if there aren't any more locked moves
-  if (sortState.column === 'moves' && !lockedFilters.some((f) => fidToCategory(f) == 'Move')) { 
+  if (sortState.column === 'moves' && !lockedFilters.some((f) => (f >= fidThreshold[1] && f < fidThreshold[2]))) { 
     updateHeader(headerColumns[0]); 
   } else { 
     updateHeader(null, true); 
@@ -616,14 +645,9 @@ function updateFilterGroups() { // Updates the grouping of filters based on AND/
   lockedFilterGroups = [[]];
   let group = 0;
   lockedFilterGroups[group].push(lockedFilters[0]);
-  for (let i = 0; i < lockedFilterMods.length; i++) {
-    if (lockedFilterMods[i].toggleOR) { // If it is OR
-      lockedFilterGroups[group].push(lockedFilters[i+1]);
-    } else { // It is AND
-      group += 1;
-      lockedFilterGroups.push([]);
-      lockedFilterGroups[group].push(lockedFilters[i+1]);
-    }
+  for (let i = 0; i < lockedFilterMods.length; i++) { // New group for AND, same group for OR
+    if (!lockedFilterMods[i].toggleOR) { group += 1;  lockedFilterGroups.push([]); } 
+    lockedFilterGroups[group].push(lockedFilters[i+1]);
   }
 }
 
@@ -638,35 +662,34 @@ function toggleOR(filterMod) { // Click a filter to toggle it between AND and OR
 function updateHeader(clickTarget = null, ignoreFlip = false) {
   // console.log(clickTarget?.sortattr)
   if (clickTarget == null) {clickTarget = sortState.target; ignoreFlip = true;}
-  // Find the new sorting attribute, and update the headers
-  const sortAttribute = clickTarget?.sortattr;
   // Set the text of the move column, depending on if a move is filtered
-  if (showMoveLearn[0] != null) {
-    headerColumns[5].textDef = '<span style="color:rgb(140, 130, 240);">' 
-                             + (isMobile ? 'Moves' : 'Filtered Moves') + '</span>';
+  if (showMoveLearn.length) {
+    headerColumns[5].textDef = `<span style="color:rgb(140, 130, 240);">${altText[0]}</span>`;
   } else {
     headerColumns[5].textDef = headerNames[5];
+    if (clickTarget == headerColumns[5]) clickTarget = null;
   }
+  // Find the new sorting attribute, and update the headers
+  const sortAttribute = clickTarget?.sortattr;
   if (sortAttribute == 'shiny') { // Toggle the global shiny state
     shinyState = (shinyState == 0 ? 3 : shinyState-1);
     if (shinyState) {
-      headerColumns[1].innerHTML = '<span style="color:rgb(140, 130, 240);">Shiny</span>';
-      const starImg = document.createElement('img');
-      starImg.className = 'star-header';
+      headerColumns[1].innerHTML = `<span style="color:rgb(140, 130, 240);">${headerNames[1]}</span>`;
+      const starImg = document.createElement('img');  starImg.className = 'star-header';
       starImg.src = `ui/shiny${shinyState}.png`;
       headerColumns[1].appendChild(starImg);
     } else {
-      headerColumns[1].innerHTML = 'Shiny';
+      headerColumns[1].innerHTML = headerNames[1];
     }
   } else if (sortAttribute == 'ab') { // Toggle the global ability state
     abilityState = (abilityState == 3 ? 0 : abilityState+1);
     if (abilityState) {
-      headerColumns[4].innerHTML = `<span style="color:rgb(140, 130, 240);">Abilities</span>`;
-      if (abilityState == 1) {headerColumns[4].innerHTML += `<span style="color:rgb(255, 255, 255); font-size:12px;">(Main Only)</span>`;}
-      else if (abilityState == 2) {headerColumns[4].innerHTML += `<span style="color:rgb(240, 230, 140); font-size:12px;">(Hidden Only)</span>`;}
-      else if (abilityState == 3) {headerColumns[4].innerHTML += `<span style="color:rgb(140, 130, 240); font-size:12px;">(Passive Only)</span>`;}
+      headerColumns[4].innerHTML = `<span style="color:rgb(140, 130, 240);">${headerNames[4]}</span>`;
+      if      (abilityState == 1) {headerColumns[4].innerHTML += `<span style="color:rgb(255, 255, 255); font-size:12px;">(${altText[1]})</span>`;}
+      else if (abilityState == 2) {headerColumns[4].innerHTML += `<span style="color:rgb(240, 230, 140); font-size:12px;">(${altText[2]})</span>`;}
+      else if (abilityState == 3) {headerColumns[4].innerHTML += `<span style="color:rgb(140, 130, 240); font-size:12px;">(${altText[3]})</span>`;}
     } else {
-      headerColumns[4].innerHTML = 'Abilities';
+      headerColumns[4].innerHTML = headerNames[4];
     }
   } else {
     headerColumns[5].innerHTML = headerColumns[5].textDef;
@@ -678,14 +701,13 @@ function updateHeader(clickTarget = null, ignoreFlip = false) {
       } else {
         sortState.column = sortAttribute;
         // Sort ascending on some columns, but descending on others
-        sortState.ascending = (sortState.column == "row")||(sortState.column == "sp")
-                            ||(sortState.column == "t1")||(sortState.column == "a1")||(sortState.column == "moves");
+        sortState.ascending = ['row','sp','type','moves'].includes(sortState.column);
         if (sortState.target?.textDef) { // Clear arrow from previous target
           sortState.target.innerHTML = sortState.target?.textDef;
         }
       }
       sortState.target = clickTarget; // Draw arrow on new target
-      clickTarget.innerHTML = clickTarget.textDef + '<span style="color:rgb(140, 130, 240); font-family: serif;">' + (sortState.ascending ? "&#9650;" : "&#9660;") + '</span>';
+      clickTarget.innerHTML = `${clickTarget.textDef}<span style="color:rgb(140, 130, 240); font-family: serif;">${(sortState.ascending ? "&#9650;":"&#9660;")}</span>`;
     }
   }
   // Update the display
@@ -694,11 +716,9 @@ function updateHeader(clickTarget = null, ignoreFlip = false) {
 
 function adjustLayout(headerTarget = null, forceAdjust = false) {
   if (isMobile != (window.innerWidth <= 768) || forceAdjust) {
-    let windowWidth = window.innerWidth;
+    const windowWidth = window.innerWidth;
     isMobile = (windowWidth <= 768);
     // console.log((isMobile ? "Mobile layout" : "Desktop layout"), windowWidth, isMobile);
-    titleimg.src = (isMobile ? 'ui/mag18.png' : 'ui/mag30.png' );
-    openMenuButton.src = (isMobile ? 'ui/menu18.png' : 'ui/menu30.png' );
     // Redraw all the header columns into the header container
     headerContainer.innerHTML = '';
     const thisRow = document.createElement('div'); thisRow.className = 'header-row';
@@ -709,14 +729,14 @@ function adjustLayout(headerTarget = null, forceAdjust = false) {
       headerContainer.appendChild(thisRow);
       const row2 = document.createElement('div'); row2.className = 'header-row';
       row2.appendChild(headerColumns[3]);
-      for (const thisColumn of headerColumns.slice(6,15)) {row2.appendChild(thisColumn);}  
+      for (const thisColumn of headerColumns.slice(6,15)) { row2.appendChild(thisColumn); }  
       headerContainer.appendChild(row2);
     } else {
-      for (const thisColumn of headerColumns) {thisRow.appendChild(thisColumn);}  
+      for (const thisColumn of headerColumns) { thisRow.appendChild(thisColumn); }  
       headerContainer.appendChild(thisRow);
     }
   increment = (isMobile ? 10 : 30);
-  updateHeader(headerTarget);
+  updateHeader(headerTarget, true);
   }
 }
 
@@ -724,15 +744,12 @@ function adjustLayout(headerTarget = null, forceAdjust = false) {
 
 // Load more items on scroll
 window.addEventListener("scroll", () => {
-  if (window.scrollY + window.innerHeight >= document.body.scrollHeight * 0.8 - 1000) {
-    renderMoreItems();
-  }
+  if (window.scrollY + window.innerHeight >= document.body.scrollHeight * 0.8 - 1000) renderMoreItems();
 });
 // Run on page load and when resizing the window
-window.addEventListener("resize", () => { 
-  adjustLayout();
-});
-searchBox.addEventListener('input', (event) => { // Typing in search box
+window.addEventListener("resize", () => adjustLayout());
+// Typing in search box
+searchBox.addEventListener('input', (event) => { 
   tabSelect = -1;
   // for (let index = 0; index < 50; index++) { // Slow down the performance for benchmarking
   refreshAllItems();
@@ -751,9 +768,9 @@ document.addEventListener('keydown', (event) => {
     searchBox.blur(); // Allow PageUp and PageDown even when in search box
   }
   if (event.key == "Escape") { // Hit escape to clear the search box, or the last filter
-    if (splashScreen.classList.contains("show")) { // If a splash screen is up
+    if (splashScreen.classList.contains("show")) { // Close any splash screen
       splashScreen.classList.remove("show");
-    } else if (searchBox.value.length > 0) { // If there is text in the search box
+    } else if (searchBox.value.length > 0) { // Clear any text from the search box
       searchBox.value = ''
       refreshAllItems();
     } else if (lockedFilters.length > 0) { // If there is a locked filter
@@ -765,10 +782,8 @@ document.addEventListener('keydown', (event) => {
         removeFilter(lastFilter, lastFilterTag, lastFilterMod); // Remove the last filter
       }
     } else if (shinyState || abilityState) { // Clear all header restrictions
-      shinyState = 0;
-      headerColumns[1].innerHTML = 'Shiny';
-      abilityState = 0;
-      headerColumns[4].innerHTML = 'Abilities';
+      shinyState = 0;   headerColumns[1].innerHTML = headerNames[1];
+      abilityState = 0; headerColumns[4].innerHTML = headerNames[4];
       updateHeader();
     }
   }
@@ -779,50 +794,40 @@ document.addEventListener('keydown', (event) => {
     event.preventDefault();
   }
 });
-  // Close splash screen when clicking outside the content box
+// Close splash screen when clicking outside the content box
 splashScreen.addEventListener("click", (event) => {
   if (event.target === splashScreen) {
     splashScreen.classList.remove("show");
   }
 });
-openMenuButton.addEventListener("click", () => {
-  openMenu();
-});
-function openMenu() {
-// Assemble the content for the help splash screen
+// Open the language selector splash
+openLangButton.addEventListener('mouseover', () => openLangButton.src = `ui/globeh.png`);
+openLangButton.addEventListener('mouseout',  () => openLangButton.src = `ui/globe.png` ); 
+openLangButton.addEventListener("click",     () => openLangMenu());
+function openLangMenu() {
+  splashContent.style.width = '270px';
+  splashContent.innerHTML = '<img src="ui/globe.png" class="lang-head-img"></img>&nbsp<b>Change Language</b><hr style="margin-bottom: 0px;">';
+  supportedLangs.forEach((thisLang, index) => {
+    const thisLangRow = document.createElement('div'); thisLangRow.className = "splash-button";
+    if (pageLang == thisLang) thisLangRow.style.color = "rgb(140, 130, 240)";
+    thisLangRow.innerHTML = `${LanguageNames[index]}`;
+    thisLangRow.addEventListener("click", () => {
+      localStorage.setItem("preferredLang", thisLang);
+      loadAndApplyLanguage(thisLang);
+      splashScreen.classList.remove("show");
+    });
+    if (thisLang != 'en') splashContent.appendChild(document.createElement('br'));
+    splashContent.appendChild(thisLangRow);
+  });
+  splashScreen.classList.add("show"); // Make it visible
+}
+// Open the help menu splash
+openHelpButton.addEventListener('mouseover', () => openHelpButton.src = `ui/helph.png`);
+openHelpButton.addEventListener('mouseout',  () => openHelpButton.src = `ui/help.png` ); 
+openHelpButton.addEventListener("click",     () => openHelpMenu());
+function openHelpMenu() {
+  // Assemble the content for the help splash screen
   splashContent.style.width = '382px';
-  splashContent.innerHTML = `
-  <b>This is a <span style="color:rgb(140, 130, 240);">fast and powerful search</span> for Pokerogue.</b><hr>
-
-  <p style="margin: 10px; font-weight: bold;">Use the <span style="color:rgb(140, 130, 240); text-decoration: underline;">Search Bar</span> to add filters for:<br></p>
-  <p style="margin: 10px; font-weight: bold;"><span style="color:${typeColors[9]};">${catToName[0]}</span>, 
-  <span style="color:${fidToColor(fidThreshold[0])[0]};">${catToName[1]}</span>, 
-  <span style="color:${fidToColor(fidThreshold[1])[0]};">${catToName[2]}</span>, 
-  <span style="color:${fidToColor(fidThreshold[2])[0]};">${catToName[3]}</span>, 
-  <span style="color:${fidToColor(fidThreshold[3])[0]};">${catToName[4]}</span>,<br>
-  <span style="color:${fidToColor(fidThreshold[4])[0]};">${catToName[5]}</span>,  
-  <span style="color:${fidToColor(fidThreshold[5])[1]};">${fidToName[fidThreshold[5]]} ${catToName[6]}</span>, or
-  <span style="color:${eggTierColors(1)};">${catToName[7]}</span>.</p>
-  Combine multiple filters to get what you want. <br>
-  <span style="color:rgb(145, 145, 145);"> You can toggle between "AND" & "OR" connectors.</span><hr>
-
-  <p style="margin: 10px; font-weight: bold;">Click the <span style="color:rgb(140, 130, 240); text-decoration: underline;">Headers</span> to sort the results:</p>
-  <p style="margin: 10px;"><b>Dex</b> column links to the <a href="https://wiki.pokerogue.net/start" target="_blank">Official Wiki</a></p>
-  <b>Shiny</b> column shows who has shiny variants.
-  <p style="margin: 10px;"><b>Ability</b> column shows <b>Main Abilities</b>, 
-  <span style="color:rgb(240, 230, 140);"><b>Hidden Ability</b></span>, and 
-  <span style="color:rgb(140, 130, 240);"><b>Passive</b></span>. 
-  <span style="color:rgb(145, 145, 145);">Click the header to restrict to one of those categories.</span></p>
-  <b>Egg Move</b> column shows <b>Normal</b> and <span style="color:rgb(240, 230, 140);"><b>Rare</b></span> egg moves. 
-  <span style="color:rgb(145, 145, 145);">After searching for a move, this column will update to show who learns the move first.</span>
-  <p style="margin: 10px;"><b>Cost</b> column is colored by <b>Egg Tier</b>:<br> 
-  <b>Common</b>, <span style="color:rgb(131, 182, 239);"><b>Rare</b></span>, <span style="color:rgb(240, 230, 140);"><b>Epic</b></span>, <span style="color:rgb(239, 131, 131);"><b>Manaphy</b></span>, <span style="color:rgb(216, 143, 205);"><b>Legendary</b></span></p><hr style="margin-bottom: 10px;">
-  
-  <span style="color:rgb(145, 145, 145); font-size:11px">This site was created by Sandstorm, through a lot of hard work. I do not store any cookies or collect any personal data. Images and game data are from the Pokerogue Github. All asset rights are retained by their original creators.</span>
-  `;
-  // ${patchNotes}
-  // Show Patch Notes &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp Change Language
-  // <span style="color:rgb(145, 145, 145);">Chance of rare egg move is <span style="color:rgb(255, 255, 255);"><b>1</b></span> in <span style="color:rgb(255, 255, 255);"><b>48</b></span>/<span style="color:rgb(131, 182, 239);"><b>24</b></span>/<span style="color:rgb(240, 230, 140);"><b>12</b></span>/<span style="color:rgb(239, 131, 131);"><b>12</b></span>/<span style="color:rgb(216, 143, 205);"><b>6</b></span>.<br>Chance is doubled for candy eggs and move gacha.</span><br><br>
-  // <span style="color:rgb(255, 255, 255);"> Using the search bar and headers, you can search for abilities, see when moves are learned, sort by highest stats, see which Pokemon have shiny variants, and much more. </span><br><br>
+  splashContent.innerHTML = helpMenuText;
   splashScreen.classList.add("show"); // Make it visible
 }
