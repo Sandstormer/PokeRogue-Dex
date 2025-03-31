@@ -84,8 +84,7 @@ function loadAndApplyLanguage(lang) {
     });      
     
     // Display items, and initial sort by row number
-    adjustLayout(headerColumns[0],true);
-    // searchBox.focus();
+    adjustLayout(headerColumns[0],true); // Should simplify .........
   }
   script.onerror = (e) => console.warn(`Failed to load ${lang}.js`, e);
   document.head.appendChild(script);
