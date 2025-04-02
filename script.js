@@ -37,6 +37,12 @@ let filteredItemIDs = null; // List of all displayed row numbers
 let shinyState = 0;   // Global state of shiny   (0,1,2,3)
 let abilityState = 0; // Global state of ability (0,1,2,3)
 let sortState = { column: null, ascending: true, target: null }; // Track the current sort state
+// const spreadMoves = possibleFID.filter((fid) => fid >= fidThreshold[1] && fid < fidThreshold[2]
+//   && (fidToProc[fid-fidThreshold[1]][7].includes(21) || fidToProc[fid-fidThreshold[1]][7].includes(22)));
+// filteredItemIDs = filteredItemIDs.filter((thisID) => spreadMoves.some((thisMove) => thisMove in items[thisID]));
+// const moveTagFID = { // List of move FIDs for spread/healing/setup
+//   999:
+// }
 
 procToDesc = [
   "User Atk","User Def","User SpAtk","User SpDef","User Speed","User Accuracy","User Evasion",
@@ -102,16 +108,20 @@ function refreshAllItems() { // Display items based on query and locked filters 
   filteredItemIDs = possibleSID;
   // Filter from query ==============
   if (query.length > 0) {
-    filteredItemIDs = filteredItemIDs.filter((thisID) => 
-      speciesNames[thisID].toLowerCase().replace(/[.’'\s-]/g,'').includes(query) ||
-      fidToSearch[items[thisID].t1]?.includes(query) ||
-      fidToSearch[items[thisID].t2]?.includes(query) ||
-      ([0,1].includes(abilityState) && fidToSearch[items[thisID].a1]?.includes(query)) ||
-      ([0,1].includes(abilityState) && fidToSearch[items[thisID].a2]?.includes(query)) ||
-      ([0,2].includes(abilityState) && fidToSearch[items[thisID].ha]?.includes(query)) ||
-      ([0,3].includes(abilityState) && fidToSearch[items[thisID].pa]?.includes(query)) ||
-      items[thisID].dex.toString().includes(query)
-  );}
+    if (/^\d+$/.test(query)) { // If query is only digits
+      filteredItemIDs = filteredItemIDs.filter((thisID) => 
+        items[thisID].dex >= parseInt(query,10) );
+    } else { // For a standard query
+      filteredItemIDs = filteredItemIDs.filter((thisID) => 
+        speciesNames[thisID].toLowerCase().replace(/[.’'\s-]/g,'').includes(query) ||
+        fidToSearch[items[thisID].t1]?.includes(query) ||
+        fidToSearch[items[thisID].t2]?.includes(query) ||
+        ([0,1].includes(abilityState) && fidToSearch[items[thisID].a1]?.includes(query)) ||
+        ([0,1].includes(abilityState) && fidToSearch[items[thisID].a2]?.includes(query)) ||
+        ([0,2].includes(abilityState) && fidToSearch[items[thisID].ha]?.includes(query)) ||
+        ([0,3].includes(abilityState) && fidToSearch[items[thisID].pa]?.includes(query)) );
+    }
+  } 
   // Filter from headers ==============
   if (abilityState == 2) filteredItemIDs = filteredItemIDs.filter(thisID => 'ha' in items[thisID]);
   // Only show items that have that tier of shiny
@@ -416,7 +426,7 @@ function showMoveSplash(fid) {
     //   splashContent.innerHTML += `<p style="color:rgb(145, 145, 145); margin:0px; margin-top:8px;">${thisDesc[1]}</p>`;
     // }
     // Add all tags for priority, targets, procs, contact, other
-    if (thisProcLine[5] || thisProcLine[6] || thisProcLine[7]||1) {
+    if (thisProcLine[5] || thisProcLine[6] || thisProcLine[7]) {
       const splashMoveTags = document.createElement('div');  splashMoveTags.className = 'splash-move-tags';
       if (thisProcLine[5] > 0) { // If non-zero priority
         {splashMoveTags.innerHTML += `<p style="color:rgb(143, 214, 154);">Priority: +${thisProcLine[5]}</p>`;};
