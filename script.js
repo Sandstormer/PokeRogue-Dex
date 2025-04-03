@@ -108,48 +108,45 @@ function refreshAllItems() { // Display items based on query and locked filters 
   // Filter from query ==============
   if (query.length > 0) {
     if (/^\d+$/.test(query)) { // If query is only digits
-      filteredItemIDs = filteredItemIDs.filter((thisID) => 
-        items[thisID].dex >= parseInt(query,10) );
+      filteredItemIDs = filteredItemIDs.filter((specID) => items[specID].dex >= parseInt(query,10));
     } else { // For a standard query
-      filteredItemIDs = filteredItemIDs.filter((thisID) => 
-        speciesNames[thisID].toLowerCase().replace(/[.’'\s-]/g,'').includes(query) ||
-        fidToSearch[items[thisID].t1]?.includes(query) ||
-        fidToSearch[items[thisID].t2]?.includes(query) ||
-        ([0,1].includes(abilityState) && fidToSearch[items[thisID].a1]?.includes(query)) ||
-        ([0,1].includes(abilityState) && fidToSearch[items[thisID].a2]?.includes(query)) ||
-        ([0,2].includes(abilityState) && fidToSearch[items[thisID].ha]?.includes(query)) ||
-        ([0,3].includes(abilityState) && fidToSearch[items[thisID].pa]?.includes(query)) );
+      filteredItemIDs = filteredItemIDs.filter((specID) => 
+        speciesNames[specID].toLowerCase().replace(/[.’'\s-]/g,'').includes(query) ||
+        fidToSearch[items[specID].t1]?.includes(query) ||
+        fidToSearch[items[specID].t2]?.includes(query) ||
+        ([0,1].includes(abilityState) && fidToSearch[items[specID].a1]?.includes(query)) ||
+        ([0,1].includes(abilityState) && fidToSearch[items[specID].a2]?.includes(query)) ||
+        ([0,2].includes(abilityState) && fidToSearch[items[specID].ha]?.includes(query)) ||
+        ([0,3].includes(abilityState) && fidToSearch[items[specID].pa]?.includes(query)) )
     }
   } 
   // Filter from headers ==============
-  if (abilityState == 2) filteredItemIDs = filteredItemIDs.filter(thisID => 'ha' in items[thisID]);
+  if (abilityState == 2) filteredItemIDs = filteredItemIDs.filter(fid => 'ha' in items[fid]);
   // Only show items that have that tier of shiny
-  if (shinyState > 1)    filteredItemIDs = filteredItemIDs.filter(thisID => items[thisID].sh >= shinyState);
+  if (shinyState > 1)    filteredItemIDs = filteredItemIDs.filter(fid => items[fid].sh >= shinyState);
   // Filter from locked filters ==============
   if (lockedFilters.length > 0) {
-    filteredItemIDs = filteredItemIDs.filter(thisID => // Search for filters with their fid as key
+    filteredItemIDs = filteredItemIDs.filter(specID => // Search for filters with their fid as key
       lockedFilterGroups.every(thisGroup => // Match at least one filter from each group
-        thisGroup.some(thisLockedFID => {
-          if (abilityState != 0 && thisLockedFID >= fidThreshold[0] && thisLockedFID < fidThreshold[1]) {
-            if (abilityState == 1)      return items[thisID]?.[thisLockedFID] == 309 || items[thisID]?.[thisLockedFID] == 310
-            else if (abilityState == 2) return items[thisID]?.[thisLockedFID] == 311
-            else if (abilityState == 3) return items[thisID]?.[thisLockedFID] == 312
-          }
-          if (thisLockedFID  <  fidThreshold[2]) return thisLockedFID in items[thisID]; // Type/Ability/Move filters
-          if (thisLockedFID  <  fidThreshold[3]) return items[thisID].ge === thisLockedFID - fidThreshold[2] + 1; // Gen filters
-          if (thisLockedFID  <  fidThreshold[4]) return items[thisID].co === thisLockedFID - fidThreshold[3] + 1; // Cost filters
-          if (thisLockedFID === fidThreshold[4]) return items[thisID].fe === 1; // Gender filter
-          if (thisLockedFID === fidThreshold[5]) return true; // Flipped stat filter
-          if (thisLockedFID  <  fidThreshold[7]) return items[thisID].et === thisLockedFID - fidThreshold[6]; // Egg tier filter
-          if (thisLockedFID  <  fidThreshold[8]) return items[thisID]?.fa === thisLockedFID; // Family filter
+        thisGroup.some(fid => {
+          if (abilityState != 0 && fid >= fidThreshold[0] && fid < fidThreshold[1])
+            return items[specID]?.[fid] == 309 + abilityState 
+               || (items[specID]?.[fid] == 309 && abilityState == 1)
+          if (fid  <  fidThreshold[2]) return fid in items[specID]; // Type/Ability/Move filters
+          if (fid  <  fidThreshold[3]) return items[specID].ge === fid - fidThreshold[2] + 1; // Gen filters
+          if (fid  <  fidThreshold[4]) return items[specID].co === fid - fidThreshold[3] + 1; // Cost filters
+          if (fid === fidThreshold[4]) return items[specID].fe === 1; // Gender filter
+          if (fid === fidThreshold[5]) return true; // Flipped stat filter
+          if (fid  <  fidThreshold[7]) return items[specID].et === fid - fidThreshold[6]; // Egg tier filter
+          if (fid  <  fidThreshold[8]) return items[specID]?.fa === fid; // Family filter
           console.warn('Filter error');
-          return thisLockedFID in items[thisID];
+          return fid in items[specID];
         }))) 
       }
   // Add moves to track in the move column  ==============
   showMoveLearn = [];
-  lockedFilters.forEach(thisLockedFID => {
-    if (thisLockedFID >= fidThreshold[1] && thisLockedFID < fidThreshold[2]) showMoveLearn.push(thisLockedFID);
+  lockedFilters.forEach(fid => {
+    if (fid >= fidThreshold[1] && fid < fidThreshold[2]) showMoveLearn.push(fid);
   });
   // Remove the pinned items for now ==============
   if (pinnedRows) filteredItemIDs = filteredItemIDs.filter((thisID) => !pinnedRows.includes(thisID));
@@ -241,8 +238,8 @@ function renderMoreItems() { // Create each list item, with rows and columns of 
     // Show image of the pokemon
     const pokeImg = document.createElement('img');  pokeImg.className = 'item-image';  
     pokeImg.stars = []; // Keep a list of stars that can change the pokemon image
-    pokeImg.shinyOverride = (items[thisID].sh >= shinyState ? shinyState : (shinyState > 0)*1);  
-    pokeImg.femOverride = (items[thisID].fe ? lockedFilters.some((f) => f == fidThreshold[4]) : 0);
+    pokeImg.shinyOverride = (item.sh >= shinyState ? shinyState : (shinyState > 0)*1);  
+    pokeImg.femOverride = (item.fe ? lockedFilters.some((f) => f == fidThreshold[4]) : 0);
     pokeImg.src = `images/${item.img}_${pokeImg.shinyOverride}${(pokeImg.femOverride ? 'f' : '')}.png`; 
     
     // Create the dex column, with stars and pin only on desktop
@@ -476,7 +473,7 @@ function showMoveSplash(fid) {
       if (thisProcLine[7].includes(54)) {splashMoveTags.innerHTML += "<p>Ignores Abilities</p>";};
       if (thisProcLine[7].includes(17)) {splashMoveTags.innerHTML += "<p>Ignores Protect</p>";};
       if (thisProcLine[7].includes(18) || thisProcLine[7].includes(14)) {splashMoveTags.innerHTML += "<p>Ignores Substitute</p>";};
-      if (thisProcLine[7].includes(19)) {splashMoveTags.innerHTML += "<p>Switches out target</p>";};
+      if (thisProcLine[7].includes(19)) {splashMoveTags.innerHTML += "<p>Target switches out</p>";};
       if (thisProcLine[7].includes(52)) {splashMoveTags.innerHTML += "<p>User switches out</p>";};
       if (thisProcLine[7].includes(23)) {splashMoveTags.innerHTML += "<p>Hits 2 times</p>";};
       if (thisProcLine[7].includes(24)) {splashMoveTags.innerHTML += "<p>Hits 3 times</p>";};
@@ -514,29 +511,29 @@ function fidToCategory(fid) {
   }
 }
 function fidToColor(fid) {
-  if (fid < fidThreshold[0]) { return ['rgb(255, 255, 255)', typeColors[fid]]; }
-  if (fid < fidThreshold[1]) { return ['rgb(140, 130, 240)', 'rgb(255, 255, 255)']; }
-  if (fid < fidThreshold[2]) { return ['rgb(145, 145, 145)', 'rgb(255, 255, 255)']; }
-  if (fid < fidThreshold[3]) { return ['rgb(131, 182, 239)', 'rgb(255, 255, 255)']; }
-  if (fid < fidThreshold[4]) { return ['rgb(240, 230, 140)', 'rgb(255, 255, 255)']; }
-  if (fid < fidThreshold[5]) { return ['rgb(216, 143, 205)', 'rgb(255, 255, 255)']; }
-  if (fid < fidThreshold[6]) { return ['rgb(255, 255, 255)', 'rgb(239, 131, 131)']; }
-  if (fid < fidThreshold[7]) { return ['rgb(255, 255, 255)',    eggTierColors(fid) ]; }
+  if (fid < fidThreshold[0]) return ['rgb(255, 255, 255)', typeColors[fid]];
+  if (fid < fidThreshold[1]) return ['rgb(140, 130, 240)', 'rgb(255, 255, 255)'];
+  if (fid < fidThreshold[2]) return ['rgb(145, 145, 145)', 'rgb(255, 255, 255)'];
+  if (fid < fidThreshold[3]) return ['rgb(131, 182, 239)', 'rgb(255, 255, 255)'];
+  if (fid < fidThreshold[4]) return ['rgb(240, 230, 140)', 'rgb(255, 255, 255)'];
+  if (fid < fidThreshold[5]) return ['rgb(216, 143, 205)', 'rgb(255, 255, 255)'];
+  if (fid < fidThreshold[6]) return ['rgb(255, 255, 255)', 'rgb(239, 131, 131)'];
+  if (fid < fidThreshold[7]) return ['rgb(255, 255, 255)', eggTierColors(fid)]
   else return ['rgb(255, 255, 255)', 'rgb(140, 130, 240)']; 
 }
 function abToColor(name) {
-  if (name == 'a1') { return (abilityState==0||abilityState==1 ? 'rgb(255, 255, 255)' : 'rgb(145,145,145)') }
-  if (name == 'a2') { return (abilityState==0||abilityState==1 ? 'rgb(255, 255, 255)' : 'rgb(145,145,145)') }
-  if (name == 'ha') { return (abilityState==0||abilityState==2 ? 'rgb(240, 230, 140)' : 'rgb(105,105,105)') }
-  if (name == 'pa') { return (abilityState==0||abilityState==3 ? 'rgb(140, 130, 240)' : 'rgb(145,145,145)') }
+  if (name == 'a1') return (abilityState==0||abilityState==1 ? 'rgb(255, 255, 255)' : 'rgb(145,145,145)')
+  if (name == 'a2') return (abilityState==0||abilityState==1 ? 'rgb(255, 255, 255)' : 'rgb(145,145,145)')
+  if (name == 'ha') return (abilityState==0||abilityState==2 ? 'rgb(240, 230, 140)' : 'rgb(105,105,105)')
+  if (name == 'pa') return (abilityState==0||abilityState==3 ? 'rgb(140, 130, 240)' : 'rgb(145,145,145)')
 }
 function eggTierColors(fid) {
   if (fid >= fidThreshold[6]) fid -= fidThreshold[6];
-  if (fid == 0) { return 'rgb(255, 255, 255)'; }
-  if (fid == 1) { return 'rgb(131, 182, 239)'; }
-  if (fid == 2) { return 'rgb(240, 230, 140)'; }
-  if (fid == 3) { return 'rgb(239, 131, 131)'; }
-  if (fid == 4) { return 'rgb(216, 143, 205)'; }
+  if (fid == 0) return 'rgb(255, 255, 255)';
+  if (fid == 1) return 'rgb(131, 182, 239)';
+  if (fid == 2) return 'rgb(240, 230, 140)';
+  if (fid == 3) return 'rgb(239, 131, 131)';
+  if (fid == 4) return 'rgb(216, 143, 205)';
   else { console.log('Invalid egg tier'); return null; }
 }
 
@@ -594,14 +591,14 @@ function displaySuggestions() { // Get search query and clear the list
 
 // Lock a filter *************************
 function lockFilter(newLockFID) {
-  if (!lockedFilters.some( (f) => f == newLockFID)) {
+  if (!lockedFilters.some((f) => f == newLockFID)) {
     lockedFilters.push(newLockFID); // Add the filter to the locked filters container
     // console.log(newLockFID); console.log(fidToName[newLockFID]);
     let filterMod = null;
     if (lockedFilters.length > 1) {
-      const famOR = (newLockFID >= fidThreshold[7] && lockedFilters[lockedFilters.length-2] >= fidThreshold[7]);
-      filterMod = document.createElement("span"); filterMod.toggleOR = famOR;
-      filterMod.className = "filter-mod";         filterMod.innerHTML = (famOR?'OR':'&');
+      const familyOR = (newLockFID >= fidThreshold[7] && lockedFilters[lockedFilters.length-2] >= fidThreshold[7]);
+      filterMod = document.createElement("span"); filterMod.toggleOR = familyOR;
+      filterMod.className = "filter-mod";         filterMod.innerHTML = (familyOR?'OR':'&');
       filterMod.addEventListener("click", () => toggleOR(filterMod));
       lockedFilterMods.push(filterMod); filterContainer.appendChild(filterMod);
     }
@@ -692,12 +689,10 @@ function updateHeader(clickTarget = null, ignoreFlip = false) {
     abilityState = (abilityState+1)%4;
     if (abilityState) {
       headerColumns[4].innerHTML = `<span style="color:rgb(140, 130, 240);">${headerNames[4]}</span>`;
-      if      (abilityState == 1) {headerColumns[4].innerHTML += `<span style="color:rgb(255, 255, 255); font-size:12px;">(${altText[1]})</span>`;}
-      else if (abilityState == 2) {headerColumns[4].innerHTML += `<span style="color:rgb(240, 230, 140); font-size:12px;">(${altText[2]})</span>`;}
-      else if (abilityState == 3) {headerColumns[4].innerHTML += `<span style="color:rgb(140, 130, 240); font-size:12px;">(${altText[3]})</span>`;}
-    } else {
-      headerColumns[4].innerHTML = headerNames[4];
-    }
+      if      (abilityState == 1) headerColumns[4].innerHTML += `<span style="color:rgb(255, 255, 255); font-size:12px;">(${altText[1]})</span>`;
+      else if (abilityState == 2) headerColumns[4].innerHTML += `<span style="color:rgb(240, 230, 140); font-size:12px;">(${altText[2]})</span>`;
+      else if (abilityState == 3) headerColumns[4].innerHTML += `<span style="color:rgb(140, 130, 240); font-size:12px;">(${altText[3]})</span>`;
+    } else headerColumns[4].innerHTML = headerNames[4];
   } else {
     headerColumns[5].innerHTML = headerColumns[5].textDef;
     if (sortAttribute) { // Clicked on a header that can actually be sorted
