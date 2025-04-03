@@ -755,15 +755,12 @@ searchBox.addEventListener('input', (event) => {
   refreshAllItems();
 });
 
-document.addEventListener("keyup", (event) => isKeyDown.delete(event.code));
 document.addEventListener('keydown', (event) => { 
-  isKeyDown.add(event.code);
-  const modKeys = ["ControlLeft","ControlRight","AltLeft","AltRight"];
   const ignoredKeys = ["Escape", "Tab", "Shift", "PageDown", "PageUp", "Control", "Alt", "Meta", "CapsLock", 
     "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"];
   if (!ignoredKeys.includes(event.key)) { // Ignore certain key presses
-    // Ignore all key presses if a modifier is held, except when pasting
-    if (modKeys.every((thisKey) => !isKeyDown.has(thisKey)) || event.code == "KeyV") {
+    // Ignore all key presses if 'Ctrl' is held, except when pasting
+    if (!event.ctrlKey || event.code == "KeyV") {
       splashScreen.classList.remove("show");
       searchBox.focus(); // Focus the search box on any key press
     }
