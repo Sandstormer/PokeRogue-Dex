@@ -21,8 +21,9 @@ const openLangButton = document.getElementById("lang-img");
 const sortAttributes = ['row','shiny','sp','type','ab','moves','co','bst','hp','atk','def','spa','spd','spe'];
 const possibleFID = [...Array(fidThreshold[fidThreshold.length-1]).keys()];
 const possibleSID = [...Array(items.length).keys()];
-const supportedLangs = ["en","fr","ko","zh-CN"];//"it","es-ES","pt-BR","de","ja"];
-const LanguageNames  = ["English","Français","한국어 (Hangugeo)","简体中文 (Jiǎntǐ Zhōngwén)"];//"Italiano","Español (España)","Português (Brasil)","Deutsch","繁體中文 (Fántǐ Zhōngwén)","日本語 (Nihongo)"];
+const supportedLangs = ["en","fr","ko","zh-CN","ja"];//"it","es-ES","pt-BR","de"];
+const LanguageNames  = ["English","Français","한국어 (Hangugeo)","简体中文 (Jiǎntǐ Zhōngwén)","日本語 (Nihongo)"];//"Italiano","Español (España)","Português (Brasil)","Deutsch","繁體中文 (Fántǐ Zhōngwén)"];
+const isKeyDown = new Set();
 let increment = 10;     // Number of items to load at a time
 let renderLimit = 0;    // Start with no items
 let showMoveLearn = []; // Filtered moves to show sources
@@ -90,7 +91,7 @@ function loadAndApplyLanguage(lang) {
     });      
     
     // Display items, and initial sort by row number
-    adjustLayout(headerColumns[0],true); // Should simplify .........
+    adjustLayout(true, headerColumns[0]); 
   }
   script.onerror = (e) => console.warn(`Failed to load ${lang}.js`, e);
   document.head.appendChild(script);
@@ -98,10 +99,8 @@ function loadAndApplyLanguage(lang) {
 }
 
 function refreshAllItems() { // Display items based on query and locked filters **************************
-  // console.log('Refreshing all items');
   const query = searchBox.value.toLowerCase().replace(/[.’'\s-]/g,'');
 
-  // itemList.innerHTML = ""; // Clear existing items
   itemList.querySelectorAll('li').forEach(li => li.replaceWith(li.cloneNode(true))); // Clones without listeners
   while (itemList.firstChild) itemList.firstChild.remove();
 
@@ -647,7 +646,7 @@ function removeFilter(fidToRemove, filterTag, filterModToRemove) {
     pageTitle.classList.remove('colorful-text');  void pageTitle.offsetWidth;
     pageTitle.classList.add('colorful-text');
   }
-  if (!isMobile) {searchBox.focus();}
+  if (!isMobile) searchBox.focus();
 }
 
 function updateFilterGroups() { // Updates the grouping of filters based on AND/OR toggles
@@ -669,7 +668,6 @@ function toggleOR(filterMod) { // Click a filter to toggle it between AND and OR
 
 // Click on the header row to sort/filter by an attribute **************************
 function updateHeader(clickTarget = null, ignoreFlip = false) {
-  // console.log(clickTarget?.sortattr)
   if (clickTarget == null) {clickTarget = sortState.target; ignoreFlip = true;}
   // Set the text of the move column, depending on if a move is filtered
   if (showMoveLearn.length) {
@@ -681,7 +679,7 @@ function updateHeader(clickTarget = null, ignoreFlip = false) {
   // Find the new sorting attribute, and update the headers
   const sortAttribute = clickTarget?.sortattr;
   if (sortAttribute == 'shiny') { // Toggle the global shiny state
-    shinyState = (shinyState == 0 ? 3 : shinyState-1);
+    shinyState = (shinyState+3)%4;
     if (shinyState) {
       headerColumns[1].innerHTML = `<span style="color:rgb(140, 130, 240);">${headerNames[1]}</span>`;
       const starImg = document.createElement('img');  starImg.className = 'star-header';
@@ -691,7 +689,7 @@ function updateHeader(clickTarget = null, ignoreFlip = false) {
       headerColumns[1].innerHTML = headerNames[1];
     }
   } else if (sortAttribute == 'ab') { // Toggle the global ability state
-    abilityState = (abilityState == 3 ? 0 : abilityState+1);
+    abilityState = (abilityState+1)%4;
     if (abilityState) {
       headerColumns[4].innerHTML = `<span style="color:rgb(140, 130, 240);">${headerNames[4]}</span>`;
       if      (abilityState == 1) {headerColumns[4].innerHTML += `<span style="color:rgb(255, 255, 255); font-size:12px;">(${altText[1]})</span>`;}
@@ -723,11 +721,9 @@ function updateHeader(clickTarget = null, ignoreFlip = false) {
   refreshAllItems();
 }
 
-function adjustLayout(headerTarget = null, forceAdjust = false) {
+function adjustLayout(forceAdjust = false, headerClick = null) {
   if (isMobile != (window.innerWidth <= 768) || forceAdjust) {
-    const windowWidth = window.innerWidth;
-    isMobile = (windowWidth <= 768);
-    // console.log((isMobile ? "Mobile layout" : "Desktop layout"), windowWidth, isMobile);
+    isMobile = (window.innerWidth <= 768);
     // Redraw all the header columns into the header container
     headerContainer.innerHTML = '';
     const thisRow = document.createElement('div'); thisRow.className = 'header-row';
@@ -738,14 +734,14 @@ function adjustLayout(headerTarget = null, forceAdjust = false) {
       headerContainer.appendChild(thisRow);
       const row2 = document.createElement('div'); row2.className = 'header-row';
       row2.appendChild(headerColumns[3]);
-      for (const thisColumn of headerColumns.slice(6,15)) { row2.appendChild(thisColumn); }  
+      for (const thisColumn of headerColumns.slice(6,15)) row2.appendChild(thisColumn);  
       headerContainer.appendChild(row2);
     } else {
-      for (const thisColumn of headerColumns) { thisRow.appendChild(thisColumn); }  
+      for (const thisColumn of headerColumns) thisRow.appendChild(thisColumn);  
       headerContainer.appendChild(thisRow);
     }
   increment = (isMobile ? 10 : 30);
-  updateHeader(headerTarget, true);
+  updateHeader(headerClick, true);
   }
 }
 
@@ -760,54 +756,56 @@ window.addEventListener("resize", () => adjustLayout());
 // Typing in search box
 searchBox.addEventListener('input', (event) => { 
   tabSelect = -1;
-  // for (let index = 0; index < 50; index++) { // Slow down the performance for benchmarking
   refreshAllItems();
-  // }
 });
+
+document.addEventListener("keyup", (event) => isKeyDown.delete(event.code));
 document.addEventListener('keydown', (event) => { 
-  const ignoredKeys = ["Escape", "Tab", "Shift", "PageDown", "PageUp", "Control", "Alt", "Meta", "CapsLock", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"];
-  if (!ignoredKeys.includes(event.key)) { // Ignore certain keys like Tab, Shift, Control, Alt, etc.
-    splashScreen.classList.remove("show");
-    searchBox.focus(); // Focus the search box on any key press
-  }
-  if (event.key == "Enter" && filterToEnter) {
-    lockFilter(filterToEnter); // Hit 'Enter' to lock the first filter
-  }
-  if (event.key == "PageDown" || event.key == "PageUp") {
-    searchBox.blur(); // Allow PageUp and PageDown even when in search box
-  }
-  if (event.key == "Escape") { // Hit escape to clear the search box, or the last filter
-    if (splashScreen.classList.contains("show")) { // Close any splash screen
+  isKeyDown.add(event.code);
+  const modKeys = ["ControlLeft","ControlRight","AltLeft","AltRight"];
+  const ignoredKeys = ["Escape", "Tab", "Shift", "PageDown", "PageUp", "Control", "Alt", "Meta", "CapsLock", 
+    "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"];
+  if (!ignoredKeys.includes(event.key)) { // Ignore certain key presses
+    // Ignore all key presses if a modifier is held, except when pasting
+    if (modKeys.every((thisKey) => !isKeyDown.has(thisKey)) || event.code == "KeyV") {
       splashScreen.classList.remove("show");
-    } else if (searchBox.value.length > 0) { // Clear any text from the search box
-      searchBox.value = ''
+      searchBox.focus(); // Focus the search box on any key press
+    }
+  }
+  // Hit 'Enter' to lock first filter
+  if (event.key == "Enter" && filterToEnter) lockFilter(filterToEnter);
+  // Allow PageUp and PageDown even when in search box
+  if (event.key == "PageDown" || event.key == "PageUp") searchBox.blur();
+  // Hit escape to clear search box, text, last filter, or headers
+  if (event.key == "Escape") {
+    if (splashScreen.classList.contains("show")) { // Close splash screen
+      splashScreen.classList.remove("show");
+    } else if (searchBox.value.length > 0) { // Clear text from the search box
+      searchBox.value = '';
       refreshAllItems();
-    } else if (lockedFilters.length > 0) { // If there is a locked filter
+    } else if (lockedFilters.length > 0) { // If there is locked filter
       const lastFilter = lockedFilters[lockedFilters.length - 1];
       const filterTags = document.querySelectorAll(".filter-tag");
-      const lastFilterTag = filterTags[filterTags.length - 1];
-      const lastFilterMod = lockedFilterMods[lockedFilterMods.length - 1];
-      if (lastFilter && lastFilterTag) {
-        removeFilter(lastFilter, lastFilterTag, lastFilterMod); // Remove the last filter
+      const lastTag = filterTags[filterTags.length - 1];
+      const lastMod = lockedFilterMods[lockedFilterMods.length - 1];
+      if (lastFilter && lastTag) {
+        removeFilter(lastFilter, lastTag, lastMod); // Remove last filter
       }
-    } else if (shinyState || abilityState) { // Clear all header restrictions
+    } else if (shinyState || abilityState) { // Clear header restrictions
       shinyState = 0;   headerColumns[1].innerHTML = headerNames[1];
       abilityState = 0; headerColumns[4].innerHTML = headerNames[4];
       updateHeader();
     }
   }
   if (event.key == "Tab" && document.activeElement == searchBox) {
-    if (tabSelect == -1) {tabSelect = 0;}
-    tabSelect += 1;
+    tabSelect += 1 + (tabSelect == -1);
     displaySuggestions();
     event.preventDefault();
   }
 });
 // Close splash screen when clicking outside the content box
 splashScreen.addEventListener("click", (event) => {
-  if (event.target === splashScreen) {
-    splashScreen.classList.remove("show");
-  }
+  if (event.target === splashScreen) splashScreen.classList.remove("show");
 });
 // Open the language selector splash
 openLangButton.addEventListener('mouseover', () => openLangButton.src = `ui/globeh.png`);
@@ -834,8 +832,7 @@ function openLangMenu() {
 openHelpButton.addEventListener('mouseover', () => openHelpButton.src = `ui/helph.png`);
 openHelpButton.addEventListener('mouseout',  () => openHelpButton.src = `ui/help.png` ); 
 openHelpButton.addEventListener("click",     () => openHelpMenu());
-function openHelpMenu() {
-  // Assemble the content for the help splash screen
+function openHelpMenu() { // Show the instructions
   splashContent.style.width = '382px';
   splashContent.innerHTML = helpMenuText;
   splashScreen.classList.add("show"); // Make it visible

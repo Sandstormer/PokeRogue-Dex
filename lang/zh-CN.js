@@ -4204,7 +4204,7 @@ helpMenuText = `
 组合多个筛选条件以获得所需结果 <br>
 <span style="color:rgb(145, 145, 145);">点击筛选条件之间以匹配任意一个</span>
 <hr>
-<p style="margin: 10px; font-weight: bold;">点击<span style="color:rgb(140, 130, 240);">表头</span>以排序结果</p>
+<p style="margin: 10px; font-weight: bold;">点击 <span style="color:rgb(140, 130, 240);">表头</span> 以排序结果</p>
 <b>${headerNames[1]}</b> column can restrict to shiny variants
 <p style="margin: 10px;"><b>${headerNames[4]}</b> column can restrict to one slot:<br>
 <b>Main Abilities</b>, 
