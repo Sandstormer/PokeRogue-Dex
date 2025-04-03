@@ -91,6 +91,7 @@ function loadAndApplyLanguage(lang) {
     });      
     
     // Display items, and initial sort by row number
+    shinyState = 0; abilityState = 0;
     adjustLayout(true, headerColumns[0]); 
   }
   script.onerror = (e) => console.warn(`Failed to load ${lang}.js`, e);
