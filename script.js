@@ -16,6 +16,10 @@ const filterContainer = document.getElementById("filter-container");
 const suggestions = document.getElementById("suggestions");
 const splashScreen = document.getElementById("splashScreen");
 const splashContent = document.getElementById("splashContent");
+const movesetScreen = document.getElementById("movesetScreen");
+const movesetContent = document.getElementById("movesetContent");
+const movesetHeader = document.getElementById("movesetHeader");
+const movesetScrollable = document.getElementById("movesetScrollable");
 const openHelpButton = document.getElementById("help-img");
 const openLangButton = document.getElementById("lang-img");
 const sortAttributes = ['row','shiny','sp','type','ab','moves','co','bst','hp','atk','def','spa','spd','spe'];
@@ -23,12 +27,12 @@ const possibleFID = [...Array(fidThreshold[fidThreshold.length-1]).keys()];
 const possibleSID = [...Array(items.length).keys()];
 const supportedLangs = ["en","fr","ko","zh-CN","ja"];//"it","es-ES","pt-BR","de"];
 const LanguageNames  = ["English","Français","한국어 (Hangugeo)","简体中文 (Jiǎntǐ Zhōngwén)","日本語 (Nihongo)"];//"Italiano","Español (España)","Português (Brasil)","Deutsch","繁體中文 (Fántǐ Zhōngwén)"];
-const isKeyDown = new Set();
+const moveCatColor = {0:'rgb(251, 173, 124)',1:'rgb(131, 182, 239)',2:'rgb(255, 255, 255)'};
 let increment = 10;     // Number of items to load at a time
 let renderLimit = 0;    // Start with no items
 let showMoveLearn = []; // Filtered moves to show sources
 let filterToEnter = null;  // Filter to apply when hitting Enter
-let tabSelect = 0;         // Filter that is tab selected
+let tabSelect = -1;         // Filter that is tab selected
 let lockedFilters = [];    // List of all locked filters
 let lockedFilterMods = []; // List of filter mod objects
 let lockedFilterGroups = [[]]; // Grouped together for OR
@@ -38,6 +42,7 @@ let filteredItemIDs = null; // List of all displayed row numbers
 let shinyState = 0;   // Global state of shiny   (0,1,2,3)
 let abilityState = 0; // Global state of ability (0,1,2,3)
 let sortState = { column: null, ascending: true, target: null }; // Track the current sort state
+let shownMovesetID = -1;
 // const spreadMoves = possibleFID.filter((fid) => fid >= fidThreshold[1] && fid < fidThreshold[2]
 //   && (fidToProc[fid-fidThreshold[1]][7].includes(21) || fidToProc[fid-fidThreshold[1]][7].includes(22)));
 // filteredItemIDs = filteredItemIDs.filter((thisID) => spreadMoves.some((thisMove) => thisMove in items[thisID]));
@@ -155,7 +160,6 @@ function refreshAllItems() { // Display items based on query and locked filters 
   // Sort items if a column is specified ==============
   if (sortState.column) {
     filteredItemIDs.sort((a, b) => {
-      // const aValue = a-2000*pinnedRows.includes(a); const bValue = b-2000*pinnedRows.includes(b);
       let aValue = a; let bValue = b; // Set default attribute of row number
       if (sortState.column == 'moves') { // Sort by source of moves
         const getLearnLevel = (ID) => 
@@ -303,8 +307,9 @@ function renderMoreItems() { // Create each list item, with rows and columns of 
     }
     
     const specColumn = document.createElement('div'); // Show species name
-    specColumn.className = 'item-column';
+    specColumn.className = 'clickable-name';
     specColumn.innerHTML = speciesNames[thisID];
+    specColumn.addEventListener('click', () => showMovesetSplash(thisID));
     
     const typeColumn = document.createElement('div'); // Show both types
     typeColumn.className = 'item-column';
@@ -316,8 +321,9 @@ function renderMoreItems() { // Create each list item, with rows and columns of 
     ['a1','a2','ha','pa'].forEach((name) => {
       if (name in item) {
         const clickableRow = document.createElement('div');  clickableRow.className = 'clickable-name';
-        clickableRow.innerHTML = `<p style="color:${abToColor(name)}; margin: 0;">${fidToName[item[name]]}</p>`;
-        clickableRow.addEventListener('click', () => {showMoveSplash(item[name]);});
+        clickableRow.style.color = abToColor(name);
+        clickableRow.innerHTML = `<p style="margin: 0;">${fidToName[item[name]]}</p>`;
+        clickableRow.addEventListener('click', () => showDescSplash(item[name]));
         abilityColumn.appendChild(clickableRow); 
       }
     });
@@ -341,7 +347,7 @@ function renderMoreItems() { // Create each list item, with rows and columns of 
         const clickableRow = document.createElement('div');  clickableRow.className = 'clickable-name';
         clickableRow.innerHTML = `<p style="color:rgb(140, 130, 240); margin: 0;"> 
                                  ${fidToName[thisMove]}:<br>${sourceText}</span></p>`;
-        clickableRow.addEventListener('click', () => showMoveSplash(thisMove));
+        clickableRow.addEventListener('click', () => showDescSplash(thisMove));
         moveColumn.appendChild(clickableRow);
       }
     });
@@ -352,7 +358,7 @@ function renderMoreItems() { // Create each list item, with rows and columns of 
         if (name == 'e4') clickableRow.style.color = 'rgb(240, 230, 140)';
         // clickableRow.style.color = typeColors[fidToProc[item[name]-fidThreshold[1]][0]];
         clickableRow.innerHTML = fidToName[item[name]];
-        clickableRow.addEventListener('click', () => showMoveSplash(item[name]));
+        clickableRow.addEventListener('click', () => showDescSplash(item[name]));
         moveColumn.appendChild(clickableRow);
       });
     }
@@ -388,7 +394,7 @@ function renderMoreItems() { // Create each list item, with rows and columns of 
       row3.appendChild(spaColumn);      row3.appendChild(spdColumn);       row3.appendChild(speColumn);    
       li.appendChild(row3); // Append the 3rd row
     } else {
-      row1.appendChild(dexColumn);      row1.appendChild(pokeImg);             row1.appendChild(specColumn);    
+      row1.appendChild(dexColumn);      row1.appendChild(pokeImg);         row1.appendChild(specColumn);    
       row1.appendChild(typeColumn);     row1.appendChild(abilityColumn);   row1.appendChild(moveColumn); 
       row1.appendChild(costColumn);     row1.appendChild(bstColumn);
       row1.appendChild(hpColumn);       row1.appendChild(atkColumn);       row1.appendChild(defColumn);
@@ -399,7 +405,85 @@ function renderMoreItems() { // Create each list item, with rows and columns of 
   });
 }
 
-function showMoveSplash(fid) {
+function showMovesetSplash(specID) {
+  movesetContent.style.width = '330px';
+  movesetHeader.innerHTML = '';
+  const item = items[specID]; shownMovesetID = specID;
+  const t2line = ('t2' in item ? ` / <span style="color:${typeColors[item.t2]}; display:inline">${fidToName[item.t2]}</span>` : '')
+  const line1 = document.createElement('div'); const line1mid = document.createElement('div');
+  line1mid.innerHTML = `${speciesNames[specID]}<br><span style="color:${typeColors[item.t1]}; display:inline">${fidToName[item.t1]}</span>${t2line}`;
+  const msImg = document.createElement('img'); msImg.src = `images/${item.img}_0.png`; msImg.className = 'moveset-image';
+  const arrowL = document.createElement('img'); arrowL.src = 'ui/arrow.png'; arrowL.className = 'moveset-arrow';
+  arrowL.addEventListener('mouseover', () => arrowL.src = `ui/arrowh.png`);
+  arrowL.addEventListener('mouseout',  () => arrowL.src = `ui/arrow.png` ); 
+  arrowL.addEventListener("click",     () => changeMoveset(-1));
+  const arrowR = document.createElement('img'); arrowR.src = 'ui/arrow.png'; arrowR.className = 'moveset-arrow'; arrowR.style="transform: scaleX(-1);";
+  arrowR.addEventListener('mouseover', () => arrowR.src = `ui/arrowh.png`);
+  arrowR.addEventListener('mouseout',  () => arrowR.src = `ui/arrow.png` ); 
+  arrowR.addEventListener("click",     () => changeMoveset(1));
+  line1.appendChild(arrowL); line1.appendChild(msImg); line1.appendChild(line1mid); line1.appendChild(arrowR);
+  movesetHeader.appendChild(line1); 
+  movesetHeader.appendChild(document.createElement('hr'));
+  const line2 = document.createElement('div');
+  line2.innerHTML = `<div>${altText[17]}</div><div>${catToName[2]}</div>
+  <div>${altText[5]}</div><div>${altText[6]}</div><div>${altText[7]}</div>`;
+  movesetHeader.appendChild(line2); 
+  movesetHeader.appendChild(document.createElement('hr'));
+  const moveList = [[],[]]; // Assemble list of moves
+  for (const [key, value] of Object.entries(item)) {
+    const intKey = Number(key);
+    if (Number.isInteger(intKey) && intKey >= fidThreshold[1] && intKey < fidThreshold[2]) {
+      if (value < 200) moveList[0].push(intKey);
+      else if (value > 202) moveList[1].push(intKey);
+    }
+  }
+  // Sort the moves
+  moveList.forEach(m => m.sort((a, b) => item[a] > item[b] ? 1 : (item[a] < item[b]) ? -1 : 0));
+  movesetScrollable.innerHTML = '';
+  [moveList[0],[item.e1,item.e2,item.e3,item.e4],moveList[1]].forEach(thisList => {
+    if (thisList != moveList[0]) movesetScrollable.appendChild(document.createElement('hr'));
+    thisList.forEach(move => makeMovesetRow(move, item));
+  });
+  if (!movesetScreen.classList.contains('show')) {
+    movesetScreen.classList.add("show"); 
+    movesetScrollable.scrollTop = 0;  
+    movesetContent.focus();          
+  }
+}
+function makeMovesetRow(fid, item) {
+  const moveRow = document.createElement('div');  moveRow.className = 'moveset-row';
+  const thisProcs = fidToProc[fid-fidThreshold[1]];
+  moveRow.innerHTML = `<div style="color:${moveSrcText(item[fid])}</div>
+    <div style="color:${typeColors[thisProcs[0]]};">${fidToName[fid]}</div>
+    <div style="color:${moveCatColor[thisProcs[1]]}">${(thisProcs[2]==-1?'-':thisProcs[2])}</div>
+    <div style="color:${thisProcs[7].includes(21)?'rgb(239, 131, 131)'
+      :(thisProcs[7].includes(22)?'rgb(247, 82, 49)':(thisProcs[7].includes(20)?'rgb(216, 143, 205)'
+      :'rgb(255, 255, 255)'))};">${(thisProcs[3]==-1?'-':thisProcs[3])}</div>
+    <div>${thisProcs[4]}</div>`;
+  moveRow.addEventListener('click', () => showDescSplash(fid));
+  movesetScrollable.appendChild(moveRow);
+}
+function moveSrcText(src) {
+  // src = -1 for mem, 0 for evo, 1-200 for level up, 201(202) for (rare)egg, 203-205 for tm tier
+  if (src == -1 ) return `rgb(251, 173, 124);"><img src="ui/mem.png"></img>`;
+  if (src ==  0 ) return `rgb(131, 182, 239);">${altText[18]}`;
+  if (src <  200) return `rgb(255, 255, 255);">${src}`;
+  if (src == 201) return `rgb(255, 255, 255);">${altText[19]}`;
+  if (src == 202) return `rgb(240, 230, 140);">${altText[19]}`;
+  const text = (altText[16].length > 2 ? 'TM' : altText[16])
+  if (src == 203) return `rgb(255, 255, 255);">${text}`;
+  if (src == 204) return `rgb(131, 182, 239);">${text}`;
+  if (src == 205) return `rgb(240, 230, 140);">${text}`;
+}
+function changeMoveset(indexChange) {
+  const index = filteredItemIDs.findIndex(ID => ID == shownMovesetID) + indexChange;
+    if (index >= 0 && index < filteredItemIDs.length) {
+      window.scrollTo({top:(89+68*isMobile)*(index-2*!isMobile)});
+      showMovesetSplash(filteredItemIDs[index]);
+    }
+}
+
+function showDescSplash(fid) {
   splashContent.style.width = '300px';
   const thisDesc = fidToDesc[fid-fidThreshold[0]];
   splashContent.innerHTML = `<b>${fidToName[fid]}</b><hr>`; // Name header
@@ -409,12 +493,12 @@ function showMoveSplash(fid) {
     //   splashContent.innerHTML += `<p style="color:rgb(145, 145, 145); margin:0px; margin-top:8px;">${thisDesc[1]}</p>`;
     // }
   } else { // For moves
-    const thisProcLine = fidToProc[fid-fidThreshold[1]];
+    const thisProcs = fidToProc[fid-fidThreshold[1]];
     const splashMoveRow = document.createElement('div');  splashMoveRow.className = 'splash-move-row';
     altText.slice(4,8).forEach((attName,index) => { // Show type and damage category, then Power, Accuracy, PP
       const splashMoveCol = document.createElement('div');
-      if (!index) splashMoveCol.innerHTML = `<span style="color:${typeColors[thisProcLine[0]]};">${fidToName[thisProcLine[0]]}</span><br><img src="ui/cat${thisProcLine[1]}.png"></img>`;
-      else splashMoveCol.innerHTML = `${attName}<br>${(thisProcLine[1+index]==-1 ? '-' : thisProcLine[1+index])}`;
+      if (!index) splashMoveCol.innerHTML = `<span style="color:${typeColors[thisProcs[0]]};">${fidToName[thisProcs[0]]}</span><br><img src="ui/cat${thisProcs[1]}.png"></img>`;
+      else splashMoveCol.innerHTML = `${attName}<br>${(thisProcs[1+index]==-1 ? '-' : thisProcs[1+index])}`;
       splashMoveRow.appendChild(splashMoveCol);
     });
     splashContent.appendChild(splashMoveRow);
@@ -423,88 +507,89 @@ function showMoveSplash(fid) {
     //   splashContent.innerHTML += `<p style="color:rgb(145, 145, 145); margin:0px; margin-top:8px;">${thisDesc[1]}</p>`;
     // }
     // Add all tags for priority, targets, procs, contact, other
-    if (thisProcLine[5] || thisProcLine[6] || thisProcLine[7]) {
+    if (thisProcs[5] || thisProcs[6] || thisProcs[7]) {
       const splashMoveTags = document.createElement('div');  splashMoveTags.className = 'splash-move-tags';
-      if (thisProcLine[5] > 0) { // If non-zero priority
-        {splashMoveTags.innerHTML += `<p style="color:rgb(143, 214, 154);">Priority: +${thisProcLine[5]}</p>`;};
-      } else if (thisProcLine[5] < 0) {
-        {splashMoveTags.innerHTML += `<p style="color:rgb(239, 131, 131);">Priority: ${thisProcLine[5]}</p>`;};
+      if (thisProcs[5] > 0) { // If non-zero priority
+        {splashMoveTags.innerHTML += `<p style="color:rgb(143, 214, 154);">Priority: +${thisProcs[5]}</p>`;};
+      } else if (thisProcs[5] < 0) {
+        {splashMoveTags.innerHTML += `<p style="color:rgb(239, 131, 131);">Priority: ${thisProcs[5]}</p>`;};
       }
-      if (thisProcLine[7].includes(20)) {splashMoveTags.innerHTML += '<p style="color:rgb(216, 143, 205);">Targets: Random Enemy</p>';};
-      if (thisProcLine[7].includes(21)) {splashMoveTags.innerHTML += '<p style="color:rgb(251, 173, 124);">Targets: All Enemies</p>';};
-      if (thisProcLine[7].includes(22)) {splashMoveTags.innerHTML += '<p style="color:rgb(239, 131, 131);">Targets: Entire Field</p>';};
-      thisProcLine[6].forEach((thisProc) => { // Procs for stats, status, flinch, etc.
+      if (thisProcs[7].includes(20)) {splashMoveTags.innerHTML += '<p style="color:rgb(216, 143, 205);">Targets: Random Enemy</p>';};
+      if (thisProcs[7].includes(21)) {splashMoveTags.innerHTML += '<p style="color:rgb(239, 131, 131);">Targets: All Enemies</p>';};
+      if (thisProcs[7].includes(22)) {splashMoveTags.innerHTML += '<p style="color:rgb(247, 82, 49);">Targets: Entire Field</p>';};
+      thisProcs[6].forEach((thisProc) => { // Procs for stats, status, flinch, etc.
         const procChance = ((thisProc[0] == '-1') ? '' : `${thisProc[0]}% `);
         const procStages = ((thisProc[2] == '0') ? '' : ` ${(thisProc[2] > 0 ? '+' : '')}${thisProc[2]}`);
         splashMoveTags.innerHTML += `<p>${procChance}${procToDesc[thisProc[1]]}${procStages}</p>`;
       });
-      if (thisProcLine[7].includes(60)) {splashMoveTags.innerHTML += "<p>User Atk maxed</p>";};
-      if (thisProcLine[7].includes(0))  {splashMoveTags.innerHTML += "<p>High Critical Ratio</p>";};
-      if (thisProcLine[7].includes(1))  {splashMoveTags.innerHTML += "<p>Guaranteed Critical Hit</p>";};
-      if (thisProcLine[7].includes(2))  {splashMoveTags.innerHTML += "<p>User Critical Rate +1</p>";};
-      if (thisProcLine[7].includes(35)) {splashMoveTags.innerHTML += "<p>Costs 50% of HP</p>";};
-      if (thisProcLine[7].includes(59)) {splashMoveTags.innerHTML += "<p>Costs 33% of HP</p>";};
-      if (thisProcLine[7].includes(34)) {splashMoveTags.innerHTML += "<p>Recoil 50% of HP</p>";};
-      if (thisProcLine[7].includes(36)) {splashMoveTags.innerHTML += "<p>Recoil 33% of damage</p>";};
-      if (thisProcLine[7].includes(37)) {splashMoveTags.innerHTML += "<p>Recoil 50% of damage</p>";};
-      if (thisProcLine[7].includes(53)) {splashMoveTags.innerHTML += "<p>Recoil 25% of damage</p>";};
-      if (thisProcLine[7].includes(27)) {splashMoveTags.innerHTML += "<p>Heals Status Effects</p>";};
-      if (thisProcLine[7].includes(28)) {splashMoveTags.innerHTML += "<p>Heals Status Effects</p>";};
-      if (thisProcLine[7].includes(29)) {splashMoveTags.innerHTML += "<p>Heals Sleep</p>";};
-      if (thisProcLine[7].includes(30)) {splashMoveTags.innerHTML += "<p>Heals Freeze</p>";};
-      if (thisProcLine[7].includes(31)) {splashMoveTags.innerHTML += "<p>Heals Paralysis</p>";};
-      if (thisProcLine[7].includes(32)) {splashMoveTags.innerHTML += "<p>Heals Burn</p>";};
-      if (thisProcLine[7].includes(39)) {splashMoveTags.innerHTML += "<p>Heals 100% damage dealt</p>";};
-      if (thisProcLine[7].includes(40)) {splashMoveTags.innerHTML += "<p>Heals 75% damage dealt</p>";};
-      if (thisProcLine[7].includes(41)) {splashMoveTags.innerHTML += "<p>Heals by target's Atk</p>";};
-      if (thisProcLine[7].includes(42)) {splashMoveTags.innerHTML += "<p>Heals 50% damage dealt</p>";};
-      if (thisProcLine[7].includes(13)) {splashMoveTags.innerHTML += "<p>Triage gives +3 priority</p>";};
-      if (thisProcLine[7].includes(5))  {splashMoveTags.innerHTML += "<p>No effect on Grass/Overcoat</p>";};
-      if (thisProcLine[7].includes(55)) {splashMoveTags.innerHTML += "<p>No seeding on Grass Types</p>";};
-      if (thisProcLine[7].includes(7))  {splashMoveTags.innerHTML += "<p>Boosted by Sharpness</p>";};
-      if (thisProcLine[7].includes(8))  {splashMoveTags.innerHTML += "<p>Boosted by Iron Fist</p>";};
-      if (thisProcLine[7].includes(9))  {splashMoveTags.innerHTML += "<p>Triggers Dancer ability</p>";};
-      if (thisProcLine[7].includes(10)) {splashMoveTags.innerHTML += "<p>No effect on Bulletproof</p>";};
-      if (thisProcLine[7].includes(11)) {splashMoveTags.innerHTML += "<p>Boosted by Mega Launcher</p>";};
-      if (thisProcLine[7].includes(12)) {splashMoveTags.innerHTML += "<p>Boosted by Strong Jaw</p>";};
-      if (thisProcLine[7].includes(33)) {splashMoveTags.innerHTML += "<p>Boosted by Reckless</p>";};
-      if (thisProcLine[7].includes(14)) {splashMoveTags.innerHTML += "<p>Sound based move</p>";};
-      if (thisProcLine[7].includes(15)) {splashMoveTags.innerHTML += "<p>Prevented by Damp ability</p>";};
-      if (thisProcLine[7].includes(16)) {splashMoveTags.innerHTML += "<p>Triggers Wind Rider</p>";};
-      if (thisProcLine[7].includes(54)) {splashMoveTags.innerHTML += "<p>Ignores Abilities</p>";};
-      if (thisProcLine[7].includes(17)) {splashMoveTags.innerHTML += "<p>Ignores Protect</p>";};
-      if (thisProcLine[7].includes(18) || thisProcLine[7].includes(14)) {splashMoveTags.innerHTML += "<p>Ignores Substitute</p>";};
-      if (thisProcLine[7].includes(19)) {splashMoveTags.innerHTML += "<p>Target switches out</p>";};
-      if (thisProcLine[7].includes(52)) {splashMoveTags.innerHTML += "<p>User switches out</p>";};
-      if (thisProcLine[7].includes(23)) {splashMoveTags.innerHTML += "<p>Hits 2 times</p>";};
-      if (thisProcLine[7].includes(24)) {splashMoveTags.innerHTML += "<p>Hits 3 times</p>";};
-      if (thisProcLine[7].includes(25)) {splashMoveTags.innerHTML += "<p>Hits 10 times</p>";};
-      if (thisProcLine[7].includes(26)) {splashMoveTags.innerHTML += "<p>Hits 2-5 times</p>";};
-      if (thisProcLine[7].includes(38)) {splashMoveTags.innerHTML += "<p>Repeats for 2-3 turns</p>";};
-      if (thisProcLine[7].includes(43)) {splashMoveTags.innerHTML += "<p>One Hit KO move</p><p>Modified against Bosses</p>";};
-      if (thisProcLine[7].includes(44)) {splashMoveTags.innerHTML += "<p>Removes hazards</p>";};
-      if (thisProcLine[7].includes(45)) {splashMoveTags.innerHTML += "<p>Traps and damages target</p>";};
-      if (thisProcLine[7].includes(46)) {splashMoveTags.innerHTML += "<p>30% deal 2x damage</p>";};
+      if (thisProcs[7].includes(60)) {splashMoveTags.innerHTML += "<p>User Atk maxed</p>";};
+      if (thisProcs[7].includes(0))  {splashMoveTags.innerHTML += "<p>High Critical Ratio</p>";};
+      if (thisProcs[7].includes(1))  {splashMoveTags.innerHTML += "<p>Guaranteed Critical Hit</p>";};
+      if (thisProcs[7].includes(2))  {splashMoveTags.innerHTML += "<p>User Critical Rate +1</p>";};
+      if (thisProcs[7].includes(35)) {splashMoveTags.innerHTML += "<p>Costs 50% of HP</p>";};
+      if (thisProcs[7].includes(59)) {splashMoveTags.innerHTML += "<p>Costs 33% of HP</p>";};
+      if (thisProcs[7].includes(34)) {splashMoveTags.innerHTML += "<p>Recoil 50% of HP</p>";};
+      if (thisProcs[7].includes(36)) {splashMoveTags.innerHTML += "<p>Recoil 33% of damage</p>";};
+      if (thisProcs[7].includes(37)) {splashMoveTags.innerHTML += "<p>Recoil 50% of damage</p>";};
+      if (thisProcs[7].includes(53)) {splashMoveTags.innerHTML += "<p>Recoil 25% of damage</p>";};
+      if (thisProcs[7].includes(46)) {splashMoveTags.innerHTML += "<p>30% deal 2x damage</p>";};
+      if (thisProcs[7].includes(27)) {splashMoveTags.innerHTML += "<p>Heals Status Effects</p>";};
+      if (thisProcs[7].includes(28)) {splashMoveTags.innerHTML += "<p>Heals Status Effects</p>";};
+      if (thisProcs[7].includes(29)) {splashMoveTags.innerHTML += "<p>Heals Sleep</p>";};
+      if (thisProcs[7].includes(30)) {splashMoveTags.innerHTML += "<p>Heals Freeze</p>";};
+      if (thisProcs[7].includes(31)) {splashMoveTags.innerHTML += "<p>Heals Paralysis</p>";};
+      if (thisProcs[7].includes(32)) {splashMoveTags.innerHTML += "<p>Heals Burn</p>";};
+      if (thisProcs[7].includes(39)) {splashMoveTags.innerHTML += "<p>Heals 100% damage dealt</p>";};
+      if (thisProcs[7].includes(40)) {splashMoveTags.innerHTML += "<p>Heals 75% damage dealt</p>";};
+      if (thisProcs[7].includes(41)) {splashMoveTags.innerHTML += "<p>Heals by target's Atk</p>";};
+      if (thisProcs[7].includes(42)) {splashMoveTags.innerHTML += "<p>Heals 50% damage dealt</p>";};
+      if (thisProcs[7].includes(13)) {splashMoveTags.innerHTML += "<p>Triage gives priority</p>";};
+      if (thisProcs[7].includes(5))  {splashMoveTags.innerHTML += "<p>No effect on Grass/Overcoat</p>";};
+      if (thisProcs[7].includes(55)) {splashMoveTags.innerHTML += "<p>No seeding on Grass Types</p>";};
+      if (thisProcs[7].includes(7))  {splashMoveTags.innerHTML += "<p>Boosted by Sharpness</p>";};
+      if (thisProcs[7].includes(8))  {splashMoveTags.innerHTML += "<p>Boosted by Iron Fist</p>";};
+      if (thisProcs[7].includes(9))  {splashMoveTags.innerHTML += "<p>Triggers Dancer ability</p>";};
+      if (thisProcs[7].includes(10)) {splashMoveTags.innerHTML += "<p>No effect on Bulletproof</p>";};
+      if (thisProcs[7].includes(11)) {splashMoveTags.innerHTML += "<p>Boosted by Mega Launcher</p>";};
+      if (thisProcs[7].includes(12)) {splashMoveTags.innerHTML += "<p>Boosted by Strong Jaw</p>";};
+      if (thisProcs[7].includes(33)) {splashMoveTags.innerHTML += "<p>Boosted by Reckless</p>";};
+      if (thisProcs[7].includes(14)) {splashMoveTags.innerHTML += "<p>Sound based move</p><p>Ignores Substitute</p>";};
+      if (thisProcs[7].includes(15)) {splashMoveTags.innerHTML += "<p>Prevented by Damp ability</p>";};
+      if (thisProcs[7].includes(16)) {splashMoveTags.innerHTML += "<p>Triggers Wind Rider</p>";};
+      if (thisProcs[7].includes(54)) {splashMoveTags.innerHTML += "<p>Ignores Abilities</p>";};
+      if (thisProcs[7].includes(17)) {splashMoveTags.innerHTML += "<p>Ignores Protect</p>";};
+      if (thisProcs[7].includes(18)) {splashMoveTags.innerHTML += "<p>Ignores Substitute</p>";};
+      if (thisProcs[7].includes(19)) {splashMoveTags.innerHTML += "<p>Target switches out</p>";};
+      if (thisProcs[7].includes(52)) {splashMoveTags.innerHTML += "<p>User switches out</p>";};
+      if (thisProcs[7].includes(23)) {splashMoveTags.innerHTML += "<p>Hits 2 times</p>";};
+      if (thisProcs[7].includes(24)) {splashMoveTags.innerHTML += "<p>Hits 3 times</p>";};
+      if (thisProcs[7].includes(25)) {splashMoveTags.innerHTML += "<p>Hits 10 times</p>";};
+      if (thisProcs[7].includes(26)) {splashMoveTags.innerHTML += "<p>Hits 2-5 times</p>";};
+      if (thisProcs[7].includes(38)) {splashMoveTags.innerHTML += "<p>Repeats for 2-3 turns</p>";};
+      if (thisProcs[7].includes(43)) {splashMoveTags.innerHTML += "<p>One Hit KO move</p><p>Modified against Bosses</p>";};
+      if (thisProcs[7].includes(44)) {splashMoveTags.innerHTML += "<p>Removes hazards</p>";};
+      if (thisProcs[7].includes(45)) {splashMoveTags.innerHTML += "<p>Traps and damages target</p>";};
       // if (thisProcLine[7].includes(6)) {splashMoveTags.innerHTML += "<p>Reflectable by magic</p>";};
-      if (thisProcLine[7].includes(47)) {splashMoveTags.innerHTML += "<p>Can't be redirected</p>";};
-      if (thisProcLine[7].includes(48)) {splashMoveTags.innerHTML += "<p>Always hits in Rain</p>";};
-      if (thisProcLine[7].includes(56)) {splashMoveTags.innerHTML += "<p>User can't switch out</p>";};
-      if (thisProcLine[7].includes(57)) {splashMoveTags.innerHTML += "<p>Target can't switch out</p>";};
-      if (thisProcLine[7].includes(58)) {splashMoveTags.innerHTML += "<p>User & Target can't switch out</p>";};
-      if (thisProcLine[7].includes(49)) {splashMoveTags.innerHTML += "<p>No effect on Bosses</p>";};
-      if (thisProcLine[7].includes(4))  {splashMoveTags.innerHTML += "<p>Makes Contact</p>";};
-      if (thisProcLine[7].includes(51)) {splashMoveTags.innerHTML += "<p style='color:rgb(240, 230, 140);'>Partially Implemented</p>";};
-      if (thisProcLine[7].includes(50)) {splashMoveTags.innerHTML += "<p style='color:rgb(239, 131, 131);'>Not Implemented</p>";};
+      if (thisProcs[7].includes(47)) {splashMoveTags.innerHTML += "<p>Can't be redirected</p>";};
+      if (thisProcs[7].includes(48)) {splashMoveTags.innerHTML += "<p>Always hits in Rain</p>";};
+      if (thisProcs[7].includes(56)) {splashMoveTags.innerHTML += "<p>User can't switch out</p>";};
+      if (thisProcs[7].includes(57)) {splashMoveTags.innerHTML += "<p>Target can't switch out</p>";};
+      if (thisProcs[7].includes(58)) {splashMoveTags.innerHTML += "<p>User & Target can't switch out</p>";};
+      if (thisProcs[7].includes(49)) {splashMoveTags.innerHTML += "<p>No effect on Bosses</p>";};
+      if (thisProcs[7].includes(4))  {splashMoveTags.innerHTML += "<p>Makes Contact</p>";};
+      if (thisProcs[7].includes(51)) {splashMoveTags.innerHTML += "<p style='color:rgb(240, 230, 140);'>Partially Implemented</p>";};
+      if (thisProcs[7].includes(50)) {splashMoveTags.innerHTML += "<p style='color:rgb(239, 131, 131);'>Not Implemented</p>";};
       splashContent.appendChild(splashMoveTags);
     }
   }
   if (!lockedFilters.includes(fid)) { // Button to add ability/move directly to filters
     const splashButton = document.createElement('div'); splashButton.className = 'splash-button'; 
-    splashButton.innerHTML = `<span>${altText[8]}</span>`;  
-    splashButton.addEventListener("click", () => { lockFilter(fid); splashScreen.classList.remove("show"); });
+    splashButton.innerHTML = altText[8];  
+    splashButton.addEventListener("click", () => { lockFilter(fid); 
+      splashScreen.classList.remove("show"); movesetScreen.classList.remove("show"); });
     splashContent.appendChild(splashButton);
   }
-  splashScreen.classList.add("show"); // Make it visible
+  splashScreen.classList.add("show");
 }
 function fidToCategory(fid) {
   for (let index = 0; index < catToName.length; index++) {
@@ -543,8 +628,9 @@ function displaySuggestions() { // Get search query and clear the list
   filterToEnter = null;   suggestions.innerHTML = '';
   const query = searchBox.value.toLowerCase().replace(/[.’'\s-]/g,'');
   if (query.length) {
-    // Decide which family filters to show
-    let filteredSID = possibleSID.filter((ID) => speciesNames[ID].toLowerCase().replace(/[.’'\s-]/g,'').includes(query));
+    // Filter by species name, to suggest families
+    let filteredSID = possibleSID.filter((ID) => items[ID].dex.toString().includes(query) || 
+      speciesNames[ID].toLowerCase().replace(/[.’'\s-]/g,'').includes(query));
     if (filteredSID.length > 20) filteredSID = [];
     let offerFamilies = [...new Set(filteredSID.map(ID => items[ID].fa))];
     if (offerFamilies.length > 4) offerFamilies = [];
@@ -594,7 +680,6 @@ function displaySuggestions() { // Get search query and clear the list
 function lockFilter(newLockFID) {
   if (!lockedFilters.some((f) => f == newLockFID)) {
     lockedFilters.push(newLockFID); // Add the filter to the locked filters container
-    // console.log(newLockFID); console.log(fidToName[newLockFID]);
     let filterMod = null;
     if (lockedFilters.length > 1) {
       const familyOR = (newLockFID >= fidThreshold[7] && lockedFilters[lockedFilters.length-2] >= fidThreshold[7]);
@@ -608,16 +693,13 @@ function lockFilter(newLockFID) {
     filterTag.innerHTML += `${fidToCategory(newLockFID)}: ${fidToName[newLockFID]}`;
     filterTag.addEventListener("click", () => removeFilter(newLockFID, filterTag, filterMod));
     filterContainer.appendChild(filterTag);
-    // Clear the search bar after locking, except with family filter
+    // Clear the search bar after locking
     searchBox.value = ""; 
     // Refresh suggestions and items
     updateFilterGroups();   refreshAllItems();
     if (newLockFID >= fidThreshold[1] && newLockFID < fidThreshold[2] && sortState.column === 'row') {
       updateHeader(headerColumns[5]);
     } else {
-      if (lockedFilters.length == 1 && sortState.column === 'moves') {
-        sortState.ascending = true;
-      }
       updateHeader(null, true);
     }
   }
@@ -625,15 +707,14 @@ function lockFilter(newLockFID) {
 
 // Remove a filter **************************
 function removeFilter(fidToRemove, filterTag, filterModToRemove) {
-  if (lockedFilters.length > 1 && fidToRemove == lockedFilters[0]) {
-    filterModToRemove = lockedFilterMods[0]; // If removing first filter, also remove mod attached to second filter
-  }
+  // If removing first filter, also remove mod attached to second filter
+  if (lockedFilters.length > 1 && fidToRemove == lockedFilters[0]) filterModToRemove = lockedFilterMods[0];
   // Remove the filter from the filter list, and remove the actual filter tag
   lockedFilters = lockedFilters.filter( (f) => f != fidToRemove );  filterTag.remove();
   lockedFilterMods = lockedFilterMods.filter( (f) => f != filterModToRemove ); // Remove from the mod list
-  if (filterModToRemove) {filterModToRemove.remove();} // Remove the actual mod element
+  if (filterModToRemove) filterModToRemove.remove(); // Remove the actual mod element
   // Refresh suggestions and items
-  updateFilterGroups();   refreshAllItems();
+  updateFilterGroups();  refreshAllItems();
   // Reset the sorting if there aren't any more locked moves
   if (sortState.column === 'moves' && !lockedFilters.some((f) => (f >= fidThreshold[1] && f < fidThreshold[2]))) { 
     updateHeader(headerColumns[0]); 
@@ -754,15 +835,27 @@ searchBox.addEventListener('input', (event) => {
   tabSelect = -1;
   refreshAllItems();
 });
-
 document.addEventListener('keydown', (event) => { 
   const ignoredKeys = ["Escape", "Tab", "Shift", "PageDown", "PageUp", "Control", "Alt", "Meta", "CapsLock", 
     "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"];
   if (!ignoredKeys.includes(event.key)) { // Ignore certain key presses
     // Ignore all key presses if 'Ctrl' is held, except when pasting
     if (!event.ctrlKey || event.code == "KeyV") {
-      splashScreen.classList.remove("show");
+      if (movesetScreen.classList.contains("show") && !splashScreen.classList.contains("show")) movesetScreen.classList.remove("show");
+      if (splashScreen.classList.contains("show")) splashScreen.classList.remove("show");
       searchBox.focus(); // Focus the search box on any key press
+    }
+  }
+  // Hit left/right to cycle moveset splash
+  if (movesetScreen.classList.contains('show') && !splashScreen.classList.contains("show")) {
+    if (event.key == "ArrowLeft" || event.key == "ArrowRight") changeMoveset(event.key == "ArrowRight" ? 1 : -1);
+  }
+  if (event.key == "ArrowUp" || event.key == "ArrowDown") {
+    event.preventDefault();
+    if (movesetScreen.classList.contains('show') && !splashScreen.classList.contains("show")) {
+      movesetScrollable.scrollBy({top:(event.key == "ArrowUp" ? -46 : 46)});
+    } else if (!splashScreen.classList.contains("show")) {
+      window.scrollBy({top:(event.key == "ArrowUp" ? -89 : 89)});
     }
   }
   // Hit 'Enter' to lock first filter
@@ -771,7 +864,9 @@ document.addEventListener('keydown', (event) => {
   if (event.key == "PageDown" || event.key == "PageUp") searchBox.blur();
   // Hit escape to clear search box, text, last filter, or headers
   if (event.key == "Escape") {
-    if (splashScreen.classList.contains("show")) { // Close splash screen
+    if (movesetScreen.classList.contains("show") && !splashScreen.classList.contains("show")) {
+      movesetScreen.classList.remove("show");
+    } else if (splashScreen.classList.contains("show")) { // Close splash screen
       splashScreen.classList.remove("show");
     } else if (searchBox.value.length > 0) { // Clear text from the search box
       searchBox.value = '';
@@ -798,7 +893,13 @@ document.addEventListener('keydown', (event) => {
 });
 // Close splash screen when clicking outside the content box
 splashScreen.addEventListener("click", (event) => {
-  if (event.target === splashScreen) splashScreen.classList.remove("show");
+  if (event.target === splashScreen) {
+    splashScreen.classList.remove("show");
+    if (movesetScreen.classList.contains("show")) movesetContent.focus();
+  }
+});
+movesetScreen.addEventListener("click", (event) => {
+  if (event.target === movesetScreen) movesetScreen.classList.remove("show");
 });
 // Open the language selector splash
 openLangButton.addEventListener('mouseover', () => openLangButton.src = `ui/globeh.png`);

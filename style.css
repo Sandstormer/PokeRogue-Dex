@@ -8,6 +8,7 @@ body {
   padding: 0px;
   width: 100vw;
   min-height: calc(100vh - 20px);
+  overflow-x: hidden;
 }
 div {
   line-height: 1.125;
@@ -230,6 +231,9 @@ h1 {
     cursor: pointer;
     /* outline: 1px solid red; */
   }
+  #movesetScrollable {
+    max-height: 600px;
+  }
 }
 
 /* My phone is 414px by 763px */
@@ -329,7 +333,6 @@ h1 {
     margin-right: -2px;
     object-fit: none;
     cursor: pointer;
-    /* outline: 1px solid red; */
   }
   .star-img {
     margin: 0px;
@@ -338,7 +341,9 @@ h1 {
     margin-top: 2px;
     object-fit:none;
     cursor: pointer;
-    /* outline: 1px solid red; */
+  }
+  #movesetScrollable {
+    max-height: calc(100vh - 300px);
   }
 }
 
@@ -359,8 +364,6 @@ h1 {
   align-items: center;
   text-align: center;
   font-weight: bold;
-  padding: 0 0px;
-  /* outline: 1px solid red; */
 }
 #itemList li:nth-child(odd) {
   background-color: #252129; /* Alternate row color */
@@ -369,25 +372,25 @@ h1 {
   font-weight: bold;
   cursor: pointer;
 }
-
+.clickable-name:hover {
+  color: rgb(140, 130, 240) !important;
+}
 .star-header {
   margin: auto;
   width: 18px;
   height: 18px;
   object-fit: none;
-  /* outline: 1px solid red; */
 }
 .item-image {
   width: 117px; 
   height: 82px; 
   margin-top: -5px;
   margin-bottom: -5px;
-  object-fit:none;
-  /* outline: 1px solid red; */
+  object-fit: none;
 }
 
-#splashScreen {
-  display: none; /* Start hidden */
+#splashScreen, #movesetScreen {
+  display: none;
   position: fixed;
   top: -10%;
   left: 0;
@@ -398,12 +401,14 @@ h1 {
   align-items: center;
   z-index: 999;
 }
+#movesetScreen {
+  z-index: 990;
+}
 .show {
   display: flex !important;
+  flex-direction: column;
 }
-#splashContent {
-  /* align-items: center; */
-  /* justify-content: space-between; */
+#splashContent, #movesetContent {
   text-align: center;
   padding: 10px;
   padding-top: 15px;
@@ -414,12 +419,23 @@ h1 {
   min-width: 270px;
   max-width: 382px;
   position: relative;
+  overflow: scroll;
+  -ms-overflow-style: none;
 }
-#splashFooter {
-  display: flex;
-  align-items: center;
-  text-align: center;
-  justify-content: space-between;
+#splashContent {
+  max-height: calc(100vh - 100px);
+}
+#splashContent::-webkit-scrollbar, #movesetContent::-webkit-scrollbar, #movesetScrollable::-webkit-scrollbar {
+  width: 5px;
+  height: 0px;
+  /* display: none; */
+}
+#splashContent::-webkit-scrollbar-track, #movesetContent::-webkit-scrollbar-track, #movesetScrollable::-webkit-scrollbar-track {
+  background: transparent;
+}  
+#splashContent::-webkit-scrollbar-thumb, #movesetContent::-webkit-scrollbar-thumb, #movesetScrollable::-webkit-scrollbar-thumb {
+  background-color: rgba(145, 145, 145, 0.5);
+  border-radius: 3px;
 }
 .splash-move-row {
   display: grid;
@@ -429,7 +445,6 @@ h1 {
   font-weight: bold;
 }
 .splash-move-tags > p {
-  /* outline: 1px solid red; */
   font-weight: bold;
   margin: 0px;
   margin-top: 8px;
@@ -450,6 +465,46 @@ h1 {
 .lang-head-img {
   margin-right: 2px;
   margin-bottom: -9px;
+}
+#movesetHeader {
+  font-weight: bold;
+}
+#movesetHeader > div:first-child {
+  display: grid;
+  grid-template-columns: 24px 117px 1fr 24px;
+  align-items: center;
+}
+#movesetHeader > div:nth-child(3), .moveset-row {
+  font-weight: bold;
+  display: grid;
+  grid-template-columns: 40px 1fr repeat(3, 40px);
+  margin-top: 5px;
+}
+#movesetScrollable {
+  margin-top: -5px;
+  overflow: scroll;
+  -ms-overflow-style: none;
+}
+.moveset-row {
+  cursor: pointer;
+}
+.moveset-image {
+  margin-top: -15px;
+  margin-bottom: -15px;
+  margin-left: 7px;
+  width: 117px; 
+  height: 76px; 
+  object-fit: none;
+}
+.moveset-arrow {
+  margin-top: -15px;
+  margin-bottom: -15px;
+  margin-left: 2px;
+  width: 20px; 
+  height: 76px; 
+  object-fit: contain;
+  cursor: pointer;
+  /* outline: 1px solid red; */
 }
 
 hr {

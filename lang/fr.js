@@ -1,5 +1,5 @@
 headerNames = ['N°','Chrom.','Nom','Type','Talents','Capacités Œuf','Cout','Total','PV','Atq','Déf','ASp','DSp','Vit'];
-altText = ['Capacités','Principaux','Caché','Passif','Entrez','Puis.','Préc.','PP','Ajouter aux filtres','Champi Mémoriel','Évolutions','Capacités Œuf','Rare Capac. Œuf','Commun','Super','Hyper','CT','N.'];
+altText = ['Capacités','Principaux','Caché','Passif','Entrez','Puis.','Préc.','PP','Ajouter aux filtres','Champi Mémoriel','Évolutions','Capacités Œuf','Rare Capac. Œuf','Commun','Super','Hyper','CT','N.','Évo','Œuf'];
 catToName = ['Type','Talent','Capacité','Gen','Cout','Sexe','Mode','Œuf','Lié à'];
 fidToDesc = [
 'Augmente la puissance des capacités de type Plante du Pokémon quand il a perdu une certaine quantité de PV.',
