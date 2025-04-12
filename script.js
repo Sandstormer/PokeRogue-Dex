@@ -337,11 +337,17 @@ function renderMoreItems() { // Create each list item, with rows and columns of 
         let source = item[thisMove];
         if (source == -1) {sourceText = `<span style="color:rgb(251, 173, 124);">${altText[9]}`;}
         else if (source == 0) {sourceText = `<span style="color:rgb(131, 182, 239);">${altText[10]}`;}
-        else if (source == 201) {sourceText = `<span style="color:rgb(255, 255, 255);">${altText[11]}`;}
-        else if (source == 202) {sourceText = `<span style="color:rgb(240, 230, 140);">${altText[12]}`;}
-        else if (source == 203) {sourceText = `<span style="color:rgb(255, 255, 255);">${altText[13]} ${altText[16]}`;}
-        else if (source == 204) {sourceText = `<span style="color:rgb(131, 182, 239);">${altText[14]} ${altText[16]}`;}
-        else if (source == 205) {sourceText = `<span style="color:rgb(240, 230, 140);">${altText[15]} ${altText[16]}`;}
+        else if (source == 201) {sourceText = `<span style="color:rgb(255, 255, 255);">${altText[19]} / ${altText[16]}`;}
+        else if (source == 202) {sourceText = `<span style="color:rgb(255, 255, 255);">${altText[19]} / </span><span style="color:rgb(131, 182, 239);">${altText[16]}`;}
+        else if (source == 203) {sourceText = `<span style="color:rgb(255, 255, 255);">${altText[19]} / </span><span style="color:rgb(240, 230, 140);">${altText[16]}`;}
+        else if (source == 204) {sourceText = `<span style="color:rgb(255, 255, 255);">${altText[11]}`;}
+        else if (source == 205) {sourceText = `<span style="color:rgb(240, 230, 140);">${altText[19]}</span><span style="color:rgb(255, 255, 255);"> / ${altText[16]}`;}
+        else if (source == 206) {sourceText = `<span style="color:rgb(240, 230, 140);">${altText[19]}</span><span style="color:rgb(255, 255, 255);"> / </span><span style="color:rgb(131, 182, 239);">${altText[16]}`;}
+        else if (source == 207) {sourceText = `<span style="color:rgb(240, 230, 140);">${altText[19]}<span style="color:rgb(255, 255, 255);"> / </span>${altText[16]}`;}
+        else if (source == 208) {sourceText = `<span style="color:rgb(240, 230, 140);">${altText[12]}`;}
+        else if (source == 209) {sourceText = `<span style="color:rgb(255, 255, 255);">${altText[13]} ${altText[16]}`;}
+        else if (source == 210) {sourceText = `<span style="color:rgb(131, 182, 239);">${altText[14]} ${altText[16]}`;}
+        else if (source == 211) {sourceText = `<span style="color:rgb(240, 230, 140);">${altText[15]} ${altText[16]}`;}
         else {sourceText = `<span style="color:rgb(255, 255, 255);">${altText[17]} ${item[thisMove]}`;}
         // Show the move name, with click event for splash screen
         const clickableRow = document.createElement('div');  clickableRow.className = 'clickable-name';
@@ -409,8 +415,10 @@ function showMovesetSplash(specID) {
   movesetContent.style.width = '330px';
   movesetHeader.innerHTML = '';
   const item = items[specID]; shownMovesetID = specID;
+  
   const t2line = ('t2' in item ? ` / <span style="color:${typeColors[item.t2]}; display:inline">${fidToName[item.t2]}</span>` : '')
   const line1 = document.createElement('div'); const line1mid = document.createElement('div');
+  line1mid.style.maxHeight = '46px';
   line1mid.innerHTML = `${speciesNames[specID]}<br><span style="color:${typeColors[item.t1]}; display:inline">${fidToName[item.t1]}</span>${t2line}`;
   const msImg = document.createElement('img'); msImg.src = `images/${item.img}_0.png`; msImg.className = 'moveset-image';
   const arrowL = document.createElement('img'); arrowL.src = 'ui/arrow.png'; arrowL.className = 'moveset-arrow';
@@ -424,6 +432,7 @@ function showMovesetSplash(specID) {
   line1.appendChild(arrowL); line1.appendChild(msImg); line1.appendChild(line1mid); line1.appendChild(arrowR);
   movesetHeader.appendChild(line1); 
   movesetHeader.appendChild(document.createElement('hr'));
+
   const line2 = document.createElement('div');
   line2.innerHTML = `<div>${altText[17]}</div><div>${catToName[2]}</div>
   <div>${altText[5]}</div><div>${altText[6]}</div><div>${altText[7]}</div>`;
@@ -434,15 +443,18 @@ function showMovesetSplash(specID) {
     const intKey = Number(key);
     if (Number.isInteger(intKey) && intKey >= fidThreshold[1] && intKey < fidThreshold[2]) {
       if (value < 200) moveList[0].push(intKey);
-      else if (value > 202) moveList[1].push(intKey);
+      else if (value > 200 && value != 204 && value != 208) moveList[1].push(intKey);
     }
   }
   // Sort the moves
-  moveList.forEach(m => m.sort((a, b) => item[a] > item[b] ? 1 : (item[a] < item[b]) ? -1 : 0));
+  moveList[0].sort((a, b) => item[a] > item[b] ? 1 : (item[a] < item[b]) ? -1 : 
+    (fidToName[a] > fidToName[b] ? 1 : (fidToName[a] < fidToName[b] ? -1 : 0 )));
+  moveList[1].sort((a, b) => (item[a]-200)%4 > (item[b]-200)%4 ? 1 : ((item[a]-200)%4 < (item[b]-200)%4) ? -1 : 
+    (fidToName[a] > fidToName[b] ? 1 : (fidToName[a] < fidToName[b] ? -1 : 0 )));
   movesetScrollable.innerHTML = '';
-  [moveList[0],[item.e1,item.e2,item.e3,item.e4],moveList[1]].forEach(thisList => {
+  [moveList[0],[item.e1,item.e2,item.e3,item.e4],moveList[1]].forEach((thisList, table) => {
     if (thisList != moveList[0]) movesetScrollable.appendChild(document.createElement('hr'));
-    thisList.forEach(move => makeMovesetRow(move, item));
+    thisList.forEach(move => makeMovesetRow(move, item, table));
   });
   if (!movesetScreen.classList.contains('show')) {
     movesetScreen.classList.add("show"); 
@@ -450,10 +462,10 @@ function showMovesetSplash(specID) {
     movesetContent.focus();          
   }
 }
-function makeMovesetRow(fid, item) {
+function makeMovesetRow(fid, item, table) {
   const moveRow = document.createElement('div');  moveRow.className = 'moveset-row';
   const thisProcs = fidToProc[fid-fidThreshold[1]];
-  moveRow.innerHTML = `<div style="color:${moveSrcText(item[fid])}</div>
+  moveRow.innerHTML = `<div style="color:${moveSrcText(item[fid],table)}</div>
     <div style="color:${typeColors[thisProcs[0]]};">${fidToName[fid]}</div>
     <div style="color:${moveCatColor[thisProcs[1]]}">${(thisProcs[2]==-1?'-':thisProcs[2])}</div>
     <div style="color:${thisProcs[7].includes(21)?'rgb(239, 131, 131)'
@@ -463,17 +475,21 @@ function makeMovesetRow(fid, item) {
   moveRow.addEventListener('click', () => showDescSplash(fid));
   movesetScrollable.appendChild(moveRow);
 }
-function moveSrcText(src) {
-  // src = -1 for mem, 0 for evo, 1-200 for level up, 201(202) for (rare)egg, 203-205 for tm tier
-  if (src == -1 ) return `rgb(251, 173, 124);"><img src="ui/mem.png"></img>`;
-  if (src ==  0 ) return `rgb(131, 182, 239);">${altText[18]}`;
-  if (src <  200) return `rgb(255, 255, 255);">${src}`;
-  if (src == 201) return `rgb(255, 255, 255);">${altText[19]}`;
-  if (src == 202) return `rgb(240, 230, 140);">${altText[19]}`;
-  const text = (altText[16].length > 2 ? 'TM' : altText[16])
-  if (src == 203) return `rgb(255, 255, 255);">${text}`;
-  if (src == 204) return `rgb(131, 182, 239);">${text}`;
-  if (src == 205) return `rgb(240, 230, 140);">${text}`;
+function moveSrcText(src, table) {
+  // src = -1:mushroom, 0:evo, 1-200:level, 201-203:egg/TM, 204:egg, 205-207:rare/TM, 208:rare, 209-211:TM
+  if (table == 0) {
+    if (src == -1 ) return `rgb(251, 173, 124);"><img src="ui/mem.png"></img>`;
+    if (src ==  0 ) return `rgb(131, 182, 239);">${altText[18]}`;
+    else return `rgb(255, 255, 255);">${src}`;
+  } else if (table == 1) {
+    if (src < 205) return `rgb(255, 255, 255);">${altText[19]}`;
+    else return `rgb(240, 230, 140);">${altText[19]}`;
+  } else {
+    const text = (altText[16].length > 2 ? 'TM' : altText[16])
+    if (src == 209 || src == 201 || src == 205) return `rgb(255, 255, 255);">${text}`;
+    if (src == 210 || src == 202 || src == 206) return `rgb(131, 182, 239);">${text}`;
+    if (src == 211 || src == 203 || src == 207) return `rgb(240, 230, 140);">${text}`;
+  }
 }
 function changeMoveset(indexChange) {
   const index = filteredItemIDs.findIndex(ID => ID == shownMovesetID) + indexChange;
