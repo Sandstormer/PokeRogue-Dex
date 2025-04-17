@@ -462,7 +462,7 @@ fidToDesc = [
 'Using its tough and impressive horn, the user rams into the target with no letup.',
 'The target is physically pounded with a long tail, a foreleg, or the like.',
 'A soothing lullaby is sung in a calming voice that puts the target into a deep slumber.',
-'The user just flops and splashes around to no effect at all...',
+'The user just flops and splashes around to no effect at all…',
 'The user mimics the move used immediately before it. The move fails if no other move has been used yet.',
 'Letting out a charming cry, the user does emotional damage to opposing Pokémon. This attack never misses.',
 'The user shines a spotlight on the target so that only the target will be attacked during the turn.',
@@ -3767,7 +3767,8 @@ fidToName = [
 '9',
 '10',
 'Female',
-'Flipped',
+'Flipped Stats',
+'Fresh Start',
 'Common',
 'Rare',
 'Epic',
@@ -4199,7 +4200,7 @@ helpMenuText = `
 <span style="color:${fidToColor(fidThreshold[2])[0]};">${catToName[3]}</span>, 
 <span style="color:${fidToColor(fidThreshold[3])[0]};">${catToName[4]}</span>,<br>
 <span style="color:${fidToColor(fidThreshold[4])[0]};">${catToName[5]}</span>,  
-<span style="color:${fidToColor(fidThreshold[5])[1]};">${fidToName[fidThreshold[5]]} ${catToName[6]}</span>, or
+<span style="color:${fidToColor(fidThreshold[5])[1]};">${fidToName[fidThreshold[5]]}</span>, or
 <span style="color:${eggTierColors(1)};">${catToName[7]}</span></p>
 Combine multiple filters to get what you want <br>
 <span style="color:rgb(145, 145, 145);">Click between filters to match either filter</span>

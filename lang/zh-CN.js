@@ -3768,6 +3768,7 @@ fidToName = [
 '10',
 '雌性',
 '能力反转',
+'初次尝试',
 '普通',
 '稀有',
 '史诗',
@@ -4199,7 +4200,7 @@ helpMenuText = `
 <span style="color:${fidToColor(fidThreshold[2])[0]};">${catToName[3]}</span>, 
 <span style="color:${fidToColor(fidThreshold[3])[0]};">${catToName[4]}</span>,<br>
 <span style="color:${fidToColor(fidThreshold[4])[0]};">${catToName[5]}</span>,  
-<span style="color:${fidToColor(fidThreshold[5])[1]};">${fidToName[fidThreshold[5]]} ${catToName[6]}</span>,
+<span style="color:${fidToColor(fidThreshold[5])[1]};">${fidToName[fidThreshold[5]]}</span>,
 <span style="color:${eggTierColors(1)};">${catToName[7]}</span></p>
 组合多个筛选条件以获得所需结果 <br>
 <span style="color:rgb(145, 145, 145);">点击筛选条件之间以匹配任意一个</span>

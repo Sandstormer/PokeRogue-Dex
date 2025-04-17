@@ -10,7 +10,6 @@
 const itemList = document.getElementById('itemList');
 const searchBox = document.getElementById('searchBox');
 const pageTitle = document.getElementById('page-title');
-const titleimg = document.getElementById('mag-img');
 const headerContainer = document.getElementById("header-container");
 const filterContainer = document.getElementById("filter-container");
 const suggestions = document.getElementById("suggestions");
@@ -142,7 +141,8 @@ function refreshAllItems() { // Display items based on query and locked filters 
           if (fid  <  fidThreshold[3]) return items[specID].ge === fid - fidThreshold[2] + 1; // Gen filters
           if (fid  <  fidThreshold[4]) return items[specID].co === fid - fidThreshold[3] + 1; // Cost filters
           if (fid === fidThreshold[4]) return items[specID].fe === 1; // Gender filter
-          if (fid === fidThreshold[5]) return true; // Flipped stat filter
+          if (fid === fidThreshold[5]) return true; // Flipped stats filter
+          if (fid === fidThreshold[5]+1) return 'fs' in items[specID]; // Fresh start filter
           if (fid  <  fidThreshold[7]) return items[specID].et === fid - fidThreshold[6]; // Egg tier filter
           if (fid  <  fidThreshold[8]) return items[specID]?.fa === fid; // Family filter
           console.warn('Filter error');
@@ -175,7 +175,7 @@ function refreshAllItems() { // Display items based on query and locked filters 
         if ('t2' in bEntry) {bValue += (bEntry.t2*2+1)*!lockedFilters.includes(bEntry.t2)}
       } else if (sortState.column == 'sp') { // Sort by species names alphabetically
         aValue = speciesNames[a]; bValue = speciesNames[b];
-      } else if (sortState.column != 'row') { // If anything other than row number
+      } else if (sortState.column != 'row') { // If anything OTHER than row number
         let effectiveSort = sortState.column;
         if (lockedFilters.some((f) => f == fidThreshold[5])) { // If flipped mode
           if (sortState.column == 'hp')  {effectiveSort = 'spe';}
