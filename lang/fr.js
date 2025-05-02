@@ -3773,6 +3773,7 @@ fidToName = [
 'Épique',
 'Manaphy',
 'Légendaire',
+'Exclusif',
 'Gouffre',
 'Terres Sauvages',
 'Plage',

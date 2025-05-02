@@ -3773,6 +3773,7 @@ fidToName = [
 'Epic',
 'Manaphy',
 'Legendary',
+'Exclusive',
 'Abyss',
 'Badlands',
 'Beach',

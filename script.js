@@ -142,7 +142,8 @@ function refreshAllItems() { // Display items based on query and locked filters 
           if (fid === fidThreshold[4]) return 'fe' in items[specID]; // Gender filter
           if (fid === fidThreshold[5]) return true; // Flipped stats filter
           if (fid === fidThreshold[5]+1) return 'fs' in items[specID]; // Fresh start filter
-          if (fid  <  fidThreshold[7]) return items[specID].et === fid - fidThreshold[6]; // Egg tier filter
+          if (fid  <  fidThreshold[7]-1) return items[specID].et === fid - fidThreshold[6]; // Egg tier filter
+          if (fid === fidThreshold[7]-1) return [1,2].includes(items[specID]?.ee); // Egg exclusive
           if (fid  <  fidThreshold[8]) return fid in items[specID]; // Biome filter
           if (fid  <  fidThreshold[9]) return items[specID]?.fa === fid; // Family filter
           console.warn('Filter error');return fid in items[specID];
@@ -702,6 +703,7 @@ function eggTierColors(fid) {
   if (fid == 2) return 'rgb(240, 230, 140)';
   if (fid == 3) return 'rgb(239, 131, 131)';
   if (fid == 4) return 'rgb(216, 143, 205)';
+  if (fid == 5) return 'rgb(140, 130, 240)';
   else { console.log('Invalid egg tier'); return null; }
 }
 
