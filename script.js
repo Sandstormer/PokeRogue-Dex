@@ -16,7 +16,6 @@ const suggestions = document.getElementById("suggestions");
 const splashScreen = document.getElementById("splashScreen");
 const splashContent = document.getElementById("splashContent");
 const movesetScreen = document.getElementById("movesetScreen");
-const movesetContent = document.getElementById("movesetContent");
 const movesetHeader = document.getElementById("movesetHeader");
 const movesetScrollable = document.getElementById("movesetScrollable");
 const openHelpButton = document.getElementById("help-img");
@@ -26,10 +25,11 @@ const possibleFID = [...Array(fidThreshold[fidThreshold.length-1]).keys()];
 const possibleSID = [...Array(items.length).keys()];
 const supportedLangs = ["en","fr","ko","zh-CN","ja"];//"it","es-ES","pt-BR","de"];
 const LanguageNames  = ["English","Français","한국어 (Hangugeo)","简体中文 (Jiǎntǐ Zhōngwén)","日本語 (Nihongo)"];//"Italiano","Español (España)","Português (Brasil)","Deutsch","繁體中文 (Fántǐ Zhōngwén)"];
-const moveCatColor = {0:'rgb(251, 173, 124)',1:'rgb(131, 182, 239)',2:'rgb(255, 255, 255)'};
+const moveCatColor = ['rgb(251, 173, 124)','rgb(131, 182, 239)','rgb(255, 255, 255)'];
+const tmColors = ['rgb(255, 255, 255)','rgb(131, 182, 239)','rgb(240, 230, 140)'];
 let increment = 10;     // Number of items to load at a time
 let renderLimit = 0;    // Start with no items
-let showMoveLearn = []; // Filtered moves to show sources
+let showMoveLearn = []; // Filtered moves/biomes to show sources
 let filterToEnter = null;  // Filter to apply when hitting Enter
 let tabSelect = -1;         // Filter that is tab selected
 let lockedFilters = [];    // List of all locked filters
@@ -38,10 +38,9 @@ let lockedFilterGroups = [[]]; // Grouped together for OR
 let pinnedRows = [];  // List of pinned row numbers
 let isMobile = false; // Change display for mobile devices
 let filteredItemIDs = null; // List of all displayed row numbers
-let shinyState = 0;   // Global state of shiny   (0,1,2,3)
-let abilityState = 0; // Global state of ability (0,1,2,3)
-let sortState = { column: null, ascending: true, target: null }; // Track the current sort state
-let shownMovesetID = -1;
+let headerState = { shiny: 0, ability: 0, biome: 0 } // Global state of shiny(0,1,2,3), ability(0,1,2,3), biome(0,1)
+let sortState = { column: null, ascending: true, target: null, biomeToggle: 0 }; // Track the current sort state
+let splashState = { species: -1, page: 0 }
 // const spreadMoves = possibleFID.filter((fid) => fid >= fidThreshold[1] && fid < fidThreshold[2]
 //   && (fidToProc[fid-fidThreshold[1]][7].includes(21) || fidToProc[fid-fidThreshold[1]][7].includes(22)));
 // filteredItemIDs = filteredItemIDs.filter((thisID) => spreadMoves.some((thisMove) => thisMove in items[thisID]));
@@ -49,11 +48,12 @@ let shownMovesetID = -1;
 //   999:
 // }
 
+// biomeText = ['Common','Uncommon','Rare','Super Rare','Ultra Rare','Boss','Com.','UC','Rare','SR','UR','Dawn','Day','Dusk','Night'] 
 procToDesc = [
   "User Atk","User Def","User SpAtk","User SpDef","User Speed","User Accuracy","User Evasion",
   "Atk","Def","SpAtk","SpDef","Speed","Accuracy","Evasion",
   "Applies Poison","Applies Toxic","Applies Sleep","Applies Freeze","Applies Paralysis","Applies Burn","Applies Confuse",
-  "Flinch","User Atk/Def/SpA/SpD/Spe","Poison/Para/Sleep","Burn/Para/Freeze"];
+  "Flinch","User Atk/Def/SpA/SpD/Spe","Poison/Para/Sleep","Burn/Para/Freeze","Stellar User Atk/SpAtk"];
   
 // Perform initial display with detected language
 let pageLang = detectLanguage();
@@ -95,7 +95,7 @@ function loadAndApplyLanguage(lang) {
     });      
     
     // Display items, and initial sort by row number
-    shinyState = 0; abilityState = 0;
+    headerState.shiny = 0; headerState.ability = 0;
     adjustLayout(true, headerColumns[0]); 
   }
   script.onerror = (e) => console.warn(`Failed to load ${lang}.js`, e);
@@ -119,41 +119,38 @@ function refreshAllItems() { // Display items based on query and locked filters 
         speciesNames[specID].toLowerCase().replace(/[.’'\s-]/g,'').includes(query) ||
         fidToSearch[items[specID].t1]?.includes(query) ||
         fidToSearch[items[specID].t2]?.includes(query) ||
-        ([0,1].includes(abilityState) && fidToSearch[items[specID].a1]?.includes(query)) ||
-        ([0,1].includes(abilityState) && fidToSearch[items[specID].a2]?.includes(query)) ||
-        ([0,2].includes(abilityState) && fidToSearch[items[specID].ha]?.includes(query)) ||
-        ([0,3].includes(abilityState) && fidToSearch[items[specID].pa]?.includes(query)) )
+        ([0,1].includes(headerState.ability) && fidToSearch[items[specID].a1]?.includes(query)) ||
+        ([0,1].includes(headerState.ability) && fidToSearch[items[specID].a2]?.includes(query)) ||
+        ([0,2].includes(headerState.ability) && fidToSearch[items[specID].ha]?.includes(query)) ||
+        ([0,3].includes(headerState.ability) && fidToSearch[items[specID].pa]?.includes(query)) )
     }
   } 
   // Filter from headers ==============
-  if (abilityState == 2) filteredItemIDs = filteredItemIDs.filter(fid => 'ha' in items[fid]);
+  if (headerState.ability == 2) filteredItemIDs = filteredItemIDs.filter(fid => 'ha' in items[fid]);
   // Only show items that have that tier of shiny
-  if (shinyState > 1)    filteredItemIDs = filteredItemIDs.filter(fid => items[fid].sh >= shinyState);
+  if (headerState.shiny > 1)    filteredItemIDs = filteredItemIDs.filter(fid => items[fid].sh >= headerState.shiny);
   // Filter from locked filters ==============
   if (lockedFilters.length > 0) {
     filteredItemIDs = filteredItemIDs.filter(specID => // Search for filters with their fid as key
       lockedFilterGroups.every(thisGroup => // Match at least one filter from each group
         thisGroup.some(fid => {
-          if (abilityState != 0 && fid >= fidThreshold[0] && fid < fidThreshold[1])
-            return items[specID]?.[fid] == 309 + abilityState 
-               || (items[specID]?.[fid] == 309 && abilityState == 1)
+          if (headerState.ability != 0 && fid >= fidThreshold[0] && fid < fidThreshold[1])
+            return items[specID]?.[fid] == 309+headerState.ability || (headerState.ability == 1 && items[specID]?.[fid] == 309)
           if (fid  <  fidThreshold[2]) return fid in items[specID]; // Type/Ability/Move filters
           if (fid  <  fidThreshold[3]) return items[specID].ge === fid - fidThreshold[2] + 1; // Gen filters
           if (fid  <  fidThreshold[4]) return items[specID].co === fid - fidThreshold[3] + 1; // Cost filters
-          if (fid === fidThreshold[4]) return items[specID].fe === 1; // Gender filter
+          if (fid === fidThreshold[4]) return 'fe' in items[specID]; // Gender filter
           if (fid === fidThreshold[5]) return true; // Flipped stats filter
           if (fid === fidThreshold[5]+1) return 'fs' in items[specID]; // Fresh start filter
           if (fid  <  fidThreshold[7]) return items[specID].et === fid - fidThreshold[6]; // Egg tier filter
-          if (fid  <  fidThreshold[8]) return items[specID]?.fa === fid; // Family filter
-          console.warn('Filter error');
-          return fid in items[specID];
+          if (fid  <  fidThreshold[8]) return fid in items[specID]; // Biome filter
+          if (fid  <  fidThreshold[9]) return items[specID]?.fa === fid; // Family filter
+          console.warn('Filter error');return fid in items[specID];
         }))) 
       }
   // Add moves to track in the move column  ==============
-  showMoveLearn = [];
-  lockedFilters.forEach(fid => {
-    if (fid >= fidThreshold[1] && fid < fidThreshold[2]) showMoveLearn.push(fid);
-  });
+  showMoveLearn = lockedFilters.filter(fid => (fid >= fidThreshold[1] && fid < fidThreshold[2])
+                                           || (fid >= fidThreshold[7] && fid < fidThreshold[8]));
   // Remove the pinned items for now ==============
   if (pinnedRows) filteredItemIDs = filteredItemIDs.filter((thisID) => !pinnedRows.includes(thisID));
 
@@ -163,7 +160,9 @@ function refreshAllItems() { // Display items based on query and locked filters 
       let aValue = a; let bValue = b; // Set default attribute of row number
       if (sortState.column == 'moves') { // Sort by source of moves
         const getLearnLevel = (ID) => 
-          showMoveLearn.reduce((total, move) => total + (move in items[ID] ? items[ID][move] : 500), 0);
+          showMoveLearn.reduce((total, move) => total + (move in items[ID] ? 
+            (move >= fidThreshold[7] ? (items[ID][move][1] ? ~~(items[ID][move][0]/20)*0.9+~~(items[ID][move][1]/20)/10 
+                : ~~(items[ID][move][0]/20)) : items[ID][move]) : 500), 0);
         aValue = getLearnLevel(a);
         bValue = getLearnLevel(b);
       } else if (sortState.column == 'type') { // Sort by type combinations
@@ -178,12 +177,12 @@ function refreshAllItems() { // Display items based on query and locked filters 
       } else if (sortState.column != 'row') { // If anything OTHER than row number
         let effectiveSort = sortState.column;
         if (lockedFilters.some((f) => f == fidThreshold[5])) { // If flipped mode
-          if (sortState.column == 'hp')  {effectiveSort = 'spe';}
-          if (sortState.column == 'atk') {effectiveSort = 'spd';}
-          if (sortState.column == 'def') {effectiveSort = 'spa';}
-          if (sortState.column == 'spa') {effectiveSort = 'def';}
-          if (sortState.column == 'spd') {effectiveSort = 'atk';}
-          if (sortState.column == 'spe') {effectiveSort = 'hp' ;}
+          if (sortState.column == 'hp')  effectiveSort = 'spe';
+          if (sortState.column == 'atk') effectiveSort = 'spd';
+          if (sortState.column == 'def') effectiveSort = 'spa';
+          if (sortState.column == 'spa') effectiveSort = 'def';
+          if (sortState.column == 'spd') effectiveSort = 'atk';
+          if (sortState.column == 'spe') effectiveSort = 'hp' ;
         }
         aValue = items[a][effectiveSort]; bValue = items[b][effectiveSort];
       }
@@ -207,11 +206,11 @@ function refreshAllItems() { // Display items based on query and locked filters 
   if (filteredItemIDs.length == 0) { // No pokemon
     const helpMessage = document.createElement('div');  helpMessage.className = 'item-help-message';
     helpMessage.innerHTML = '<hr>';
-    if (shinyState > 1) helpMessage.innerHTML += '<b><span style="color:rgb(140, 130, 240);">Restricted to Pokemon that have shiny variants.</b><br><br></span>';
-    if (abilityState > 0) helpMessage.innerHTML += '<b><span style="color:rgb(140, 130, 240);">Abilities are restricted to only ' + (abilityState == 1 ? 'Main' : (abilityState == 2 ? 'Hidden' : 'Passive'))+ ' Abilities.</b><br><br></span>';
+    if (headerState.shiny > 1) helpMessage.innerHTML += '<b><span style="color:rgb(140, 130, 240);">Restricted to Pokemon that have shiny variants.</b><br><br></span>';
+    if (headerState.ability > 0) helpMessage.innerHTML += '<b><span style="color:rgb(140, 130, 240);">Abilities are restricted to only ' + (headerState.ability == 1 ? 'Main' : (headerState.ability == 2 ? 'Hidden' : 'Passive'))+ ' Abilities.</b><br><br></span>';
     if (suggestions.innerHTML === '') { // No suggestions
       if (lockedFilters.length == 0) { // No locked filters
-        helpMessage.innerHTML += '<b>There are no Pokemon or filters' + (isMobile ? '<br>' : ' ') + 'that match the search term' + (shinyState > 1 ? ' and have shiny variants.</b>' : '.</b><br>Please check your spelling and try again.');
+        helpMessage.innerHTML += '<b>There are no Pokemon or filters' + (isMobile ? '<br>' : ' ') + 'that match the search term' + (headerState.shiny > 1 ? ' and have shiny variants.</b>' : '.</b><br>Please check your spelling and try again.');
       } else {
         if (query === '') {
           helpMessage.innerHTML += '<b>There are no Pokemon that match the filters.</b><br>Remove filters, or change the connections to "OR".';
@@ -243,8 +242,8 @@ function renderMoreItems() { // Create each list item, with rows and columns of 
     // Show image of the pokemon
     const pokeImg = document.createElement('img');  pokeImg.className = 'item-image';  
     pokeImg.stars = []; // Keep a list of stars that can change the pokemon image
-    pokeImg.shinyOverride = (item.sh >= shinyState ? shinyState : (shinyState > 0)*1);  
-    pokeImg.femOverride = (item.fe ? lockedFilters.some((f) => f == fidThreshold[4]) : 0);
+    pokeImg.shinyOverride = (item.sh >= headerState.shiny ? headerState.shiny : (headerState.shiny > 0)*1);  
+    pokeImg.femOverride = (item?.fe == 1 ? lockedFilters.some((f) => f == fidThreshold[4]) : 0);
     pokeImg.src = `images/${item.img}_${pokeImg.shinyOverride}${(pokeImg.femOverride ? 'f' : '')}.png`; 
     
     // Create the dex column, with stars and pin only on desktop
@@ -265,7 +264,7 @@ function renderMoreItems() { // Create each list item, with rows and columns of 
         pinImg.src = 'ui/pinon.png';
       }
     });
-    if (item.fe == 1) {
+    if (item?.fe == 1) {
       femImg.addEventListener('mouseover', () => femImg.src = `ui/femon.png`);
       femImg.addEventListener('mouseout',  () => femImg.src = `ui/fem${(pokeImg.femOverride?'on':'off')}.png`);
       femImg.addEventListener('click', () => { // Add click event to the fem button
@@ -293,13 +292,13 @@ function renderMoreItems() { // Create each list item, with rows and columns of 
       pinColumn.appendChild(pinImg);
       dexColumn.innerHTML = `<a href="https://wiki.pokerogue.net/pokedex:${item.dex}" target="_blank">#${item.dex}</a><br>`;
       pokeImg.stars.forEach((thisStar) => starColumn.appendChild(thisStar));
-      if (item.fe == 1) {
+      if (item?.fe == 1) {
         femImg.className = 'star-img';
         starColumn.appendChild(femImg);
       }
     } else { // Append all to the dex column on desktop
       dexColumn.appendChild(pinImg);
-      if (item.fe == 1) dexColumn.appendChild(femImg);
+      if (item?.fe == 1) dexColumn.appendChild(femImg);
       const dexText = document.createElement('div');
       dexText.innerHTML = `<a href="https://wiki.pokerogue.net/pokedex:${item.dex}" target="_blank">#${item.dex}</a><br>`;
       dexColumn.appendChild(dexText);
@@ -309,7 +308,7 @@ function renderMoreItems() { // Create each list item, with rows and columns of 
     const specColumn = document.createElement('div'); // Show species name
     specColumn.className = 'clickable-name';
     specColumn.innerHTML = speciesNames[thisID];
-    specColumn.addEventListener('click', () => showMovesetSplash(thisID));
+    specColumn.addEventListener('click', () => showMovesetSplash(thisID, 0));
     
     const typeColumn = document.createElement('div'); // Show both types
     typeColumn.className = 'item-column';
@@ -331,29 +330,39 @@ function renderMoreItems() { // Create each list item, with rows and columns of 
     // Show the column of egg moves, or filtered moves and their sources
     const moveColumn = document.createElement('div');  moveColumn.className = 'item-column';  moveColumn.innerHTML = '';
     let numMovesShown = 0;
-    showMoveLearn.forEach((thisMove) => {
-      if (thisMove in item && numMovesShown < 2) { 
+    showMoveLearn.forEach((thisFID) => {
+      if (thisFID in item && numMovesShown < 2) { 
         numMovesShown += 1;
-        let source = item[thisMove];
-        if (source == -1) {sourceText = `<span style="color:rgb(251, 173, 124);">${altText[9]}`;}
-        else if (source == 0) {sourceText = `<span style="color:rgb(131, 182, 239);">${altText[10]}`;}
-        else if (source == 201) {sourceText = `<span style="color:rgb(255, 255, 255);">${altText[19]} / ${altText[16]}`;}
-        else if (source == 202) {sourceText = `<span style="color:rgb(255, 255, 255);">${altText[19]} / </span><span style="color:rgb(131, 182, 239);">${altText[16]}`;}
-        else if (source == 203) {sourceText = `<span style="color:rgb(255, 255, 255);">${altText[19]} / </span><span style="color:rgb(240, 230, 140);">${altText[16]}`;}
-        else if (source == 204) {sourceText = `<span style="color:rgb(255, 255, 255);">${altText[11]}`;}
-        else if (source == 205) {sourceText = `<span style="color:rgb(240, 230, 140);">${altText[19]}</span><span style="color:rgb(255, 255, 255);"> / ${altText[16]}`;}
-        else if (source == 206) {sourceText = `<span style="color:rgb(240, 230, 140);">${altText[19]}</span><span style="color:rgb(255, 255, 255);"> / </span><span style="color:rgb(131, 182, 239);">${altText[16]}`;}
-        else if (source == 207) {sourceText = `<span style="color:rgb(240, 230, 140);">${altText[19]}<span style="color:rgb(255, 255, 255);"> / </span>${altText[16]}`;}
-        else if (source == 208) {sourceText = `<span style="color:rgb(240, 230, 140);">${altText[12]}`;}
-        else if (source == 209) {sourceText = `<span style="color:rgb(255, 255, 255);">${altText[13]} ${altText[16]}`;}
-        else if (source == 210) {sourceText = `<span style="color:rgb(131, 182, 239);">${altText[14]} ${altText[16]}`;}
-        else if (source == 211) {sourceText = `<span style="color:rgb(240, 230, 140);">${altText[15]} ${altText[16]}`;}
-        else {sourceText = `<span style="color:rgb(255, 255, 255);">${altText[17]} ${item[thisMove]}`;}
-        // Show the move name, with click event for splash screen
+        let source = item[thisFID];  let sourceText = '<span style="color:';
         const clickableRow = document.createElement('div');  clickableRow.className = 'clickable-name';
-        clickableRow.innerHTML = `<p style="color:rgb(140, 130, 240); margin: 0;"> 
-                                 ${fidToName[thisMove]}:<br>${sourceText}</span></p>`;
-        clickableRow.addEventListener('click', () => showDescSplash(thisMove));
+        if (thisFID >= fidThreshold[7]) { // For biomes
+          const rarityN = ~~(source[0]/20);  const rarityB = ~~(source[1]/20);
+          if (rarityN && rarityB && [3,5,7,9].includes(rarityB)) { // Show both, with short labels
+            sourceText += `${makeBiomeDesc(rarityN,'small')}</span><span style="color:rgb(255, 255, 255);"> / </span><span style="color:${makeBiomeDesc(rarityB,'small')}`;
+          } else { // Show the only rarity
+            sourceText += makeBiomeDesc(rarityN, 'full');
+          }
+          clickableRow.addEventListener('click', () => showMovesetSplash(thisID, 1));
+          // biomeText = ['Common','Uncommon','Rare','Super Rare','Ultra Rare','Boss','Com','Unc','Rare','SR','UR','Dawn','Day','Dusk','Night']
+        } else { // For moves
+          if (source == -1) sourceText += `rgb(251, 173, 124);">${altText[9]}`;
+          else if (source == 0) sourceText += `rgb(131, 182, 239);">${altText[10]}`;
+          else if (source == 201) sourceText += `rgb(255, 255, 255);">${altText[19]} / ${altText[16]}`;
+          else if (source == 202) sourceText += `rgb(255, 255, 255);">${altText[19]} / </span><span style="color:rgb(131, 182, 239);">${altText[16]}`;
+          else if (source == 203) sourceText += `rgb(255, 255, 255);">${altText[19]} / </span><span style="color:rgb(240, 230, 140);">${altText[16]}`;
+          else if (source == 204) sourceText += `rgb(255, 255, 255);">${altText[11]}`;
+          else if (source == 205) sourceText += `rgb(240, 230, 140);">${altText[19]}</span><span style="color:rgb(255, 255, 255);"> / ${altText[16]}`;
+          else if (source == 206) sourceText += `rgb(240, 230, 140);">${altText[19]}</span><span style="color:rgb(255, 255, 255);"> / </span><span style="color:rgb(131, 182, 239);">${altText[16]}`;
+          else if (source == 207) sourceText += `rgb(240, 230, 140);">${altText[19]}<span style="color:rgb(255, 255, 255);"> / </span>${altText[16]}`;
+          else if (source == 208) sourceText += `rgb(240, 230, 140);">${altText[12]}`;
+          else if (source == 209) sourceText += `rgb(255, 255, 255);">${altText[13]} ${altText[16]}`;
+          else if (source == 210) sourceText += `rgb(131, 182, 239);">${altText[14]} ${altText[16]}`;
+          else if (source == 211) sourceText += `rgb(240, 230, 140);">${altText[15]} ${altText[16]}`;
+          else sourceText += `rgb(255, 255, 255);">${altText[17]} ${item[thisFID]}`;
+          clickableRow.addEventListener('click', () => showDescSplash(thisFID));
+        };
+        // Show the move name, with click event for splash screen
+        clickableRow.innerHTML = `<p style="color:rgb(140, 130, 240); margin: 0;">${fidToName[thisFID]}:<br>${sourceText}</span></p>`;
         moveColumn.appendChild(clickableRow);
       }
     });
@@ -370,8 +379,9 @@ function renderMoreItems() { // Create each list item, with rows and columns of 
     }
 
     // Show the cost, colored by the egg tier
-    const costColumn = document.createElement('div'); costColumn.className = 'item-column';
+    const costColumn = document.createElement('div'); costColumn.className = 'clickable-name';
           costColumn.innerHTML = `${headerNames[6]}<br><span style="color:${eggTierColors(item.et)};">${item.co}</span>`;  
+          costColumn.addEventListener('click', () => showMovesetSplash(thisID, 1));
     let flipped = lockedFilters.includes(fidThreshold[5]);                
     const bstColumn = document.createElement('div');  bstColumn.className = 'item-column'; // Create the stats columns
           bstColumn.innerHTML = `${headerNames[ 7]}<br>${item.bst}`;
@@ -410,56 +420,115 @@ function renderMoreItems() { // Create each list item, with rows and columns of 
     itemList.appendChild(li); // Append the current entry to the list of Pokemon
   });
 }
-
-function showMovesetSplash(specID) {
-  movesetContent.style.width = '330px';
-  movesetHeader.innerHTML = '';
-  const item = items[specID]; shownMovesetID = specID;
-  
-  const t2line = ('t2' in item ? ` / <span style="color:${typeColors[item.t2]}; display:inline">${fidToName[item.t2]}</span>` : '')
-  const line1 = document.createElement('div'); const line1mid = document.createElement('div');
-  line1mid.style.maxHeight = '46px';
-  line1mid.innerHTML = `${speciesNames[specID]}<br><span style="color:${typeColors[item.t1]}; display:inline">${fidToName[item.t1]}</span>${t2line}`;
-  const msImg = document.createElement('img'); msImg.src = `images/${item.img}_0.png`; msImg.className = 'moveset-image';
-  const arrowL = document.createElement('img'); arrowL.src = 'ui/arrow.png'; arrowL.className = 'moveset-arrow';
-  arrowL.addEventListener('mouseover', () => arrowL.src = `ui/arrowh.png`);
-  arrowL.addEventListener('mouseout',  () => arrowL.src = `ui/arrow.png` ); 
-  arrowL.addEventListener("click",     () => changeMoveset(-1));
-  const arrowR = document.createElement('img'); arrowR.src = 'ui/arrow.png'; arrowR.className = 'moveset-arrow'; arrowR.style="transform: scaleX(-1);";
-  arrowR.addEventListener('mouseover', () => arrowR.src = `ui/arrowh.png`);
-  arrowR.addEventListener('mouseout',  () => arrowR.src = `ui/arrow.png` ); 
-  arrowR.addEventListener("click",     () => changeMoveset(1));
-  line1.appendChild(arrowL); line1.appendChild(msImg); line1.appendChild(line1mid); line1.appendChild(arrowR);
-  movesetHeader.appendChild(line1); 
-  movesetHeader.appendChild(document.createElement('hr'));
-
-  const line2 = document.createElement('div');
-  line2.innerHTML = `<div>${altText[17]}</div><div>${catToName[2]}</div>
-  <div>${altText[5]}</div><div>${altText[6]}</div><div>${altText[7]}</div>`;
-  movesetHeader.appendChild(line2); 
-  movesetHeader.appendChild(document.createElement('hr'));
-  const moveList = [[],[]]; // Assemble list of moves
-  for (const [key, value] of Object.entries(item)) {
-    const intKey = Number(key);
-    if (Number.isInteger(intKey) && intKey >= fidThreshold[1] && intKey < fidThreshold[2]) {
-      if (value < 200) moveList[0].push(intKey);
-      else if (value > 200 && value != 204 && value != 208) moveList[1].push(intKey);
-    }
+function makeBiomeDesc(source, style) {
+  if (style == 'full') {
+    if      (source == 1) return `rgb(255, 255, 255);">${biomeText[0]}`;
+    else if (source == 2) return `rgb(131, 182, 239);">${biomeText[1]}`;
+    else if (source == 3) return `rgb(131, 182, 239);">${biomeText[5]} ${biomeText[1]}`;
+    else if (source == 4) return `rgb(240, 230, 140);">${biomeText[2]}`;
+    else if (source == 5) return `rgb(240, 230, 140);">${biomeText[5]} ${biomeText[2]}`;
+    else if (source == 6) return `rgb(239, 131, 131);">${biomeText[3]}`;
+    else if (source == 7) return `rgb(239, 131, 131);">${biomeText[5]} ${biomeText[3]}`;
+    else if (source == 8) return `rgb(216, 143, 205);">${biomeText[4]}`;
+    else if (source == 9) return `rgb(216, 143, 205);">${biomeText[5]} ${biomeText[4]}`;
+  } else if (style == 'small') {
+    if      (source == 1) return `rgb(255, 255, 255);">${biomeText[6]}`;
+    else if (source == 2) return `rgb(131, 182, 239);">${biomeText[7]}`;
+    else if (source == 3) return `rgb(131, 182, 239);">${biomeText[5]} ${biomeText[7]}`;
+    else if (source == 4) return `rgb(240, 230, 140);">${biomeText[8]}`;
+    else if (source == 5) return `rgb(240, 230, 140);">${biomeText[5]} ${biomeText[8]}`;
+    else if (source == 6) return `rgb(239, 131, 131);">${biomeText[9]}`;
+    else if (source == 7) return `rgb(239, 131, 131);">${biomeText[5]} ${biomeText[9]}`;
+    else if (source == 8) return `rgb(216, 143, 205);">${biomeText[10]}`;
+    else if (source == 9) return `rgb(216, 143, 205);">${biomeText[5]} ${biomeText[10]}`;
   }
-  // Sort the moves
-  moveList[0].sort((a, b) => item[a] > item[b] ? 1 : (item[a] < item[b]) ? -1 : 
-    (fidToName[a] > fidToName[b] ? 1 : (fidToName[a] < fidToName[b] ? -1 : 0 )));
-  moveList[1].sort((a, b) => (item[a]-200)%4 > (item[b]-200)%4 ? 1 : ((item[a]-200)%4 < (item[b]-200)%4) ? -1 : 
-    (fidToName[a] > fidToName[b] ? 1 : (fidToName[a] < fidToName[b] ? -1 : 0 )));
+}
+
+function makeMovesetHeader(specID) {
+  movesetHeader.innerHTML = '';
+  const item = items[specID]; splashState.species = specID;
+  
+  const headerRow = document.createElement('div'); headerRow.className = 'moveset-big-header';
+  const arrowL = createArrow(false);  const arrowR = createArrow(true);
+  const msImg = document.createElement('img'); msImg.src = `images/${item.img}_0.png`; msImg.className = 'moveset-image';
+  headerRow.appendChild(arrowL); headerRow.appendChild(msImg); 
+  const nameAndType = document.createElement('div'); nameAndType.style.maxHeight = '46px';
+  const typeTwoText = ('t2' in item ? ` / <span style="color:${typeColors[item.t2]}; display:inline">${fidToName[item.t2]}</span>` : '')
+  nameAndType.innerHTML = `${speciesNames[specID]}<br><span style="color:${typeColors[item.t1]}; display:inline">${fidToName[item.t1]}</span>${typeTwoText}`;
+  headerRow.appendChild(nameAndType); headerRow.appendChild(arrowR);
+  movesetHeader.appendChild(headerRow); 
+  movesetHeader.appendChild(document.createElement('hr'));
+  
+  // const splashButton = document.createElement('div'); splashButton.className = 'splash-button'; 
+  // splashButton.innerHTML = 'eeeeeeee'; splashButton.style.margin = '-10px auto -10px auto';
+  // splashButton.addEventListener("click", () => mode = 3 );
+  // movesetHeader.appendChild(splashButton);
+  // movesetHeader.appendChild(document.createElement('hr'));
+}
+function createArrow(isRight) {
+  const arrow = document.createElement('img');  arrow.src = 'ui/arrow.png';  arrow.className = 'moveset-arrow';
+  if (isRight) arrow.style.transform = 'scaleX(-1)';
+  arrow.addEventListener('mouseover', () => arrow.src = 'ui/arrowh.png');
+  arrow.addEventListener('mouseout',  () => arrow.src = 'ui/arrow.png');
+  arrow.addEventListener('click', () => changeMoveset(isRight ? 1 : -1));
+  return arrow;
+}
+function showMovesetSplash(specID, overridePage=null) {
+  if (overridePage != null) splashState.page = overridePage;
+  const item = items[specID];
+  makeMovesetHeader(specID);
   movesetScrollable.innerHTML = '';
-  [moveList[0],[item.e1,item.e2,item.e3,item.e4],moveList[1]].forEach((thisList, table) => {
-    if (thisList != moveList[0]) movesetScrollable.appendChild(document.createElement('hr'));
-    thisList.forEach(move => makeMovesetRow(move, item, table));
-  });
+  if (splashState.page) { // Show biomes
+    if ('ee' in item) {
+      if (item.ee == 1) movesetScrollable.innerHTML += '<b>This Pokemon is <span style="color:rgb(140, 130, 240);">Egg Exclusive</span>.</b><br>It does not appear in any biomes, and can only be obtained from eggs.'
+      if (item.ee == 2) movesetScrollable.innerHTML += '<b>This is a <span style="color:rgb(216, 143, 205);">Baby Pokemon</span>.</b><br>It does not appear in any biomes, but can be unlocked by encountering its evolution.'
+      if (item.ee == 3) movesetScrollable.innerHTML += '<b>This Pokemon is <span style="color:rgb(131, 182, 239);">Form Exclusive</span>.</b><br>It does not appear in any biomes, and can only be obtained via form change.'
+    } else {
+      possibleFID.slice(fidThreshold[7],fidThreshold[8]).forEach((fid) => {
+        if (fid in item) {
+          const biomeRow = document.createElement('div');  biomeRow.className = 'biome-row';
+          if (!movesetScrollable.innerHTML) biomeRow.style.marginTop = '4px';
+          biomeRow.innerHTML = `<b>${fidToName[fid]}:</b>`;
+          item[fid].forEach(src => {
+            biomeRow.innerHTML += `<br><span style="font-weight:bold; color:${makeBiomeDesc(~~(src/20),'full')}</span>`;
+            if (src%20) {
+              let timeText = '';
+              [1,2,4,8].forEach((i,index) => timeText += ((src%20)%(2*i)>=i ? `${timeText?', ':''}${biomeText[11+index]}`:''));
+              biomeRow.innerHTML += `<span style="font-size:16px;"> (${timeText})</span>`;
+            }
+          });
+          movesetScrollable.appendChild(biomeRow);
+        }
+      });
+    }
+    // movesetScrollable.appendChild(document.createElement('hr'));
+  } else { // Show moveset
+    const msHeaderText = document.createElement('div'); msHeaderText.className = 'moveset-row-header';
+    msHeaderText.innerHTML = `<div>${altText[17]}</div><div>${catToName[2]}</div>
+      <div>${altText[5]}</div><div>${altText[6]}</div><div>${altText[7]}</div>`;
+    movesetHeader.appendChild(msHeaderText); 
+    movesetHeader.appendChild(document.createElement('hr'));
+    const moveList = [[],[]]; // Assemble list of moves
+    for (const [key, value] of Object.entries(item)) {
+      const intKey = Number(key);
+      if (Number.isInteger(intKey) && intKey >= fidThreshold[1] && intKey < fidThreshold[2]) {
+        if (value < 200) moveList[0].push(intKey);
+        else if (value > 200 && value != 204 && value != 208) moveList[1].push(intKey);
+      }
+    }
+    // Sort the moves
+    moveList[0].sort((a, b) => item[a] > item[b] ? 1 : (item[a] < item[b]) ? -1 : 
+      (fidToName[a] > fidToName[b] ? 1 : (fidToName[a] < fidToName[b] ? -1 : 0 )));
+    moveList[1].sort((a, b) => item[a]%4 > item[b]%4 ? 1 : (item[a]%4 < item[b]%4) ? -1 : 
+      (fidToName[a] > fidToName[b] ? 1 : (fidToName[a] < fidToName[b] ? -1 : 0 )));
+    [moveList[0],[item.e1,item.e2,item.e3,item.e4],moveList[1]].forEach((thisList, tableIndex) => {
+      if (thisList != moveList[0]) movesetScrollable.appendChild(document.createElement('hr'));
+      thisList.forEach(move => makeMovesetRow(move, item, tableIndex));
+    });
+  }
   if (!movesetScreen.classList.contains('show')) {
     movesetScreen.classList.add("show"); 
-    movesetScrollable.scrollTop = 0;  
-    movesetContent.focus();          
+    movesetScrollable.scrollTop = 0;
   }
 }
 function makeMovesetRow(fid, item, table) {
@@ -482,17 +551,13 @@ function moveSrcText(src, table) {
     if (src ==  0 ) return `rgb(131, 182, 239);">${altText[18]}`;
     else return `rgb(255, 255, 255);">${src}`;
   } else if (table == 1) {
-    if (src < 205) return `rgb(255, 255, 255);">${altText[19]}`;
-    else return `rgb(240, 230, 140);">${altText[19]}`;
+    return `${src < 205 ? 'rgb(255, 255, 255)':'rgb(240, 230, 140)'};">${altText[19]}`
   } else {
-    const text = (altText[16].length > 2 ? 'TM' : altText[16])
-    if (src == 209 || src == 201 || src == 205) return `rgb(255, 255, 255);">${text}`;
-    if (src == 210 || src == 202 || src == 206) return `rgb(131, 182, 239);">${text}`;
-    if (src == 211 || src == 203 || src == 207) return `rgb(240, 230, 140);">${text}`;
+    return `${tmColors[src%4-1]};">${(altText[16].length > 2 ? 'TM' : altText[16])}`
   }
 }
 function changeMoveset(indexChange) {
-  const index = filteredItemIDs.findIndex(ID => ID == shownMovesetID) + indexChange;
+  const index = filteredItemIDs.findIndex(ID => ID == splashState.species) + indexChange;
     if (index >= 0 && index < filteredItemIDs.length) {
       window.scrollTo({top:(89+68*isMobile)*(index-2*!isMobile)});
       showMovesetSplash(filteredItemIDs[index]);
@@ -522,13 +587,13 @@ function showDescSplash(fid) {
     // if (thisDesc[1]) { // If there is a custom description
     //   splashContent.innerHTML += `<p style="color:rgb(145, 145, 145); margin:0px; margin-top:8px;">${thisDesc[1]}</p>`;
     // }
-    // Add all tags for priority, targets, procs, contact, other
+    // Add all descriptions for priority, targets, procs, tags
     if (thisProcs[5] || thisProcs[6] || thisProcs[7]) {
       const splashMoveTags = document.createElement('div');  splashMoveTags.className = 'splash-move-tags';
       if (thisProcs[5] > 0) { // If non-zero priority
-        {splashMoveTags.innerHTML += `<p style="color:rgb(143, 214, 154);">Priority: +${thisProcs[5]}</p>`;};
+        splashMoveTags.innerHTML += `<p style="color:rgb(143, 214, 154);">Priority: +${thisProcs[5]}</p>`;
       } else if (thisProcs[5] < 0) {
-        {splashMoveTags.innerHTML += `<p style="color:rgb(239, 131, 131);">Priority: ${thisProcs[5]}</p>`;};
+        splashMoveTags.innerHTML += `<p style="color:rgb(239, 131, 131);">Priority: ${thisProcs[5]}</p>`;
       }
       if (thisProcs[7].includes(20)) {splashMoveTags.innerHTML += '<p style="color:rgb(216, 143, 205);">Targets: Random Enemy</p>';};
       if (thisProcs[7].includes(21)) {splashMoveTags.innerHTML += '<p style="color:rgb(239, 131, 131);">Targets: All Enemies</p>';};
@@ -621,13 +686,14 @@ function fidToColor(fid) {
   if (fid < fidThreshold[5]) return ['rgb(216, 143, 205)', 'rgb(255, 255, 255)'];
   if (fid < fidThreshold[6]) return ['rgb(255, 255, 255)', 'rgb(239, 131, 131)'];
   if (fid < fidThreshold[7]) return ['rgb(255, 255, 255)', eggTierColors(fid)]
+  if (fid < fidThreshold[8]) return ['rgb(143, 214, 154)', 'rgb(255, 255, 255)'];
   else return ['rgb(255, 255, 255)', 'rgb(140, 130, 240)']; 
 }
 function abToColor(name) {
-  if (name == 'a1') return (abilityState==0||abilityState==1 ? 'rgb(255, 255, 255)' : 'rgb(145,145,145)')
-  if (name == 'a2') return (abilityState==0||abilityState==1 ? 'rgb(255, 255, 255)' : 'rgb(145,145,145)')
-  if (name == 'ha') return (abilityState==0||abilityState==2 ? 'rgb(240, 230, 140)' : 'rgb(105,105,105)')
-  if (name == 'pa') return (abilityState==0||abilityState==3 ? 'rgb(140, 130, 240)' : 'rgb(145,145,145)')
+  if (name == 'a1') return (headerState.ability==0||headerState.ability==1 ? 'rgb(255, 255, 255)' : 'rgb(145,145,145)')
+  if (name == 'a2') return (headerState.ability==0||headerState.ability==1 ? 'rgb(255, 255, 255)' : 'rgb(145,145,145)')
+  if (name == 'ha') return (headerState.ability==0||headerState.ability==2 ? 'rgb(240, 230, 140)' : 'rgb(105,105,105)')
+  if (name == 'pa') return (headerState.ability==0||headerState.ability==3 ? 'rgb(140, 130, 240)' : 'rgb(145,145,145)')
 }
 function eggTierColors(fid) {
   if (fid >= fidThreshold[6]) fid -= fidThreshold[6];
@@ -658,8 +724,8 @@ function displaySuggestions() { // Get search query and clear the list
         if (fid >= fidThreshold[2] && fid < fidThreshold[7]) {
           // Search via category for later categories
           searchableName = `${fidToCategory(fid).toLowerCase().replace(/[.’'\s-]/g,'')}${searchableName}`;  
-        } else if (fid >= fidThreshold[7] && offerFamilies.includes(fid)) {
-          return true;
+        } else if (fid >= fidThreshold[8] && offerFamilies.includes(fid)) {
+          return !lockedFilters.some((f) => f == fid);
         }
         // Suggest if it contains the search query and is not already locked
         return searchableName.includes(query) && !lockedFilters.some((f) => f == fid);
@@ -698,7 +764,7 @@ function lockFilter(newLockFID) {
     lockedFilters.push(newLockFID); // Add the filter to the locked filters container
     let filterMod = null;
     if (lockedFilters.length > 1) {
-      const familyOR = (newLockFID >= fidThreshold[7] && lockedFilters[lockedFilters.length-2] >= fidThreshold[7]);
+      const familyOR = (newLockFID >= fidThreshold[8] && lockedFilters[lockedFilters.length-2] >= fidThreshold[8]);
       filterMod = document.createElement("span"); filterMod.toggleOR = familyOR;
       filterMod.className = "filter-mod";         filterMod.innerHTML = (familyOR?'OR':'&');
       filterMod.addEventListener("click", () => toggleOR(filterMod));
@@ -713,7 +779,7 @@ function lockFilter(newLockFID) {
     searchBox.value = ""; 
     // Refresh suggestions and items
     updateFilterGroups();   refreshAllItems();
-    if (newLockFID >= fidThreshold[1] && newLockFID < fidThreshold[2] && sortState.column === 'row') {
+    if (sortState.column === 'row' && ((newLockFID >= fidThreshold[1] && newLockFID < fidThreshold[2]) || (newLockFID >= fidThreshold[7] && newLockFID < fidThreshold[8]))) {
       updateHeader(headerColumns[5]);
     } else {
       updateHeader(null, true);
@@ -732,7 +798,7 @@ function removeFilter(fidToRemove, filterTag, filterModToRemove) {
   // Refresh suggestions and items
   updateFilterGroups();  refreshAllItems();
   // Reset the sorting if there aren't any more locked moves
-  if (sortState.column === 'moves' && !lockedFilters.some((f) => (f >= fidThreshold[1] && f < fidThreshold[2]))) { 
+  if (sortState.column === 'moves' && !lockedFilters.some((f) => (f >= (fidThreshold[1] && f < fidThreshold[2]) || (f >= fidThreshold[7] && f < fidThreshold[8])))) { 
     updateHeader(headerColumns[0]); 
   } else { 
     updateHeader(null, true); 
@@ -774,22 +840,22 @@ function updateHeader(clickTarget = null, ignoreFlip = false) {
   // Find the new sorting attribute, and update the headers
   const sortAttribute = clickTarget?.sortattr;
   if (sortAttribute == 'shiny') { // Toggle the global shiny state
-    shinyState = (shinyState+3)%4;
-    if (shinyState) {
+    headerState.shiny = (headerState.shiny+3)%4;
+    if (headerState.shiny) {
       headerColumns[1].innerHTML = `<span style="color:rgb(140, 130, 240);">${headerNames[1]}</span>`;
       const starImg = document.createElement('img');  starImg.className = 'star-header';
-      starImg.src = `ui/shiny${shinyState}.png`;
+      starImg.src = `ui/shiny${headerState.shiny}.png`;
       headerColumns[1].appendChild(starImg);
     } else {
       headerColumns[1].innerHTML = headerNames[1];
     }
   } else if (sortAttribute == 'ab') { // Toggle the global ability state
-    abilityState = (abilityState+1)%4;
-    if (abilityState) {
+    headerState.ability = (headerState.ability+1)%4;
+    if (headerState.ability) {
       headerColumns[4].innerHTML = `<span style="color:rgb(140, 130, 240);">${headerNames[4]}</span>`;
-      if      (abilityState == 1) headerColumns[4].innerHTML += `<span style="color:rgb(255, 255, 255); font-size:12px;">(${altText[1]})</span>`;
-      else if (abilityState == 2) headerColumns[4].innerHTML += `<span style="color:rgb(240, 230, 140); font-size:12px;">(${altText[2]})</span>`;
-      else if (abilityState == 3) headerColumns[4].innerHTML += `<span style="color:rgb(140, 130, 240); font-size:12px;">(${altText[3]})</span>`;
+      if      (headerState.ability == 1) headerColumns[4].innerHTML += `<span style="color:rgb(255, 255, 255); font-size:12px;">(${altText[1]})</span>`;
+      else if (headerState.ability == 2) headerColumns[4].innerHTML += `<span style="color:rgb(240, 230, 140); font-size:12px;">(${altText[2]})</span>`;
+      else if (headerState.ability == 3) headerColumns[4].innerHTML += `<span style="color:rgb(140, 130, 240); font-size:12px;">(${altText[3]})</span>`;
     } else headerColumns[4].innerHTML = headerNames[4];
   } else {
     headerColumns[5].innerHTML = headerColumns[5].textDef;
@@ -875,7 +941,7 @@ document.addEventListener('keydown', (event) => {
     }
   }
   // Hit 'Enter' to lock first filter
-  if (event.key == "Enter" && filterToEnter) lockFilter(filterToEnter);
+  if (event.key == "Enter" && filterToEnter != null) lockFilter(filterToEnter);
   // Allow PageUp and PageDown even when in search box
   if (event.key == "PageDown" || event.key == "PageUp") searchBox.blur();
   // Hit escape to clear search box, text, last filter, or headers
@@ -892,12 +958,10 @@ document.addEventListener('keydown', (event) => {
       const filterTags = document.querySelectorAll(".filter-tag");
       const lastTag = filterTags[filterTags.length - 1];
       const lastMod = lockedFilterMods[lockedFilterMods.length - 1];
-      if (lastFilter && lastTag) {
-        removeFilter(lastFilter, lastTag, lastMod); // Remove last filter
-      }
-    } else if (shinyState || abilityState) { // Clear header restrictions
-      shinyState = 0;   headerColumns[1].innerHTML = headerNames[1];
-      abilityState = 0; headerColumns[4].innerHTML = headerNames[4];
+      removeFilter(lastFilter, lastTag, lastMod); // Remove last filter
+    } else if (headerState.shiny || headerState.ability) { // Clear header restrictions
+      headerState.shiny = 0;   headerColumns[1].innerHTML = headerNames[1];
+      headerState.ability = 0; headerColumns[4].innerHTML = headerNames[4];
       updateHeader();
     }
   }
@@ -911,7 +975,6 @@ document.addEventListener('keydown', (event) => {
 splashScreen.addEventListener("click", (event) => {
   if (event.target === splashScreen) {
     splashScreen.classList.remove("show");
-    if (movesetScreen.classList.contains("show")) movesetContent.focus();
   }
 });
 movesetScreen.addEventListener("click", (event) => {

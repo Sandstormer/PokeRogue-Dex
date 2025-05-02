@@ -416,6 +416,7 @@ h1 {
   border: 1px solid #ffffff;
   border-radius: 4px;
   background-color: #151019;
+  width: 330px;
   min-width: 270px;
   max-width: 382px;
   position: relative;
@@ -428,7 +429,6 @@ h1 {
 #splashContent::-webkit-scrollbar, #movesetContent::-webkit-scrollbar, #movesetScrollable::-webkit-scrollbar {
   width: 5px;
   height: 0px;
-  /* display: none; */
 }
 #splashContent::-webkit-scrollbar-track, #movesetContent::-webkit-scrollbar-track, #movesetScrollable::-webkit-scrollbar-track {
   background: transparent;
@@ -469,24 +469,27 @@ h1 {
 #movesetHeader {
   font-weight: bold;
 }
-#movesetHeader > div:first-child {
+.moveset-big-header {
   display: grid;
   grid-template-columns: 24px 117px 1fr 24px;
   align-items: center;
 }
-#movesetHeader > div:nth-child(3), .moveset-row {
+.biome-row {
+  margin-top: 12px;
+}
+.moveset-row-header, .moveset-row {
   font-weight: bold;
   display: grid;
   grid-template-columns: 40px 1fr repeat(3, 40px);
   margin-top: 5px;
 }
+.moveset-row {
+  cursor: pointer;
+}
 #movesetScrollable {
   margin-top: -5px;
   overflow: scroll;
   -ms-overflow-style: none;
-}
-.moveset-row {
-  cursor: pointer;
 }
 .moveset-image {
   margin-top: -15px;
@@ -504,7 +507,6 @@ h1 {
   height: 76px; 
   object-fit: contain;
   cursor: pointer;
-  /* outline: 1px solid red; */
 }
 
 hr {
