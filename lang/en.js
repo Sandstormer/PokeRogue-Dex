@@ -1,6 +1,6 @@
 headerNames = ['Dex','Shiny','Species','Types','Abilities','Egg Moves','Cost','BST','HP','Atk','Def','SpA','SpD','Spe'];
 altText = ['Moves','Main Only','Hidden Only','Passive Only','Search','Pow','Acc','PP','Add to filters','Memory','Evolution','Egg Move','Rare Egg Move','Common','Great','Ultra','TM','Lv.','Evo','Egg'];
-catToName = ['Type','Ability','Move','Gen','Cost','Gender','Mode','Egg Tier','Biome','Related To'];
+catToName = ['Type','Ability','Move','Gen','Cost','Gender','Mode','Egg Tier','New','Biome','Related To'];
 biomeText = ['Common','Uncommon','Rare','Super Rare','Ultra Rare','Boss','Com.','Unc.','Rare','SR','UR','Dawn','Day','Dusk','Night'];
 fidToDesc = [
 'Powers up Grass-type moves when the Pokémon’s HP is low.',
@@ -234,6 +234,7 @@ fidToDesc = [
 'Boosts the Pokémon’s Speed stat in snow.',
 'Boosts its Speed stat if hit by an Electric-type move instead of taking damage.',
 'Turns the ground into Electric Terrain when the Pokémon enters a battle. The futuristic engine within the Pokémon also boosts its Sp. Atk stat on Electric Terrain.',
+'Comes out disguised as the Pokémon in the party’s last spot.',
 'For five turns, the Pokémon’s Attack and Speed stats are halved.',
 'Reduces the HP of sleeping opposing Pokémon.',
 'Changes the Pokémon’s type to match the Plate it holds.',
@@ -244,7 +245,6 @@ fidToDesc = [
 'The Pokémon’s pure salt protects it from status conditions and halves the damage taken from Ghost-type moves.',
 'Halves the Pokémon’s Attack and Sp. Atk stats when its HP becomes half or less.',
 'The Pokémon cowardly switches out when its HP becomes half or less.',
-'Comes out disguised as the Pokémon in the party’s last spot.',
 'When the Pokémon eats a Berry, it will regurgitate that Berry at the end of the next turn and eat it one more time.',
 'The Pokémon will always act more slowly when using status moves, but these moves will be unimpeded by the Ability of the target.',
 'The power of the Pokémon’s ruinous sword lowers the Defense stats of all Pokémon except itself.',
@@ -283,6 +283,7 @@ fidToDesc = [
 'The power of the Pokémon’s ruinous wooden tablets lowers the Attack stats of all Pokémon except itself.',
 'The Pokémon’s ice head can take a physical attack as a substitute, but the attack also changes the Pokémon’s appearance. The ice will be restored when it hails.',
 'The Pokémon changes its form, alternating between its Full Belly Mode and Hangry Mode after the end of each turn.',
+'Boosts the Attack stat when the Pokémon is hit by a Fire-type move. The Pokémon also cannot be burned.',
 'Ignores the effects of opposing Pokémon’s Abilities and moves that draw in moves.',
 'If the Pokémon uses moves that make direct contact, it can attack the target even if the target protects itself.',
 'When the Pokémon knocks out a target, it utters a chilling neigh, which boosts its Attack stat.',
@@ -297,7 +298,6 @@ fidToDesc = [
 'The mysterious tail covering the Pokémon’s head makes opponents unable to use priority moves against the Pokémon or its allies.',
 'Boosts the Pokémon’s most proficient stat in harsh sunlight or if the Pokémon is holding Booster Energy.',
 'Boosts the Pokémon’s most proficient stat on Electric Terrain or if the Pokémon is holding Booster Energy.',
-'Boosts the Attack stat when the Pokémon is hit by a Fire-type move. The Pokémon also cannot be burned.',
 'A sickly sweet scent spreads across the field when the Pokémon enters a battle, lowering the evasiveness of opposing Pokémon.',
 'The Pokémon’s heart fills with memories, causing the Teal Mask to shine and the Pokémon’s Speed stat to be boosted.',
 'The Pokémon’s heart fills with memories, causing the Wellspring Mask to shine and the Pokémon’s Sp. Def stat to be boosted.',
@@ -2841,6 +2841,7 @@ fidToName = [
 'Slush Rush',
 'Motor Drive',
 'Hadron Engine',
+'Illusion',
 'Slow Start',
 'Bad Dreams',
 'Multitype',
@@ -2851,7 +2852,6 @@ fidToName = [
 'Purifying Salt',
 'Defeatist',
 'Wimp Out',
-'Illusion',
 'Cud Chew',
 'Mycelium Might',
 'Sword Of Ruin',
@@ -2890,6 +2890,7 @@ fidToName = [
 'Tablets Of Ruin',
 'Ice Face',
 'Hunger Switch',
+'Thermal Exchange',
 'Stalwart',
 'Unseen Fist',
 'Chilling Neigh',
@@ -2904,7 +2905,6 @@ fidToName = [
 'Armor Tail',
 'Protosynthesis',
 'Quark Drive',
-'Thermal Exchange',
 'Supersweet Syrup',
 'Embody Aspect Teal',
 'Embody Aspect Wellspring',
@@ -3774,6 +3774,7 @@ fidToName = [
 'Manaphy',
 'Legendary',
 'Exclusive',
+'Shiny Variants',
 'Abyss',
 'Badlands',
 'Beach',

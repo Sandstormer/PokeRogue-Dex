@@ -143,15 +143,16 @@ function refreshAllItems() { // Display items based on query and locked filters 
           if (fid === fidThreshold[5]) return true; // Flipped stats filter
           if (fid === fidThreshold[5]+1) return 'fs' in items[specID]; // Fresh start filter
           if (fid  <  fidThreshold[7]-1) return items[specID].et === fid - fidThreshold[6]; // Egg tier filter
-          if (fid === fidThreshold[7]-1) return [1,2].includes(items[specID]?.ee); // Egg exclusive
-          if (fid  <  fidThreshold[8]) return fid in items[specID]; // Biome filter
-          if (fid  <  fidThreshold[9]) return items[specID]?.fa === fid; // Family filter
+          if (fid === fidThreshold[7]-1) return [1,2,3].includes(items[specID]?.ee); // Egg exclusive
+          if (fid === fidThreshold[7]) return 'nv' in items[specID]; // New variants
+          if (fid  <  fidThreshold[9]) return fid in items[specID]; // Biome filter
+          if (fid  <  fidThreshold[10]) return items[specID]?.fa === fid; // Family filter
           console.warn('Filter error');return fid in items[specID];
         }))) 
       }
   // Add moves to track in the move column  ==============
   showMoveLearn = lockedFilters.filter(fid => (fid >= fidThreshold[1] && fid < fidThreshold[2])
-                                           || (fid >= fidThreshold[7] && fid < fidThreshold[8]));
+                                           || (fid >= fidThreshold[8] && fid < fidThreshold[9]));
   // Remove the pinned items for now ==============
   if (pinnedRows) filteredItemIDs = filteredItemIDs.filter((thisID) => !pinnedRows.includes(thisID));
 
@@ -162,7 +163,7 @@ function refreshAllItems() { // Display items based on query and locked filters 
       if (sortState.column == 'moves') { // Sort by source of moves
         const getLearnLevel = (ID) => 
           showMoveLearn.reduce((total, move) => total + (move in items[ID] ? 
-            (move >= fidThreshold[7] ? (items[ID][move][1] ? ~~(items[ID][move][0]/20)*0.9+~~(items[ID][move][1]/20)/10 
+            (move >= fidThreshold[8] ? (items[ID][move][1] ? ~~(items[ID][move][0]/20)*0.9+~~(items[ID][move][1]/20)/10 
                 : ~~(items[ID][move][0]/20)) : items[ID][move]) : 500), 0);
         aValue = getLearnLevel(a);
         bValue = getLearnLevel(b);
@@ -336,7 +337,7 @@ function renderMoreItems() { // Create each list item, with rows and columns of 
         numMovesShown += 1;
         let source = item[thisFID];  let sourceText = '<span style="color:';
         const clickableRow = document.createElement('div');  clickableRow.className = 'clickable-name';
-        if (thisFID >= fidThreshold[7]) { // For biomes
+        if (thisFID >= fidThreshold[8]) { // For biomes
           const rarityN = ~~(source[0]/20);  const rarityB = ~~(source[1]/20);
           if (rarityN && rarityB && [3,5,7,9].includes(rarityB)) { // Show both, with short labels
             sourceText += `${makeBiomeDesc(rarityN,'small')}</span><span style="color:rgb(255, 255, 255);"> / </span><span style="color:${makeBiomeDesc(rarityB,'small')}`;
@@ -481,11 +482,13 @@ function showMovesetSplash(specID, overridePage=null) {
   movesetScrollable.innerHTML = '';
   if (splashState.page) { // Show biomes
     if ('ee' in item) {
-      if (item.ee == 1) movesetScrollable.innerHTML += '<b>This Pokemon is <span style="color:rgb(140, 130, 240);">Egg Exclusive</span>.</b><br>It does not appear in any biomes, and can only be obtained from eggs.'
+      if (item.ee == 1) movesetScrollable.innerHTML += '<b>This Pokemon is <span style="color:rgb(143, 214, 154);">Egg Exclusive</span>.</b><br>It does not appear in any biomes, and can only be obtained from eggs.'
       if (item.ee == 2) movesetScrollable.innerHTML += '<b>This is a <span style="color:rgb(216, 143, 205);">Baby Pokemon</span>.</b><br>It does not appear in any biomes, but can be unlocked by encountering its evolution.'
-      if (item.ee == 3) movesetScrollable.innerHTML += '<b>This Pokemon is <span style="color:rgb(131, 182, 239);">Form Exclusive</span>.</b><br>It does not appear in any biomes, and can only be obtained via form change.'
-    } else {
-      possibleFID.slice(fidThreshold[7],fidThreshold[8]).forEach((fid) => {
+      if (item.ee == 3) movesetScrollable.innerHTML += '<b>This <span style="color:rgb(239, 131, 131);">Paradox Pokemon</span> is <span style="color:rgb(143, 214, 154);">Egg Exclusive</span>.</b><br>It can only be obtained from eggs, but can afterward be caught in Classic mode.'
+      if (item.ee == 4) movesetScrollable.innerHTML += '<b>This Pokemon is <span style="color:rgb(131, 182, 239);">Form Exclusive</span>.</b><br>It does not appear in any biomes, and can only be obtained via form change.'
+      if (item.ee == 5) movesetScrollable.innerHTML += 'This Pokemon can only be caught after obtaining <b><span style="color:rgb(239, 131, 131);">All Other Pokemon</span></b>.<br>It does not appear in standard eggs.'
+    }
+      possibleFID.slice(fidThreshold[8],fidThreshold[9]).forEach((fid) => {
         if (fid in item) {
           const biomeRow = document.createElement('div');  biomeRow.className = 'biome-row';
           if (!movesetScrollable.innerHTML) biomeRow.style.marginTop = '4px';
@@ -501,7 +504,7 @@ function showMovesetSplash(specID, overridePage=null) {
           movesetScrollable.appendChild(biomeRow);
         }
       });
-    }
+    
     // movesetScrollable.appendChild(document.createElement('hr'));
   } else { // Show moveset
     const msHeaderText = document.createElement('div'); msHeaderText.className = 'moveset-row-header';
@@ -687,7 +690,8 @@ function fidToColor(fid) {
   if (fid < fidThreshold[5]) return ['rgb(216, 143, 205)', 'rgb(255, 255, 255)'];
   if (fid < fidThreshold[6]) return ['rgb(255, 255, 255)', 'rgb(239, 131, 131)'];
   if (fid < fidThreshold[7]) return ['rgb(255, 255, 255)', eggTierColors(fid)]
-  if (fid < fidThreshold[8]) return ['rgb(143, 214, 154)', 'rgb(255, 255, 255)'];
+  if (fid < fidThreshold[8]) return ['rgb( 83, 237, 229)', 'rgb(229, 80, 120)'];
+  if (fid < fidThreshold[9]) return ['rgb(143, 214, 154)', 'rgb(255, 255, 255)'];
   else return ['rgb(255, 255, 255)', 'rgb(140, 130, 240)']; 
 }
 function abToColor(name) {
@@ -703,7 +707,7 @@ function eggTierColors(fid) {
   if (fid == 2) return 'rgb(240, 230, 140)';
   if (fid == 3) return 'rgb(239, 131, 131)';
   if (fid == 4) return 'rgb(216, 143, 205)';
-  if (fid == 5) return 'rgb(140, 130, 240)';
+  if (fid == 5) return 'rgb(143, 214, 154)';
   else { console.log('Invalid egg tier'); return null; }
 }
 
@@ -723,7 +727,7 @@ function displaySuggestions() { // Get search query and clear the list
     // Filter suggestions based on query and exclude already locked filters
     matchingFID = possibleFID.filter((fid) => {
         let searchableName = fidToSearch[fid];
-        if (fid >= fidThreshold[2] && fid < fidThreshold[7]) {
+        if (fid >= fidThreshold[2] && fid < fidThreshold[8]) {
           // Search via category for later categories
           searchableName = `${fidToCategory(fid).toLowerCase().replace(/[.’'\s-]/g,'')}${searchableName}`;  
         } else if (fid >= fidThreshold[8] && offerFamilies.includes(fid)) {
@@ -779,12 +783,12 @@ function lockFilter(newLockFID) {
     filterContainer.appendChild(filterTag);
     // Clear the search bar after locking
     searchBox.value = ""; 
-    // Refresh suggestions and items
-    updateFilterGroups();   refreshAllItems();
-    if (sortState.column === 'row' && ((newLockFID >= fidThreshold[1] && newLockFID < fidThreshold[2]) || (newLockFID >= fidThreshold[7] && newLockFID < fidThreshold[8]))) {
+    updateFilterGroups();   
+    if (newLockFID === fidThreshold[7] && headerState.shiny == 0) updateHeader(headerColumns[1]);
+    if (sortState.column === 'row' && ((newLockFID >= fidThreshold[1] && newLockFID < fidThreshold[2]) || (newLockFID >= fidThreshold[8] && newLockFID < fidThreshold[9]))) {
       updateHeader(headerColumns[5]);
     } else {
-      updateHeader(null, true);
+      updateHeader(null, true); // Update header, then refresh items and suggestions
     }
   }
 }
@@ -797,13 +801,13 @@ function removeFilter(fidToRemove, filterTag, filterModToRemove) {
   lockedFilters = lockedFilters.filter( (f) => f != fidToRemove );  filterTag.remove();
   lockedFilterMods = lockedFilterMods.filter( (f) => f != filterModToRemove ); // Remove from the mod list
   if (filterModToRemove) filterModToRemove.remove(); // Remove the actual mod element
-  // Refresh suggestions and items
-  updateFilterGroups();  refreshAllItems();
+  updateFilterGroups();  
+  if (fidToRemove == fidThreshold[7] && headerState.shiny == 3) { headerState.shiny = 0;  headerColumns[1].innerHTML = headerNames[1]; }
   // Reset the sorting if there aren't any more locked moves
-  if (sortState.column === 'moves' && !lockedFilters.some((f) => (f >= (fidThreshold[1] && f < fidThreshold[2]) || (f >= fidThreshold[7] && f < fidThreshold[8])))) { 
+  if (sortState.column === 'moves' && !lockedFilters.some((f) => (f >= (fidThreshold[1] && f < fidThreshold[2]) || (f >= fidThreshold[8] && f < fidThreshold[9])))) { 
     updateHeader(headerColumns[0]); 
   } else { 
-    updateHeader(null, true); 
+    updateHeader(null, true); // Update header, then refresh items and suggestions
   }
   if (lockedFilters.length == 0) { // Reset the animation of the page title
     pageTitle.classList.remove('colorful-text');  void pageTitle.offsetWidth;
@@ -833,7 +837,7 @@ function toggleOR(filterMod) { // Click a filter to toggle it between AND and OR
 function updateHeader(clickTarget = null, ignoreFlip = false) {
   if (clickTarget == null) {clickTarget = sortState.target; ignoreFlip = true;}
   // Set the text of the move column, depending on if a move is filtered
-  if (showMoveLearn.length) {
+  if (lockedFilters.some(f => (f >= fidThreshold[1] && f < fidThreshold[2]) || (f >= fidThreshold[8] && f < fidThreshold[9]))) {
     headerColumns[5].textDef = `<span style="color:rgb(140, 130, 240);">${altText[0]}</span>`;
   } else {
     headerColumns[5].textDef = headerNames[5];
