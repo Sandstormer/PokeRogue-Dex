@@ -310,7 +310,7 @@ function renderMoreItems() { // Create each list item, with rows and columns of 
     const specColumn = document.createElement('div'); // Show species name
     specColumn.className = 'clickable-name';
     specColumn.innerHTML = speciesNames[thisID];
-    specColumn.addEventListener('click', () => showMovesetSplash(thisID, 0));
+    specColumn.addEventListener('click', () => showInfoSplash(thisID, 0));
     
     const typeColumn = document.createElement('div'); // Show both types
     typeColumn.className = 'item-column';
@@ -344,7 +344,7 @@ function renderMoreItems() { // Create each list item, with rows and columns of 
           } else { // Show the only rarity
             sourceText += makeBiomeDesc(rarityN, 'full');
           }
-          clickableRow.addEventListener('click', () => showMovesetSplash(thisID, 1));
+          clickableRow.addEventListener('click', () => showInfoSplash(thisID, 1));
           // biomeText = ['Common','Uncommon','Rare','Super Rare','Ultra Rare','Boss','Com','Unc','Rare','SR','UR','Dawn','Day','Dusk','Night']
         } else { // For moves
           if (source == -1) sourceText += `rgb(251, 173, 124);">${altText[9]}`;
@@ -383,7 +383,7 @@ function renderMoreItems() { // Create each list item, with rows and columns of 
     // Show the cost, colored by the egg tier
     const costColumn = document.createElement('div'); costColumn.className = 'clickable-name';
           costColumn.innerHTML = `${headerNames[6]}<br><span style="color:${eggTierColors(item.et)};">${item.co}</span>`;  
-          costColumn.addEventListener('click', () => showMovesetSplash(thisID, 1));
+          costColumn.addEventListener('click', () => showInfoSplash(thisID, 1));
     let flipped = lockedFilters.includes(fidThreshold[5]);                
     const bstColumn = document.createElement('div');  bstColumn.className = 'item-column'; // Create the stats columns
           bstColumn.innerHTML = `${headerNames[ 7]}<br>${item.bst}`;
@@ -475,7 +475,7 @@ function createArrow(isRight) {
   arrow.addEventListener('click', () => changeMoveset(isRight ? 1 : -1));
   return arrow;
 }
-function showMovesetSplash(specID, overridePage=null) {
+function showInfoSplash(specID, overridePage=null) {
   if (overridePage != null) splashState.page = overridePage;
   const item = items[specID];
   makeMovesetHeader(specID);
@@ -564,7 +564,7 @@ function changeMoveset(indexChange) {
   const index = filteredItemIDs.findIndex(ID => ID == splashState.species) + indexChange;
     if (index >= 0 && index < filteredItemIDs.length) {
       window.scrollTo({top:(89+68*isMobile)*(index-2*!isMobile)});
-      showMovesetSplash(filteredItemIDs[index]);
+      showInfoSplash(filteredItemIDs[index]);
     }
 }
 
@@ -727,8 +727,7 @@ function displaySuggestions() { // Get search query and clear the list
     // Filter suggestions based on query and exclude already locked filters
     matchingFID = possibleFID.filter((fid) => {
         let searchableName = fidToSearch[fid];
-        if (fid >= fidThreshold[2] && fid < fidThreshold[8]) {
-          // Search via category for later categories
+        if (fid >= fidThreshold[2] && fid < fidThreshold[8]) { // Search via category for later categories
           searchableName = `${fidToCategory(fid).toLowerCase().replace(/[.’'\s-]/g,'')}${searchableName}`;  
         } else if (fid >= fidThreshold[8] && offerFamilies.includes(fid)) {
           return !lockedFilters.some((f) => f == fid);
@@ -743,9 +742,6 @@ function displaySuggestions() { // Get search query and clear the list
       // Count how many hits each suggestion has
 
       // Sort the list of suggestions based on hits in the item list (but still by type/ability/move)
-
-      // Remove suggestions that have no matches?
-      // Not implemented yet...
     }
 
     // Highlight a suggestion if tab is hit
@@ -911,15 +907,11 @@ function adjustLayout(forceAdjust = false, headerClick = null) {
 }
 
 // All event listeners **************************
-
-// Load more items on scroll
-window.addEventListener("scroll", () => {
+window.addEventListener("scroll", () => { // Load more items on scroll
   if (window.scrollY + window.innerHeight >= document.body.scrollHeight * 0.8 - 1000) renderMoreItems();
 });
-// Run on page load and when resizing the window
-window.addEventListener("resize", () => adjustLayout());
-// Typing in search box
-searchBox.addEventListener('input', (event) => { 
+window.addEventListener("resize", () => adjustLayout()); // Run on page load and when resizing the window
+searchBox.addEventListener('input', (event) => { // Typing in search box
   tabSelect = -1;
   refreshAllItems();
 });
