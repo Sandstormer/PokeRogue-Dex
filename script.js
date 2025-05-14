@@ -42,7 +42,7 @@ let headerState = { shiny: 0, ability: 0, biome: 0 } // Global state of shiny(0,
 let sortState = { column: null, ascending: true, target: null, biomeToggle: 0 }; // Track the current sort state
 let splashState = { species: -1, page: 0 }
 // const spreadMoves = possibleFID.filter((fid) => fid >= fidThreshold[1] && fid < fidThreshold[2]
-//   && (fidToProc[fid-fidThreshold[1]][7].includes(21) || fidToProc[fid-fidThreshold[1]][7].includes(22)));
+//   && (fidToProc[fid-fidThreshold[0]][7].includes(21) || fidToProc[fid-fidThreshold[0]][7].includes(22)));
 // filteredItemIDs = filteredItemIDs.filter((thisID) => spreadMoves.some((thisMove) => thisMove in items[thisID]));
 // const moveTagFID = { // List of move FIDs for spread/healing/setup
 //   999:
@@ -53,7 +53,7 @@ procToDesc = [
   "User Atk","User Def","User SpAtk","User SpDef","User Speed","User Accuracy","User Evasion",
   "Atk","Def","SpAtk","SpDef","Speed","Accuracy","Evasion",
   "Applies Poison","Applies Toxic","Applies Sleep","Applies Freeze","Applies Paralysis","Applies Burn","Applies Confuse",
-  "Flinch","User Atk/Def/SpA/SpD/Spe","Poison/Para/Sleep","Burn/Para/Freeze","Stellar User Atk/SpAtk"];
+  "Flinch","User Atk/Def/SpA/SpD/Spe","Poison/Para/Sleep","Burn/Para/Freeze","Stellar User Atk/SpAtk","Damage"];
   
 // Perform initial display with detected language
 let pageLang = detectLanguage();
@@ -373,7 +373,7 @@ function renderMoreItems() { // Create each list item, with rows and columns of 
         // Show the move name, with click event for splash screen
         const clickableRow = document.createElement('div');  clickableRow.className = 'clickable-name';
         if (name == 'e4') clickableRow.style.color = 'rgb(240, 230, 140)';
-        // clickableRow.style.color = typeColors[fidToProc[item[name]-fidThreshold[1]][0]];
+        // clickableRow.style.color = typeColors[fidToProc[item[name]-fidThreshold[0]][0]];
         clickableRow.innerHTML = fidToName[item[name]];
         clickableRow.addEventListener('click', () => showDescSplash(item[name]));
         moveColumn.appendChild(clickableRow);
@@ -537,7 +537,7 @@ function showInfoSplash(specID, overridePage=null) {
 }
 function makeMovesetRow(fid, item, table) {
   const moveRow = document.createElement('div');  moveRow.className = 'moveset-row';
-  const thisProcs = fidToProc[fid-fidThreshold[1]];
+  const thisProcs = fidToProc[fid-fidThreshold[0]];
   moveRow.innerHTML = `<div style="color:${moveSrcText(item[fid],table)}</div>
     <div style="color:${typeColors[thisProcs[0]]};">${fidToName[fid]}</div>
     <div style="color:${moveCatColor[thisProcs[1]]}">${(thisProcs[2]==-1?'-':thisProcs[2])}</div>
@@ -572,13 +572,29 @@ function showDescSplash(fid) {
   splashContent.style.width = '300px';
   const thisDesc = fidToDesc[fid-fidThreshold[0]];
   splashContent.innerHTML = `<b>${fidToName[fid]}</b><hr>`; // Name header
+  const thisProcs = fidToProc[fid-fidThreshold[0]];
   if (fid<fidThreshold[1]) { // For abilities
     splashContent.innerHTML = `<b>${fidToName[fid]}</b><hr>${thisDesc}<br>`;
     // if (thisDesc[1]) { // If there is a custom description
     //   splashContent.innerHTML += `<p style="color:rgb(145, 145, 145); margin:0px; margin-top:8px;">${thisDesc[1]}</p>`;
     // }
+    if (thisProcs[0] || thisProcs[1]) {
+      const splashMoveTags = document.createElement('div');  splashMoveTags.className = 'splash-move-tags';
+      thisProcs[0].forEach((thisProc) => { // Procs for stat boosts etc.
+        if ([1,-1].includes(thisProc[1])) {
+          splashMoveTags.innerHTML += `<p>${procToDesc[thisProc[0]]} ${thisProc[1]==1?'+':''}${thisProc[1]}</p>`;
+        } else {
+          splashMoveTags.innerHTML += `<p>${procToDesc[thisProc[0]]} × ${thisProc[1]}</p>`;
+        }
+      });
+      if (thisProcs[1].includes(0)) splashMoveTags.innerHTML += "<p style='color:rgb(239, 131, 131);'>Not Implemented</p>";
+      if (thisProcs[1].includes(1)) splashMoveTags.innerHTML += "<p style='color:rgb(240, 230, 140);'>Partially Implemented</p>";
+      if (thisProcs[1].includes(2)) splashMoveTags.innerHTML += "<p>Can't be suppressed</p>";
+      if (thisProcs[1].includes(3)) splashMoveTags.innerHTML += "<p>Can't be replaced</p>";
+      if (thisProcs[1].includes(4)) splashMoveTags.innerHTML += "<p>Can't be ignored</p>";
+      splashContent.appendChild(splashMoveTags);
+    }
   } else { // For moves
-    const thisProcs = fidToProc[fid-fidThreshold[1]];
     const splashMoveRow = document.createElement('div');  splashMoveRow.className = 'splash-move-row';
     altText.slice(4,8).forEach((attName,index) => { // Show type and damage category, then Power, Accuracy, PP
       const splashMoveCol = document.createElement('div');
