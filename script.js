@@ -278,14 +278,14 @@ function renderMoreItems() { // Create each list item, with rows and columns of 
     for (let i = 1; i < 4; i++) { // Create up to 3 shiny stars
       if (item.sh >= i) {
         const starImg = document.createElement('img'); starImg.className = 'star-img';
-        starImg.src = `ui/shiny${i}${(pokeImg.shinyOverride==i ? '' : 'g')}.png`;
+        starImg.src = `ui/shiny${(pokeImg.shinyOverride==i?i:'g')}.png`;
         starImg.addEventListener('mouseover', () => starImg.src = `ui/shiny${i}.png`);
-        starImg.addEventListener('mouseout',  () => starImg.src = `ui/shiny${i}${(pokeImg.shinyOverride==i?'':'g')}.png`);
+        starImg.addEventListener('mouseout',  () => starImg.src = `ui/shiny${(pokeImg.shinyOverride==i?i:'g')}.png`);
         starImg.addEventListener('click', () => { // Add click events to all the stars, changing the poke image
-          pokeImg.stars.forEach((thisStar) => thisStar.src = 'ui/shiny1g.png');
+          pokeImg.stars.forEach((thisStar) => thisStar.src = 'ui/shinyg.png');
           pokeImg.shinyOverride = (pokeImg.shinyOverride==i ? 0 : i);
           pokeImg.src = `images/${item.img}_${pokeImg.shinyOverride}${(pokeImg.femOverride ? 'f' : '')}.png`;  
-          starImg.src = `ui/shiny${i}${(pokeImg.shinyOverride==i ? '' : 'g')}.png`;
+          starImg.src = `ui/shiny${(pokeImg.shinyOverride==i?i:'g')}.png`;
         });
         pokeImg.stars.push(starImg);
       }
@@ -504,8 +504,13 @@ function showInfoSplash(specID, overridePage=null) {
           movesetScrollable.appendChild(biomeRow);
         }
       });
-    
     // movesetScrollable.appendChild(document.createElement('hr'));
+    // const splashCostInfo = document.createElement('div');  splashCostInfo.className = 'splash-move-tags';
+    // [`<p>Friendship per candy: ${upgradeCosts[item.co-1][4]}<img src="ui/candy.png"></p>`,
+    //  `<p>Passive: ${upgradeCosts[item.co-1][0]}</p>`,
+    //  `<p>Cost Reduction: ${upgradeCosts[item.co-1][1]} & ${upgradeCosts[item.co-1][2]}</p>`,
+    //  `<p>Species Egg: ${upgradeCosts[item.co-1][3]}</p>`].forEach((costLine) => splashCostInfo.innerHTML += costLine );
+    // movesetScrollable.appendChild(splashCostInfo);
   } else { // Show moveset
     const msHeaderText = document.createElement('div'); msHeaderText.className = 'moveset-row-header';
     msHeaderText.innerHTML = `<div>${altText[17]}</div><div>${catToName[2]}</div>
