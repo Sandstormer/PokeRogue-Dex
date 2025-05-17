@@ -140,8 +140,9 @@ function refreshAllItems() { // Display items based on query and locked filters 
           if (fid  <  fidThreshold[3]) return items[specID].ge === fid - fidThreshold[2] + 1; // Gen filters
           if (fid  <  fidThreshold[4]) return items[specID].co === fid - fidThreshold[3] + 1; // Cost filters
           if (fid === fidThreshold[4]) return 'fe' in items[specID]; // Gender filter
-          if (fid === fidThreshold[5]) return true; // Flipped stats filter
+          if (fid === fidThreshold[5]) return 'st' in items[specID]; // Starter select filter
           if (fid === fidThreshold[5]+1) return 'fs' in items[specID]; // Fresh start filter
+          if (fid === fidThreshold[5]+2) return true; // Flipped stats filter
           if (fid  <  fidThreshold[7]-1) return items[specID].et === fid - fidThreshold[6]; // Egg tier filter
           if (fid === fidThreshold[7]-1) return [1,2,3].includes(items[specID]?.ee); // Egg exclusive
           if (fid === fidThreshold[7]) return 'nv' in items[specID]; // New variants
@@ -178,7 +179,7 @@ function refreshAllItems() { // Display items based on query and locked filters 
         aValue = speciesNames[a]; bValue = speciesNames[b];
       } else if (sortState.column != 'row') { // If anything OTHER than row number
         let effectiveSort = sortState.column;
-        if (lockedFilters.some((f) => f == fidThreshold[5])) { // If flipped mode
+        if (lockedFilters.some((f) => f == fidThreshold[5]+2)) { // If flipped mode
           if (sortState.column == 'hp')  effectiveSort = 'spe';
           if (sortState.column == 'atk') effectiveSort = 'spd';
           if (sortState.column == 'def') effectiveSort = 'spa';
@@ -384,7 +385,7 @@ function renderMoreItems() { // Create each list item, with rows and columns of 
     const costColumn = document.createElement('div'); costColumn.className = 'clickable-name';
           costColumn.innerHTML = `${headerNames[6]}<br><span style="color:${eggTierColors(item.et)};">${item.co}</span>`;  
           costColumn.addEventListener('click', () => showInfoSplash(thisID, 1));
-    let flipped = lockedFilters.includes(fidThreshold[5]);                
+    let flipped = lockedFilters.includes(fidThreshold[5]+2);                
     const bstColumn = document.createElement('div');  bstColumn.className = 'item-column'; // Create the stats columns
           bstColumn.innerHTML = `${headerNames[ 7]}<br>${item.bst}`;
     const hpColumn = document.createElement('div');   hpColumn.className = 'item-column';  
