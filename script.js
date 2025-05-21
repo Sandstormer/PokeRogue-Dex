@@ -757,7 +757,7 @@ function displaySuggestions() { // Get search query and clear the list
         // Suggest if it contains the search query and is not already locked
         return searchableName.includes(query) && !lockedFilters.some((f) => f == fid);
     });
-    if (matchingFID.length > 20) matchingFID = []; // Erase the list of suggestions if it is too large
+    if (matchingFID.length > 22) matchingFID = []; // Erase the list of suggestions if it is too large
     
     if (lockedFilters.length > 0) { // If there is at least one locked filter, re-sort the list
       // (If there are no locked filters, the list is already presorted)
