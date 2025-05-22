@@ -587,11 +587,9 @@ function showDescSplash(fid) {
     if (thisProcs[0] || thisProcs[1]) {
       const splashMoveTags = document.createElement('div');  splashMoveTags.className = 'splash-move-tags';
       thisProcs[0].forEach((thisProc) => { // Procs for stat boosts etc.
-        if ([1,-1].includes(thisProc[1])) {
-          splashMoveTags.innerHTML += `<p>${procToDesc[thisProc[0]]} ${thisProc[1]==1?'+':''}${thisProc[1]}</p>`;
-        } else {
-          splashMoveTags.innerHTML += `<p>${procToDesc[thisProc[0]]} × ${thisProc[1]}</p>`;
-        }
+        const procChance = ((thisProc[0]>0)?`${thisProc[0]}% `:'');
+        const procStages = ((thisProc[2]=='0')?'':` ${(thisProc[0]==-2?'× ':(thisProc[2]>0?'+':''))}${thisProc[2]}${thisProc[0]==-3?'%':''}`);
+        splashMoveTags.innerHTML += `<p>${procChance}${procToDesc[thisProc[1]]}${procStages}</p>`;
       });
       if (thisProcs[1].includes(0)) splashMoveTags.innerHTML += "<p style='color:rgb(239, 131, 131);'>Not Implemented</p>";
       if (thisProcs[1].includes(1)) splashMoveTags.innerHTML += "<p style='color:rgb(240, 230, 140);'>Partially Implemented</p>";
