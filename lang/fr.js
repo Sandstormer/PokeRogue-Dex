@@ -2,6 +2,7 @@ headerNames = ['N°','Chrom.','Nom','Type','Talents','Capacités Œuf','Cout','T
 altText = ['Capacités','Principaux','Caché','Passif','Entrez','Puis.','Préc.','PP','Ajouter aux filtres','Champi Mémoriel','Évolutions','Capacités Œuf','Rare Capac. Œuf','Commun','Super','Hyper','CT','N.','Évo','Œuf'];
 catToName = ['Type','Talent','Capacité','Gen','Cout','Sexe','Mode','Œuf','Nouvelle','Biome','Lié à'];
 biomeText = ['Commun','Peu Commun','Rare','Super Rare','Hyper Rare','Boss','Com.','PC','Rare','SR','HR','Aube','Jour','Crépuscule','Nuit'];
+infoText = ['Bonheur par Bonbon','Passif','Cout réduit','Acheter un Œuf','Talent Caché','Exclusif à l’Œuf','Exclusif aux Bébés','Pokémon Paradoxe','Changement de forme','Biomes'];
 fidToDesc = [
 'Augmente la puissance des capacités de type Plante du Pokémon quand il a perdu une certaine quantité de PV.',
 'Augmente la Vitesse du Pokémon s’il y a du soleil.',

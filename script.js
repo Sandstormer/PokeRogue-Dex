@@ -27,11 +27,12 @@ const supportedLangs = ["en","fr","ko","zh-CN","ja"];//"it","es-ES","pt-BR","de"
 const LanguageNames  = ["English","Français","한국어 (Hangugeo)","简体中文 (Jiǎntǐ Zhōngwén)","日本語 (Nihongo)"];//"Italiano","Español (España)","Português (Brasil)","Deutsch","繁體中文 (Fántǐ Zhōngwén)"];
 const moveCatColor = ['rgb(251, 173, 124)','rgb(131, 182, 239)','rgb(255, 255, 255)'];
 const tmColors = ['rgb(255, 255, 255)','rgb(131, 182, 239)','rgb(240, 230, 140)'];
+const REMchance = [24,12,6,6,3];
 let increment = 10;     // Number of items to load at a time
 let renderLimit = 0;    // Start with no items
 let showMoveLearn = []; // Filtered moves/biomes to show sources
 let filterToEnter = null;  // Filter to apply when hitting Enter
-let tabSelect = -1;         // Filter that is tab selected
+let tabSelect = -1;        // Filter that is tab selected
 let lockedFilters = [];    // List of all locked filters
 let lockedFilterMods = []; // List of filter mod objects
 let lockedFilterGroups = [[]]; // Grouped together for OR
@@ -39,7 +40,7 @@ let pinnedRows = [];  // List of pinned row numbers
 let isMobile = false; // Change display for mobile devices
 let filteredItemIDs = null; // List of all displayed row numbers
 let headerState = { shiny: 0, ability: 0, biome: 0 } // Global state of shiny(0,1,2,3), ability(0,1,2,3), biome(0,1)
-let sortState = { column: null, ascending: true, target: null, biomeToggle: 0 }; // Track the current sort state
+let sortState = { column: null, ascending: true, target: null }; // Track the current sort state
 let splashState = { species: -1, page: 0 }
 // const spreadMoves = possibleFID.filter((fid) => fid >= fidThreshold[1] && fid < fidThreshold[2]
 //   && (fidToProc[fid-fidThreshold[0]][7].includes(21) || fidToProc[fid-fidThreshold[0]][7].includes(22)));
@@ -152,8 +153,7 @@ function refreshAllItems() { // Display items based on query and locked filters 
         }))) 
       }
   // Add moves to track in the move column  ==============
-  showMoveLearn = lockedFilters.filter(fid => (fid >= fidThreshold[1] && fid < fidThreshold[2])
-                                           || (fid >= fidThreshold[8] && fid < fidThreshold[9]));
+  showMoveLearn = lockedFilters.filter(fid => isMoveOrBiome(fid));
   // Remove the pinned items for now ==============
   if (pinnedRows) filteredItemIDs = filteredItemIDs.filter((thisID) => !pinnedRows.includes(thisID));
 
@@ -333,8 +333,8 @@ function renderMoreItems() { // Create each list item, with rows and columns of 
     // Show the column of egg moves, or filtered moves and their sources
     const moveColumn = document.createElement('div');  moveColumn.className = 'item-column';  moveColumn.innerHTML = '';
     let numMovesShown = 0;
-    showMoveLearn.forEach((thisFID) => {
-      if (thisFID in item && numMovesShown < 2) { 
+    showMoveLearn.forEach((thisFID) => { // Show filtered moves/biomes
+    if (thisFID in item && numMovesShown < 2) {
         numMovesShown += 1;
         let source = item[thisFID];  let sourceText = '<span style="color:';
         const clickableRow = document.createElement('div');  clickableRow.className = 'clickable-name';
@@ -369,16 +369,40 @@ function renderMoreItems() { // Create each list item, with rows and columns of 
         moveColumn.appendChild(clickableRow);
       }
     });
-    if (showMoveLearn.length == 0) {
-      ['e1','e2','e3','e4'].forEach((name) => {
-        // Show the move name, with click event for splash screen
-        const clickableRow = document.createElement('div');  clickableRow.className = 'clickable-name';
-        if (name == 'e4') clickableRow.style.color = 'rgb(240, 230, 140)';
-        // clickableRow.style.color = typeColors[fidToProc[item[name]-fidThreshold[0]][0]];
-        clickableRow.innerHTML = fidToName[item[name]];
-        clickableRow.addEventListener('click', () => showDescSplash(item[name]));
-        moveColumn.appendChild(clickableRow);
-      });
+    if (showMoveLearn.length == 0) { // If there are no filtered moves/biomes
+      if (headerState.biome) { // Show all biomes
+        possibleFID.slice(fidThreshold[8],fidThreshold[9]).forEach((fid) => {
+          if (fid in item) {
+            if (numMovesShown < 4) {
+              numMovesShown += 1;
+              const clickableRow = document.createElement('div');  clickableRow.className = 'clickable-name';
+              clickableRow.innerHTML = fidToName[fid];
+              moveColumn.appendChild(clickableRow);
+            } else {
+              moveColumn.lastChild.innerHTML += ' ...';
+            }
+          }
+        });
+        if (!numMovesShown && [1,2].includes(item?.ee)) {
+          const clickableRow = document.createElement('div');  clickableRow.className = 'clickable-name';
+          if (item.ee == 1) clickableRow.innerHTML += `<span style="color:rgb(143, 214, 154);">${infoText[5]}</span>`;
+          if (item.ee == 2) clickableRow.innerHTML += `<span style="color:rgb(216, 143, 205);">${infoText[6]}</span>`;
+          // if (item.ee == 3) clickableRow.innerHTML += '<span style="color:rgb(239, 131, 131);">Paradox Exclusive</span>'
+          // if (item.ee == 4) clickableRow.innerHTML += '<span style="color:rgb(131, 182, 239);">Form Change</span>'
+          // if (item.ee == 5) clickableRow.innerHTML += '<span style="color:rgb(239, 131, 131);">Special</span>'
+          moveColumn.appendChild(clickableRow);
+        }
+      } else { // Show egg moves
+        ['e1','e2','e3','e4'].forEach((name) => {
+          // Show the move name, with click event for splash screen
+          const clickableRow = document.createElement('div');  clickableRow.className = 'clickable-name';
+          if (name == 'e4') clickableRow.style.color = 'rgb(240, 230, 140)';
+          // clickableRow.style.color = typeColors[fidToProc[item[name]-fidThreshold[0]][0]];
+          clickableRow.innerHTML = fidToName[item[name]];
+          clickableRow.addEventListener('click', () => showDescSplash(item[name]));
+          moveColumn.appendChild(clickableRow);
+        });
+      }
     }
 
     // Show the cost, colored by the egg tier
@@ -483,11 +507,11 @@ function showInfoSplash(specID, overridePage=null) {
   movesetScrollable.innerHTML = '';
   if (splashState.page) { // Show biomes
     if ('ee' in item) {
-      if (item.ee == 1) movesetScrollable.innerHTML += '<b>This Pokemon is <span style="color:rgb(143, 214, 154);">Egg Exclusive</span>.</b><br>It does not appear in any biomes, and can only be obtained from eggs.'
-      if (item.ee == 2) movesetScrollable.innerHTML += '<b>This is a <span style="color:rgb(216, 143, 205);">Baby Pokemon</span>.</b><br>It does not appear in any biomes, but can be unlocked by encountering its evolution.'
-      if (item.ee == 3) movesetScrollable.innerHTML += '<b>This <span style="color:rgb(239, 131, 131);">Paradox Pokemon</span> is <span style="color:rgb(143, 214, 154);">Egg Exclusive</span>.</b><br>It can only be obtained from eggs, but can afterward be caught in Classic mode.'
-      if (item.ee == 4) movesetScrollable.innerHTML += '<b>This Pokemon is <span style="color:rgb(131, 182, 239);">Form Exclusive</span>.</b><br>It does not appear in any biomes, and can only be obtained via form change.'
-      if (item.ee == 5) movesetScrollable.innerHTML += 'This Pokemon can only be caught after obtaining <b><span style="color:rgb(239, 131, 131);">All Other Pokemon</span></b>.<br>It does not appear in standard eggs.'
+      if (item.ee == 1) movesetScrollable.innerHTML += '<b>This Pokemon is <span style="color:rgb(143, 214, 154);">Egg Exclusive</span>.</b><br>It does not appear in any biomes, and can only be obtained from eggs.';
+      if (item.ee == 2) movesetScrollable.innerHTML += '<b>This is a <span style="color:rgb(216, 143, 205);">Baby Pokemon</span>.</b><br>It does not appear in any biomes, but can be unlocked by encountering its evolution.';
+      if (item.ee == 3) movesetScrollable.innerHTML += '<b>This <span style="color:rgb(239, 131, 131);">Paradox Pokemon</span> is <span style="color:rgb(143, 214, 154);">Egg Exclusive</span>.</b><br>It can only be obtained from eggs, but can afterward be caught in Classic mode.';
+      if (item.ee == 4) movesetScrollable.innerHTML += '<b>Only available via <span style="color:rgb(131, 182, 239);">Form Change</span>.</b><br>It does not appear in any biomes, and can only be obtained via form change.';
+      if (item.ee == 5) movesetScrollable.innerHTML += 'This Pokemon can only be caught after obtaining <b><span style="color:rgb(239, 131, 131);">All Other Pokemon</span></b>.<br>It does not appear in standard eggs.';
     }
       possibleFID.slice(fidThreshold[8],fidThreshold[9]).forEach((fid) => {
         if (fid in item) {
@@ -505,13 +529,17 @@ function showInfoSplash(specID, overridePage=null) {
           movesetScrollable.appendChild(biomeRow);
         }
       });
-    // movesetScrollable.appendChild(document.createElement('hr'));
-    // const splashCostInfo = document.createElement('div');  splashCostInfo.className = 'splash-move-tags';
-    // [`<p>Friendship per candy: ${upgradeCosts[item.co-1][4]}<img src="ui/candy.png"></p>`,
-    //  `<p>Passive: ${upgradeCosts[item.co-1][0]}</p>`,
-    //  `<p>Cost Reduction: ${upgradeCosts[item.co-1][1]} & ${upgradeCosts[item.co-1][2]}</p>`,
-    //  `<p>Species Egg: ${upgradeCosts[item.co-1][3]}</p>`].forEach((costLine) => splashCostInfo.innerHTML += costLine );
-    // movesetScrollable.appendChild(splashCostInfo);
+    movesetScrollable.appendChild(document.createElement('hr'));
+    const splashCostInfo = document.createElement('div');  splashCostInfo.className = 'splash-move-tags';
+    splashCostInfo.innerHTML = `
+      <p>${infoText[0]}: <span style="color:rgb(239, 131, 131)";>${upgradeCosts[item.co-1][4]}</span> <img src="ui/fren.png"></p>
+      <p>${infoText[1]}: <span style="color:rgb(140, 130, 240)";>${upgradeCosts[item.co-1][0]}</span> <img src="ui/candy.png" style="margin-bottom:-2px;"></p>
+      <p>${infoText[2]}: <span style="color:rgb(131, 182, 239)";>${upgradeCosts[item.co-1][1]}</span> &
+        <span style="color:rgb(240, 230, 140)";> ${upgradeCosts[item.co-1][2]}<span> <img src="ui/candy.png" style="margin-bottom:-2px;"></p>
+      <p>${infoText[3]}: ${upgradeCosts[item.co-1][3]} <img src="ui/candy.png" style="margin-bottom:-2px;">
+      <span style="color:rgb(145, 145, 145); font-size:12px;"><br>${altText[12]}: 1 in ${REMchance[item.et]}</span></p>
+      `;
+    movesetScrollable.appendChild(splashCostInfo);
   } else { // Show moveset
     const msHeaderText = document.createElement('div'); msHeaderText.className = 'moveset-row-header';
     msHeaderText.innerHTML = `<div>${altText[17]}</div><div>${catToName[2]}</div>
@@ -730,6 +758,9 @@ function eggTierColors(fid) {
   if (fid == 5) return 'rgb(143, 214, 154)';
   else { console.log('Invalid egg tier'); return null; }
 }
+function isMoveOrBiome(fid) {
+  return (fid >= fidThreshold[1] && fid < fidThreshold[2]) || (fid >= fidThreshold[8] && fid < fidThreshold[9])
+}
 
 // Display the filter suggestions *************************
 function displaySuggestions() { // Get search query and clear the list
@@ -801,7 +832,7 @@ function lockFilter(newLockFID) {
     searchBox.value = ""; 
     updateFilterGroups();   
     if (newLockFID === fidThreshold[7] && headerState.shiny == 0) updateHeader(headerColumns[1]);
-    if (sortState.column === 'row' && ((newLockFID >= fidThreshold[1] && newLockFID < fidThreshold[2]) || (newLockFID >= fidThreshold[8] && newLockFID < fidThreshold[9]))) {
+    if (sortState.column === 'row' && isMoveOrBiome(newLockFID)) {
       updateHeader(headerColumns[5]);
     } else {
       updateHeader(null, true); // Update header, then refresh items and suggestions
@@ -820,7 +851,7 @@ function removeFilter(fidToRemove, filterTag, filterModToRemove) {
   updateFilterGroups();  
   if (fidToRemove == fidThreshold[7] && headerState.shiny == 3) { headerState.shiny = 0;  headerColumns[1].innerHTML = headerNames[1]; }
   // Reset the sorting if there aren't any more locked moves
-  if (sortState.column === 'moves' && !lockedFilters.some((f) => (f >= (fidThreshold[1] && f < fidThreshold[2]) || (f >= fidThreshold[8] && f < fidThreshold[9])))) { 
+  if (sortState.column === 'moves' && !lockedFilters.some(f => (f >= isMoveOrBiome(f)))) { 
     updateHeader(headerColumns[0]); 
   } else { 
     updateHeader(null, true); // Update header, then refresh items and suggestions
@@ -851,16 +882,15 @@ function toggleOR(filterMod) { // Click a filter to toggle it between AND and OR
 
 // Click on the header row to sort/filter by an attribute **************************
 function updateHeader(clickTarget = null, ignoreFlip = false) {
-  if (clickTarget == null) {clickTarget = sortState.target; ignoreFlip = true;}
-  // Set the text of the move column, depending on if a move is filtered
-  if (lockedFilters.some(f => (f >= fidThreshold[1] && f < fidThreshold[2]) || (f >= fidThreshold[8] && f < fidThreshold[9]))) {
-    headerColumns[5].textDef = `<span style="color:rgb(140, 130, 240);">${altText[0]}</span>`;
-  } else {
-    headerColumns[5].textDef = headerNames[5];
-    if (clickTarget == headerColumns[5]) clickTarget = null;
-  }
-  // Find the new sorting attribute, and update the headers
+  if (clickTarget == null) { clickTarget = sortState.target; ignoreFlip = true; }
   const sortAttribute = clickTarget?.sortattr;
+  const hasMovesBiomes = lockedFilters.some(f => isMoveOrBiome(f));
+  // If clicking move column, with no moves/biomes filtered, toggle between egg moves and biomes
+  if (sortAttribute == 'moves' && !hasMovesBiomes) headerState.biome = !headerState.biome;
+  // Set the text of the move column, depending on if a move is filtered
+  headerColumns[5].textDef = (hasMovesBiomes?`<span style="color:rgb(140, 130, 240);">${altText[0]}</span>`:
+    (headerState.biome?`<span style="color:rgb(140, 130, 240);">${infoText[9]}</span>`:headerNames[5]));
+  // Find the new sorting attribute, and update the headers
   if (sortAttribute == 'shiny') { // Toggle the global shiny state
     headerState.shiny = (headerState.shiny+3)%4;
     if (headerState.shiny) {
@@ -881,7 +911,8 @@ function updateHeader(clickTarget = null, ignoreFlip = false) {
     } else headerColumns[4].innerHTML = headerNames[4];
   } else {
     headerColumns[5].innerHTML = headerColumns[5].textDef;
-    if (sortAttribute) { // Clicked on a header that can actually be sorted
+    if (sortAttribute && !(sortAttribute == 'moves' && !hasMovesBiomes)) { 
+      // Clicked on a header that can actually be sorted
       if (sortState.column === sortAttribute) {
         if (!ignoreFlip) {
           sortState.ascending = !sortState.ascending; // Toggle sort direction if sorting by the same column
@@ -898,8 +929,7 @@ function updateHeader(clickTarget = null, ignoreFlip = false) {
       clickTarget.innerHTML = `${clickTarget.textDef}<span style="color:rgb(140, 130, 240); font-family: serif;">${(sortState.ascending ? "&#9650;":"&#9660;")}</span>`;
     }
   }
-  // Update the display
-  refreshAllItems();
+  refreshAllItems(); // Update the display
 }
 
 function adjustLayout(forceAdjust = false, headerClick = null) {

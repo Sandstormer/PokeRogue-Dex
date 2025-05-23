@@ -2,6 +2,7 @@ headerNames = ['Dex','Shiny','Species','Types','Abilities','Egg Moves','Cost','B
 altText = ['Moves','Main Only','Hidden Only','Passive Only','Search','Pow','Acc','PP','Add to filters','Memory','Evolution','Egg Move','Rare Egg Move','Common','Great','Ultra','TM','Lv.','Evo','Egg'];
 catToName = ['Type','Ability','Move','Gen','Cost','Gender','Mode','Egg Tier','New','Biome','Related To'];
 biomeText = ['Common','Uncommon','Rare','Super Rare','Ultra Rare','Boss','Com.','Unc.','Rare','SR','UR','Dawn','Day','Dusk','Night'];
+infoText = ['Friendship per Candy','Passive','Cost Reduction','Species Egg','Hidden Ability','Egg Exclusive','Baby Exclusive','Paradox Pokemon','Form Change','Biomes'];
 fidToDesc = [
 'Powers up Grass-type moves when the Pokémon’s HP is low.',
 'Boosts the Pokémon’s Speed stat in harsh sunlight.',
