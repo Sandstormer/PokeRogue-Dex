@@ -658,7 +658,7 @@ function showDescSplash(fid) {
       if (thisProcs[7].includes(60)) {splashMoveTags.innerHTML += "<p>User Atk maxed</p>";};
       if (thisProcs[7].includes(0))  {splashMoveTags.innerHTML += "<p>High Critical Ratio</p>";};
       if (thisProcs[7].includes(1))  {splashMoveTags.innerHTML += "<p>Guaranteed Critical Hit</p>";};
-      if (thisProcs[7].includes(2))  {splashMoveTags.innerHTML += "<p>User Critical Rate +1</p>";};
+      if (thisProcs[7].includes(2))  {splashMoveTags.innerHTML += "<p>User Critical Rate +2</p>";};
       if (thisProcs[7].includes(35)) {splashMoveTags.innerHTML += "<p>Costs 50% of HP</p>";};
       if (thisProcs[7].includes(59)) {splashMoveTags.innerHTML += "<p>Costs 33% of HP</p>";};
       if (thisProcs[7].includes(34)) {splashMoveTags.innerHTML += "<p>Recoil 50% of HP</p>";};
