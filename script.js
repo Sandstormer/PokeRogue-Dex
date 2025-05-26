@@ -27,6 +27,7 @@ const supportedLangs = ["en","fr","ko","zh-CN","ja"];//"it","es-ES","pt-BR","de"
 const LanguageNames  = ["English","Français","한국어 (Hangugeo)","简体中文 (Jiǎntǐ Zhōngwén)","日本語 (Nihongo)"];//"Italiano","Español (España)","Português (Brasil)","Deutsch","繁體中文 (Fántǐ Zhōngwén)"];
 const moveCatColor = ['rgb(251, 173, 124)','rgb(131, 182, 239)','rgb(255, 255, 255)'];
 const tmColors = ['rgb(255, 255, 255)','rgb(131, 182, 239)','rgb(240, 230, 140)'];
+const flipStats = {bst:'bst',hp:'spe',atk:'spd',def:'spa',spa:'def',spd:'atk',spe:'hp'};
 const REMchance = [24,12,6,6,3];
 let increment = 10;     // Number of items to load at a time
 let renderLimit = 0;    // Start with no items
@@ -85,7 +86,7 @@ function loadAndApplyLanguage(lang) {
     fidToSearch = fidToName.map((thisName, fid) => makeSearchable( // Search via category for later categories
       fid >= fidThreshold[2] && fid < fidThreshold[8] ? `${fidToCategory(fid)}${thisName}` : thisName
     ));
-    specToSearch = makeSearchable(speciesNames);
+    specToSearch = speciesNames.map(s => makeSearchable(s));
     searchBox.placeholder = `${altText[4]} ${headerNames[2]} / ${headerNames[3]} / ${headerNames[4]} / ${altText[0]} ...`;
     
     // Set up the header columns
@@ -106,10 +107,9 @@ function loadAndApplyLanguage(lang) {
   document.head.appendChild(script);
   console.log(`Attempting to load: ${script.src}`);
 }
-function makeSearchable(input) {
-  const normalize = str => str.toLowerCase().replace(/[.’'\s-]/g,'');
-  if (Array.isArray(input)) return input.map(normalize);
-  else return normalize(input);
+function makeSearchable(input) { // Remove punctuation, accents, and compound characters
+  return input.normalize("NFD").replace(/[\u0300-\u036f\u2019.'\s-]/g,"").toLowerCase()
+    .replace(/ß/g,"ss").replace(/œ/g,"oe").replace(/æ/g,"ae");
 }
 
 function refreshAllItems() { // Display items based on query and locked filters **************************
@@ -167,6 +167,10 @@ function refreshAllItems() { // Display items based on query and locked filters 
 
   // Sort items if a column is specified ==============
   if (sortState.column) {
+    let effectiveSort = sortState.column;
+    if (lockedFilters.some((f) => f == fidThreshold[5]+2) && sortState.column in flipStats) { // If flipped mode
+      effectiveSort = flipStats[sortState.column]
+    }
     filteredItemIDs.sort((a, b) => {
       let aValue = a; let bValue = b; // Set default attribute of row number
       if (sortState.column == 'moves') { // Sort by source of moves
@@ -186,15 +190,6 @@ function refreshAllItems() { // Display items based on query and locked filters 
       } else if (sortState.column == 'sp') { // Sort by species names alphabetically
         aValue = speciesNames[a]; bValue = speciesNames[b];
       } else if (sortState.column != 'row') { // If anything OTHER than row number
-        let effectiveSort = sortState.column;
-        if (lockedFilters.some((f) => f == fidThreshold[5]+2)) { // If flipped mode
-          if (sortState.column == 'hp')  effectiveSort = 'spe';
-          if (sortState.column == 'atk') effectiveSort = 'spd';
-          if (sortState.column == 'def') effectiveSort = 'spa';
-          if (sortState.column == 'spa') effectiveSort = 'def';
-          if (sortState.column == 'spd') effectiveSort = 'atk';
-          if (sortState.column == 'spe') effectiveSort = 'hp' ;
-        }
         aValue = items[a][effectiveSort]; bValue = items[b][effectiveSort];
       }
       if (aValue < bValue) return sortState.ascending ? -1 : 1;
@@ -344,36 +339,36 @@ function renderMoreItems() { // Create each list item, with rows and columns of 
     showMoveLearn.forEach((thisFID) => { // Show filtered moves/biomes
     if (thisFID in item && numMovesShown < 2) {
         numMovesShown += 1;
-        let source = item[thisFID];  let sourceText = '<span style="color:';
+        let src = item[thisFID];  let srcText = '<span style="color:';
         const clickableRow = document.createElement('div');  clickableRow.className = 'clickable-name';
         if (thisFID >= fidThreshold[8]) { // For biomes
-          const rarityN = ~~(source[0]/20);  const rarityB = ~~(source[1]/20);
+          const rarityN = ~~(src[0]/20);  const rarityB = ~~(src[1]/20);
           if (rarityN && rarityB && [3,5,7,9].includes(rarityB)) { // Show both, with short labels
-            sourceText += `${makeBiomeDesc(rarityN,'small')}</span><span style="color:rgb(255, 255, 255);"> / </span><span style="color:${makeBiomeDesc(rarityB,'small')}`;
+            srcText += `${makeBiomeDesc(rarityN,1)}</span><span style="color:rgb(255, 255, 255);"> / </span><span style="color:${makeBiomeDesc(rarityB,1)}`;
           } else { // Show the only rarity
-            sourceText += makeBiomeDesc(rarityN, 'full');
+            srcText += makeBiomeDesc(rarityN);
           }
           clickableRow.addEventListener('click', () => showInfoSplash(thisID, 1));
           // biomeText = ['Common','Uncommon','Rare','Super Rare','Ultra Rare','Boss','Com','Unc','Rare','SR','UR','Dawn','Day','Dusk','Night']
         } else { // For moves
-          if (source == -1) sourceText += `rgb(251, 173, 124);">${altText[9]}`;
-          else if (source == 0) sourceText += `rgb(131, 182, 239);">${altText[10]}`;
-          else if (source == 201) sourceText += `rgb(255, 255, 255);">${altText[19]} / ${altText[16]}`;
-          else if (source == 202) sourceText += `rgb(255, 255, 255);">${altText[19]} / </span><span style="color:rgb(131, 182, 239);">${altText[16]}`;
-          else if (source == 203) sourceText += `rgb(255, 255, 255);">${altText[19]} / </span><span style="color:rgb(240, 230, 140);">${altText[16]}`;
-          else if (source == 204) sourceText += `rgb(255, 255, 255);">${altText[11]}`;
-          else if (source == 205) sourceText += `rgb(240, 230, 140);">${altText[19]}</span><span style="color:rgb(255, 255, 255);"> / ${altText[16]}`;
-          else if (source == 206) sourceText += `rgb(240, 230, 140);">${altText[19]}</span><span style="color:rgb(255, 255, 255);"> / </span><span style="color:rgb(131, 182, 239);">${altText[16]}`;
-          else if (source == 207) sourceText += `rgb(240, 230, 140);">${altText[19]}<span style="color:rgb(255, 255, 255);"> / </span>${altText[16]}`;
-          else if (source == 208) sourceText += `rgb(240, 230, 140);">${altText[12]}`;
-          else if (source == 209) sourceText += `rgb(255, 255, 255);">${altText[13]} ${altText[16]}`;
-          else if (source == 210) sourceText += `rgb(131, 182, 239);">${altText[14]} ${altText[16]}`;
-          else if (source == 211) sourceText += `rgb(240, 230, 140);">${altText[15]} ${altText[16]}`;
-          else sourceText += `rgb(255, 255, 255);">${altText[17]} ${item[thisFID]}`;
+          if (src == -1) srcText += `rgb(251, 173, 124);">${altText[9]}`;
+          else if (src == 0) srcText += `rgb(131, 182, 239);">${altText[10]}`;
+          else if (src == 201) srcText += `rgb(255, 255, 255);">${altText[19]} / ${altText[16]}`;
+          else if (src == 202) srcText += `rgb(255, 255, 255);">${altText[19]} / </span><span style="color:rgb(131, 182, 239);">${altText[16]}`;
+          else if (src == 203) srcText += `rgb(255, 255, 255);">${altText[19]} / </span><span style="color:rgb(240, 230, 140);">${altText[16]}`;
+          else if (src == 204) srcText += `rgb(255, 255, 255);">${altText[11]}`;
+          else if (src == 205) srcText += `rgb(240, 230, 140);">${altText[19]}</span><span style="color:rgb(255, 255, 255);"> / ${altText[16]}`;
+          else if (src == 206) srcText += `rgb(240, 230, 140);">${altText[19]}</span><span style="color:rgb(255, 255, 255);"> / </span><span style="color:rgb(131, 182, 239);">${altText[16]}`;
+          else if (src == 207) srcText += `rgb(240, 230, 140);">${altText[19]}<span style="color:rgb(255, 255, 255);"> / </span>${altText[16]}`;
+          else if (src == 208) srcText += `rgb(240, 230, 140);">${altText[12]}`;
+          else if (src == 209) srcText += `rgb(255, 255, 255);">${altText[13]} ${altText[16]}`;
+          else if (src == 210) srcText += `rgb(131, 182, 239);">${altText[14]} ${altText[16]}`;
+          else if (src == 211) srcText += `rgb(240, 230, 140);">${altText[15]} ${altText[16]}`;
+          else srcText += `rgb(255, 255, 255);">${altText[17]} ${item[thisFID]}`;
           clickableRow.addEventListener('click', () => showDescSplash(thisFID));
         };
         // Show the move name, with click event for splash screen
-        clickableRow.innerHTML = `<p style="color:rgb(140, 130, 240); margin: 0;">${fidToName[thisFID]}:<br>${sourceText}</span></p>`;
+        clickableRow.innerHTML = `<p style="color:rgb(140, 130, 240); margin: 0;">${fidToName[thisFID]}:<br>${srcText}</span></p>`;
         moveColumn.appendChild(clickableRow);
       }
     });
@@ -391,13 +386,11 @@ function renderMoreItems() { // Create each list item, with rows and columns of 
             }
           }
         });
-        if (!numMovesShown && [1,2].includes(item?.ee)) {
+        if (!numMovesShown && [1,2].includes(item?.ee)) { // Show text for egg exclusives
           const clickableRow = document.createElement('div');  clickableRow.className = 'clickable-name';
           if (item.ee == 1) clickableRow.innerHTML += `<span style="color:rgb(143, 214, 154);">${infoText[5]}</span>`;
           if (item.ee == 2) clickableRow.innerHTML += `<span style="color:rgb(216, 143, 205);">${infoText[6]}</span>`;
-          // if (item.ee == 3) clickableRow.innerHTML += '<span style="color:rgb(239, 131, 131);">Paradox Exclusive</span>'
           // if (item.ee == 4) clickableRow.innerHTML += '<span style="color:rgb(131, 182, 239);">Form Change</span>'
-          // if (item.ee == 5) clickableRow.innerHTML += '<span style="color:rgb(239, 131, 131);">Special</span>'
           moveColumn.appendChild(clickableRow);
         }
       } else { // Show egg moves
@@ -415,57 +408,39 @@ function renderMoreItems() { // Create each list item, with rows and columns of 
     // Show the cost, colored by the egg tier
     const costColumn = document.createElement('div'); costColumn.className = 'clickable-name';
           costColumn.innerHTML = `${headerNames[6]}<br><span style="color:${eggTierColors(item.et)};">${item.co}</span>`;  
-          costColumn.addEventListener('click', () => showInfoSplash(thisID, 1));
+          costColumn.addEventListener('click', () => showInfoSplash(thisID,1));
     // Create the stats columns
-    let flipped = lockedFilters.includes(fidThreshold[5]+2);
-    const bstColumn = document.createElement('div');  bstColumn.className = 'item-column';
-          bstColumn.innerHTML = `${headerNames[ 7]}<br>${item.bst}`;
-    const hpColumn = document.createElement('div');   hpColumn.className = 'item-column';
-          hpColumn.innerHTML  = `${headerNames[ 8]}<br>${(flipped ? item.spe : item.hp)}`;
-    const atkColumn = document.createElement('div');  atkColumn.className = 'item-column';
-          atkColumn.innerHTML = `${headerNames[ 9]}<br>${(flipped ? item.spd : item.atk)}`;
-    const defColumn = document.createElement('div');  defColumn.className = 'item-column';
-          defColumn.innerHTML = `${headerNames[10]}<br>${(flipped ? item.spa : item.def)}`;
-    const spaColumn = document.createElement('div');  spaColumn.className = 'item-column';
-          spaColumn.innerHTML = `${headerNames[11]}<br>${(flipped ? item.def : item.spa)}`;
-    const spdColumn = document.createElement('div');  spdColumn.className = 'item-column';
-          spdColumn.innerHTML = `${headerNames[12]}<br>${(flipped ? item.atk : item.spd)}`;
-    const speColumn = document.createElement('div');  speColumn.className = 'item-column';
-          speColumn.innerHTML = `${headerNames[13]}<br>${(flipped ? item.hp  : item.spe)}`;
-
-    const row1 = document.createElement('div'); row1.className = 'row'; let row2 = row1;
-    if (isMobile) {
-      row1.appendChild(dexColumn);      row1.appendChild(starColumn);
-      row1.appendChild(specColumn);     row1.appendChild(pinColumn);
-      const row2 = document.createElement('div'); row2.className = 'row'; li.appendChild(row1);
-      row2.appendChild(pokeImg); row2.appendChild(abilityColumn); row2.appendChild(moveColumn);
-      const row3 = document.createElement('div'); row3.className = 'row'; li.appendChild(row2);
-      row3.appendChild(typeColumn);     row3.appendChild(costColumn);      row3.appendChild(bstColumn);
-      row3.appendChild(hpColumn);       row3.appendChild(atkColumn);       row3.appendChild(defColumn);
-      row3.appendChild(spaColumn);      row3.appendChild(spdColumn);       row3.appendChild(speColumn);
-      li.appendChild(row3);
-    } else {
-      row1.appendChild(dexColumn);      row1.appendChild(pokeImg);         row1.appendChild(specColumn);
-      row1.appendChild(typeColumn);     row1.appendChild(abilityColumn);   row1.appendChild(moveColumn);
-      row1.appendChild(costColumn);     row1.appendChild(bstColumn);
-      row1.appendChild(hpColumn);       row1.appendChild(atkColumn);       row1.appendChild(defColumn);
-      row1.appendChild(spaColumn);      row1.appendChild(spdColumn);       row1.appendChild(speColumn);
-      li.appendChild(row1); // Append the only row
-    }
+    const statColumns = [];
+    const flipped = lockedFilters.includes(fidThreshold[5]+2);
+    sortAttributes.slice(7,14).forEach((thisAtt,index) => {
+      const newColumn = document.createElement('div');  newColumn.className = 'item-column';
+      newColumn.innerHTML = `${headerNames[index+7]}<br>${(flipped?item[flipStats[thisAtt]]:item[thisAtt])}`;
+      statColumns.push(newColumn);
+    });
+    // Append all the columns, according to the layout
+    const layoutColumns = ( isMobile ?
+      [[dexColumn,starColumn,specColumn,pinColumn],[pokeImg,abilityColumn,moveColumn],[typeColumn,costColumn,...statColumns]] :
+      [[dexColumn,pokeImg,specColumn,typeColumn,abilityColumn,moveColumn,costColumn,...statColumns]]
+    );
+    layoutColumns.forEach(thisRow => {
+      const newRow = document.createElement('div'); newRow.className = 'row';
+      thisRow.forEach(thisColumn => newRow.appendChild(thisColumn));
+      li.appendChild(newRow);
+    });
     itemList.appendChild(li); // Append the current entry to the list of Pokemon
   });
 }
-function makeBiomeDesc(source, style) {
-  const offset = (style == 'small' ? 6 : 0);
-  if      (source == 1) return `rgb(255, 255, 255);">${biomeText[0+offset]}`;
-  else if (source == 2) return `rgb(131, 182, 239);">${biomeText[1+offset]}`;
-  else if (source == 3) return `rgb(131, 182, 239);">${biomeText[5]} ${biomeText[0+offset]}`;
-  else if (source == 4) return `rgb(240, 230, 140);">${biomeText[2+offset]}`;
-  else if (source == 5) return `rgb(240, 230, 140);">${biomeText[5]} ${biomeText[2+offset]}`;
-  else if (source == 6) return `rgb(239, 131, 131);">${biomeText[3+offset]}`;
-  else if (source == 7) return `rgb(239, 131, 131);">${biomeText[5]} ${biomeText[3+offset]}`;
-  else if (source == 8) return `rgb(216, 143, 205);">${biomeText[4+offset]}`;
-  else if (source == 9) return `rgb(216, 143, 205);">${biomeText[5]} ${biomeText[4+offset]}`;
+function makeBiomeDesc(src, isSmall=0) {
+  const offset = isSmall*6;
+  if      (src == 1) return `rgb(255, 255, 255);">${biomeText[0+offset]}`;
+  else if (src == 2) return `rgb(131, 182, 239);">${biomeText[1+offset]}`;
+  else if (src == 3) return `rgb(131, 182, 239);">${biomeText[5]} ${biomeText[0+offset]}`;
+  else if (src == 4) return `rgb(240, 230, 140);">${biomeText[2+offset]}`;
+  else if (src == 5) return `rgb(240, 230, 140);">${biomeText[5]} ${biomeText[2+offset]}`;
+  else if (src == 6) return `rgb(239, 131, 131);">${biomeText[3+offset]}`;
+  else if (src == 7) return `rgb(239, 131, 131);">${biomeText[5]} ${biomeText[3+offset]}`;
+  else if (src == 8) return `rgb(216, 143, 205);">${biomeText[4+offset]}`;
+  else if (src == 9) return `rgb(216, 143, 205);">${biomeText[5]} ${biomeText[4+offset]}`;
 }
 
 function makeMovesetHeader(specID) {
@@ -507,7 +482,7 @@ function showInfoSplash(specID, overridePage=null) {
       if (item.ee == 1) movesetScrollable.innerHTML += '<b>This Pokemon is <span style="color:rgb(143, 214, 154);">Egg Exclusive</span>.</b><br>It does not appear in any biomes, and can only be obtained from eggs.';
       if (item.ee == 2) movesetScrollable.innerHTML += '<b>This is a <span style="color:rgb(216, 143, 205);">Baby Pokemon</span>.</b><br>It does not appear in any biomes, but can be unlocked by encountering its evolution.';
       if (item.ee == 3) movesetScrollable.innerHTML += '<b>This <span style="color:rgb(239, 131, 131);">Paradox Pokemon</span> is <span style="color:rgb(143, 214, 154);">Egg Exclusive</span>.</b><br>It can only be obtained from eggs, but can afterward be caught in Classic mode.';
-      if (item.ee == 4) movesetScrollable.innerHTML += '<b>Only available via <span style="color:rgb(131, 182, 239);">Form Change</span>.</b><br>It does not appear in any biomes, and can only be obtained via form change.';
+      if (item.ee == 4) movesetScrollable.innerHTML += '<b>Only available via <span style="color:rgb(131, 182, 239);">Form Change</span>.</b><br>It does not appear in any biomes.';
       if (item.ee == 5) movesetScrollable.innerHTML += 'This Pokemon can only be caught after obtaining <b><span style="color:rgb(239, 131, 131);">All Other Pokemon</span></b>.<br>It does not appear in standard eggs.';
     }
       possibleFID.slice(fidThreshold[8],fidThreshold[9]).forEach((fid) => {
@@ -516,7 +491,7 @@ function showInfoSplash(specID, overridePage=null) {
           if (!movesetScrollable.innerHTML) biomeRow.style.marginTop = '4px';
           biomeRow.innerHTML = `<b>${fidToName[fid]}:</b>`;
           item[fid].forEach(src => {
-            biomeRow.innerHTML += `<br><span style="font-weight:bold; color:${makeBiomeDesc(~~(src/20),'full')}</span>`;
+            biomeRow.innerHTML += `<br><span style="font-weight:bold; color:${makeBiomeDesc(~~(src/20))}</span>`;
             if (src%20) {
               let timeText = '';
               [1,2,4,8].forEach((i,index) => timeText += ((src%20)%(2*i)>=i ? `${timeText?', ':''}${biomeText[11+index]}`:''));
@@ -581,13 +556,13 @@ function makeMovesetRow(fid, item, table) {
 }
 function moveSrcText(src, table) {
   // src = -1:mushroom, 0:evo, 1-200:level, 201-203:egg/TM, 204:egg, 205-207:rare/TM, 208:rare, 209-211:TM
-  if (table == 0) {
+  if (table == 0) { // Level moves
     if (src == -1 ) return `rgb(251, 173, 124);"><img src="ui/mem.png"></img>`;
     if (src ==  0 ) return `rgb(131, 182, 239);">${altText[18]}`;
     else return `rgb(255, 255, 255);">${src}`;
-  } else if (table == 1) {
+  } else if (table == 1) { // Egg moves
     return `${src < 205 ? 'rgb(255, 255, 255)':'rgb(240, 230, 140)'};">${altText[19]}`
-  } else {
+  } else { // TM moves
     return `${tmColors[src%4-1]};">${(altText[16].length > 2 ? 'TM' : altText[16])}`
   }
 }
@@ -739,11 +714,10 @@ function fidToColor(fid) {
   if (fid < fidThreshold[9]) return ['rgb(143, 214, 154)', 'rgb(255, 255, 255)'];
   else return ['rgb(255, 255, 255)', 'rgb(140, 130, 240)']; 
 }
-function abToColor(name) {
-  if (name == 'a1') return (headerState.ability==0||headerState.ability==1 ? 'rgb(255, 255, 255)' : 'rgb(145,145,145)')
-  if (name == 'a2') return (headerState.ability==0||headerState.ability==1 ? 'rgb(255, 255, 255)' : 'rgb(145,145,145)')
-  if (name == 'ha') return (headerState.ability==0||headerState.ability==2 ? 'rgb(240, 230, 140)' : 'rgb(105,105,105)')
-  if (name == 'pa') return (headerState.ability==0||headerState.ability==3 ? 'rgb(140, 130, 240)' : 'rgb(145,145,145)')
+function abToColor(src) {
+  if (src == 'ha') return ([0,2].includes(headerState.ability) ? 'rgb(240, 230, 140)':'rgb(105,105,105)')
+  if (src == 'pa') return ([0,3].includes(headerState.ability) ? 'rgb(140, 130, 240)':'rgb(145,145,145)')
+  return ([0,1].includes(headerState.ability) ? 'rgb(255, 255, 255)':'rgb(145,145,145)')
 }
 function eggTierColors(fid) {
   if (fid >= fidThreshold[6]) fid -= fidThreshold[6];
@@ -918,7 +892,7 @@ function updateHeader(clickTarget = null, ignoreFlip = false) {
         }
       }
       sortState.target = clickTarget; // Draw arrow on new target
-      clickTarget.innerHTML = `${clickTarget.textDef}<span style="color:rgb(140, 130, 240); font-family: serif;">${(sortState.ascending ? "&#9650;":"&#9660;")}</span>`;
+      clickTarget.innerHTML = `${clickTarget.textDef}<span style="color:rgb(140, 130, 240); font-family: serif;">${(sortState.ascending?"&#9650;":"&#9660;")}</span>`;
     }
   }
   refreshAllItems(); // Update the display
@@ -937,7 +911,7 @@ function adjustLayout(forceAdjust = false, headerClick = null) {
       headerContainer.appendChild(thisRow);
       const row2 = document.createElement('div'); row2.className = 'header-row';
       row2.appendChild(headerColumns[3]);
-      for (const thisColumn of headerColumns.slice(6,15)) row2.appendChild(thisColumn);  
+      for (const thisColumn of headerColumns.slice(6,14)) row2.appendChild(thisColumn);  
       headerContainer.appendChild(row2);
     } else {
       for (const thisColumn of headerColumns) thisRow.appendChild(thisColumn);  
