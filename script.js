@@ -82,7 +82,10 @@ function loadAndApplyLanguage(lang) {
     console.log(`${lang}.js loaded successfully`);
     
     // Initialize some arrays
-    fidToSearch = fidToName.map(str => str.toLowerCase().replace(/[.’'\s-]/g,''));
+    fidToSearch = fidToName.map((thisName, fid) => makeSearchable( // Search via category for later categories
+      fid >= fidThreshold[2] && fid < fidThreshold[8] ? `${fidToCategory(fid)}${thisName}` : thisName
+    ));
+    specToSearch = makeSearchable(speciesNames);
     searchBox.placeholder = `${altText[4]} ${headerNames[2]} / ${headerNames[3]} / ${headerNames[4]} / ${altText[0]} ...`;
     
     // Set up the header columns
@@ -103,9 +106,14 @@ function loadAndApplyLanguage(lang) {
   document.head.appendChild(script);
   console.log(`Attempting to load: ${script.src}`);
 }
+function makeSearchable(input) {
+  const normalize = str => str.toLowerCase().replace(/[.’'\s-]/g,'');
+  if (Array.isArray(input)) return input.map(normalize);
+  else return normalize(input);
+}
 
 function refreshAllItems() { // Display items based on query and locked filters **************************
-  const query = searchBox.value.toLowerCase().replace(/[.’'\s-]/g,'');
+  const query = makeSearchable(searchBox.value);
 
   itemList.querySelectorAll('li').forEach(li => li.replaceWith(li.cloneNode(true))); // Clones without listeners
   while (itemList.firstChild) itemList.firstChild.remove();
@@ -117,7 +125,7 @@ function refreshAllItems() { // Display items based on query and locked filters 
       filteredItemIDs = filteredItemIDs.filter((specID) => items[specID].dex >= parseInt(query,10));
     } else { // For a standard query
       filteredItemIDs = filteredItemIDs.filter((specID) => 
-        speciesNames[specID].toLowerCase().replace(/[.’'\s-]/g,'').includes(query) ||
+        specToSearch[specID].includes(query) ||
         fidToSearch[items[specID].t1]?.includes(query) ||
         fidToSearch[items[specID].t2]?.includes(query) ||
         ([0,1].includes(headerState.ability) && fidToSearch[items[specID].a1]?.includes(query)) ||
@@ -397,7 +405,6 @@ function renderMoreItems() { // Create each list item, with rows and columns of 
           // Show the move name, with click event for splash screen
           const clickableRow = document.createElement('div');  clickableRow.className = 'clickable-name';
           if (name == 'e4') clickableRow.style.color = 'rgb(240, 230, 140)';
-          // clickableRow.style.color = typeColors[fidToProc[item[name]-fidThreshold[0]][0]];
           clickableRow.innerHTML = fidToName[item[name]];
           clickableRow.addEventListener('click', () => showDescSplash(item[name]));
           moveColumn.appendChild(clickableRow);
@@ -409,66 +416,56 @@ function renderMoreItems() { // Create each list item, with rows and columns of 
     const costColumn = document.createElement('div'); costColumn.className = 'clickable-name';
           costColumn.innerHTML = `${headerNames[6]}<br><span style="color:${eggTierColors(item.et)};">${item.co}</span>`;  
           costColumn.addEventListener('click', () => showInfoSplash(thisID, 1));
-    let flipped = lockedFilters.includes(fidThreshold[5]+2);                
-    const bstColumn = document.createElement('div');  bstColumn.className = 'item-column'; // Create the stats columns
+    // Create the stats columns
+    let flipped = lockedFilters.includes(fidThreshold[5]+2);
+    const bstColumn = document.createElement('div');  bstColumn.className = 'item-column';
           bstColumn.innerHTML = `${headerNames[ 7]}<br>${item.bst}`;
-    const hpColumn = document.createElement('div');   hpColumn.className = 'item-column';  
+    const hpColumn = document.createElement('div');   hpColumn.className = 'item-column';
           hpColumn.innerHTML  = `${headerNames[ 8]}<br>${(flipped ? item.spe : item.hp)}`;
-    const atkColumn = document.createElement('div');  atkColumn.className = 'item-column'; 
-          atkColumn.innerHTML = `${headerNames[ 9]}<br>${(flipped ? item.spd : item.atk)}`;    
-    const defColumn = document.createElement('div');  defColumn.className = 'item-column'; 
-          defColumn.innerHTML = `${headerNames[10]}<br>${(flipped ? item.spa : item.def)}`;    
-    const spaColumn = document.createElement('div');  spaColumn.className = 'item-column'; 
-          spaColumn.innerHTML = `${headerNames[11]}<br>${(flipped ? item.def : item.spa)}`;    
-    const spdColumn = document.createElement('div');  spdColumn.className = 'item-column'; 
-          spdColumn.innerHTML = `${headerNames[12]}<br>${(flipped ? item.atk : item.spd)}`;    
-    const speColumn = document.createElement('div');  speColumn.className = 'item-column'; 
+    const atkColumn = document.createElement('div');  atkColumn.className = 'item-column';
+          atkColumn.innerHTML = `${headerNames[ 9]}<br>${(flipped ? item.spd : item.atk)}`;
+    const defColumn = document.createElement('div');  defColumn.className = 'item-column';
+          defColumn.innerHTML = `${headerNames[10]}<br>${(flipped ? item.spa : item.def)}`;
+    const spaColumn = document.createElement('div');  spaColumn.className = 'item-column';
+          spaColumn.innerHTML = `${headerNames[11]}<br>${(flipped ? item.def : item.spa)}`;
+    const spdColumn = document.createElement('div');  spdColumn.className = 'item-column';
+          spdColumn.innerHTML = `${headerNames[12]}<br>${(flipped ? item.atk : item.spd)}`;
+    const speColumn = document.createElement('div');  speColumn.className = 'item-column';
           speColumn.innerHTML = `${headerNames[13]}<br>${(flipped ? item.hp  : item.spe)}`;
 
     const row1 = document.createElement('div'); row1.className = 'row'; let row2 = row1;
     if (isMobile) {
-      row1.appendChild(dexColumn);      row1.appendChild(starColumn); 
+      row1.appendChild(dexColumn);      row1.appendChild(starColumn);
       row1.appendChild(specColumn);     row1.appendChild(pinColumn);
       const row2 = document.createElement('div'); row2.className = 'row'; li.appendChild(row1);
-      row2.appendChild(pokeImg); row2.appendChild(abilityColumn); row2.appendChild(moveColumn);   
+      row2.appendChild(pokeImg); row2.appendChild(abilityColumn); row2.appendChild(moveColumn);
       const row3 = document.createElement('div'); row3.className = 'row'; li.appendChild(row2);
       row3.appendChild(typeColumn);     row3.appendChild(costColumn);      row3.appendChild(bstColumn);
       row3.appendChild(hpColumn);       row3.appendChild(atkColumn);       row3.appendChild(defColumn);
-      row3.appendChild(spaColumn);      row3.appendChild(spdColumn);       row3.appendChild(speColumn);    
-      li.appendChild(row3); // Append the 3rd row
+      row3.appendChild(spaColumn);      row3.appendChild(spdColumn);       row3.appendChild(speColumn);
+      li.appendChild(row3);
     } else {
-      row1.appendChild(dexColumn);      row1.appendChild(pokeImg);         row1.appendChild(specColumn);    
-      row1.appendChild(typeColumn);     row1.appendChild(abilityColumn);   row1.appendChild(moveColumn); 
+      row1.appendChild(dexColumn);      row1.appendChild(pokeImg);         row1.appendChild(specColumn);
+      row1.appendChild(typeColumn);     row1.appendChild(abilityColumn);   row1.appendChild(moveColumn);
       row1.appendChild(costColumn);     row1.appendChild(bstColumn);
       row1.appendChild(hpColumn);       row1.appendChild(atkColumn);       row1.appendChild(defColumn);
-      row1.appendChild(spaColumn);      row1.appendChild(spdColumn);       row1.appendChild(speColumn);    
+      row1.appendChild(spaColumn);      row1.appendChild(spdColumn);       row1.appendChild(speColumn);
       li.appendChild(row1); // Append the only row
     }
     itemList.appendChild(li); // Append the current entry to the list of Pokemon
   });
 }
 function makeBiomeDesc(source, style) {
-  if (style == 'full') {
-    if      (source == 1) return `rgb(255, 255, 255);">${biomeText[0]}`;
-    else if (source == 2) return `rgb(131, 182, 239);">${biomeText[1]}`;
-    else if (source == 3) return `rgb(131, 182, 239);">${biomeText[5]} ${biomeText[1]}`;
-    else if (source == 4) return `rgb(240, 230, 140);">${biomeText[2]}`;
-    else if (source == 5) return `rgb(240, 230, 140);">${biomeText[5]} ${biomeText[2]}`;
-    else if (source == 6) return `rgb(239, 131, 131);">${biomeText[3]}`;
-    else if (source == 7) return `rgb(239, 131, 131);">${biomeText[5]} ${biomeText[3]}`;
-    else if (source == 8) return `rgb(216, 143, 205);">${biomeText[4]}`;
-    else if (source == 9) return `rgb(216, 143, 205);">${biomeText[5]} ${biomeText[4]}`;
-  } else if (style == 'small') {
-    if      (source == 1) return `rgb(255, 255, 255);">${biomeText[6]}`;
-    else if (source == 2) return `rgb(131, 182, 239);">${biomeText[7]}`;
-    else if (source == 3) return `rgb(131, 182, 239);">${biomeText[5]} ${biomeText[7]}`;
-    else if (source == 4) return `rgb(240, 230, 140);">${biomeText[8]}`;
-    else if (source == 5) return `rgb(240, 230, 140);">${biomeText[5]} ${biomeText[8]}`;
-    else if (source == 6) return `rgb(239, 131, 131);">${biomeText[9]}`;
-    else if (source == 7) return `rgb(239, 131, 131);">${biomeText[5]} ${biomeText[9]}`;
-    else if (source == 8) return `rgb(216, 143, 205);">${biomeText[10]}`;
-    else if (source == 9) return `rgb(216, 143, 205);">${biomeText[5]} ${biomeText[10]}`;
-  }
+  const offset = (style == 'small' ? 6 : 0);
+  if      (source == 1) return `rgb(255, 255, 255);">${biomeText[0+offset]}`;
+  else if (source == 2) return `rgb(131, 182, 239);">${biomeText[1+offset]}`;
+  else if (source == 3) return `rgb(131, 182, 239);">${biomeText[5]} ${biomeText[0+offset]}`;
+  else if (source == 4) return `rgb(240, 230, 140);">${biomeText[2+offset]}`;
+  else if (source == 5) return `rgb(240, 230, 140);">${biomeText[5]} ${biomeText[2+offset]}`;
+  else if (source == 6) return `rgb(239, 131, 131);">${biomeText[3+offset]}`;
+  else if (source == 7) return `rgb(239, 131, 131);">${biomeText[5]} ${biomeText[3+offset]}`;
+  else if (source == 8) return `rgb(216, 143, 205);">${biomeText[4+offset]}`;
+  else if (source == 9) return `rgb(216, 143, 205);">${biomeText[5]} ${biomeText[4+offset]}`;
 }
 
 function makeMovesetHeader(specID) {
@@ -702,7 +699,7 @@ function showDescSplash(fid) {
       if (thisProcs[7].includes(43)) {splashMoveTags.innerHTML += "<p>One Hit KO move</p><p>Modified against Bosses</p>";};
       if (thisProcs[7].includes(44)) {splashMoveTags.innerHTML += "<p>Removes hazards</p>";};
       if (thisProcs[7].includes(45)) {splashMoveTags.innerHTML += "<p>Traps and damages target</p>";};
-      // if (thisProcLine[7].includes(6)) {splashMoveTags.innerHTML += "<p>Reflectable by magic</p>";};
+      // if (thisProcLine[7].includes(6)) {splashMoveTags.innerHTML += "<p>Can be reflected</p>";};
       if (thisProcs[7].includes(47)) {splashMoveTags.innerHTML += "<p>Can't be redirected</p>";};
       if (thisProcs[7].includes(48)) {splashMoveTags.innerHTML += "<p>Always hits in Rain</p>";};
       if (thisProcs[7].includes(56)) {splashMoveTags.innerHTML += "<p>User can't switch out</p>";};
@@ -765,11 +762,10 @@ function isMoveOrBiome(fid) {
 // Display the filter suggestions *************************
 function displaySuggestions() { // Get search query and clear the list
   filterToEnter = null;   suggestions.innerHTML = '';
-  const query = searchBox.value.toLowerCase().replace(/[.’'\s-]/g,'');
+  const query = makeSearchable(searchBox.value);
   if (query.length) {
     // Filter by species name, to suggest families
-    let filteredSID = possibleSID.filter((ID) => items[ID].dex.toString().includes(query) || 
-      speciesNames[ID].toLowerCase().replace(/[.’'\s-]/g,'').includes(query));
+    let filteredSID = possibleSID.filter((ID) => items[ID].dex.toString().includes(query) || specToSearch[ID].includes(query));
     if (filteredSID.length > 20) filteredSID = [];
     let offerFamilies = [...new Set(filteredSID.map(ID => items[ID].fa))];
     if (offerFamilies.length > 4) offerFamilies = [];
@@ -777,14 +773,10 @@ function displaySuggestions() { // Get search query and clear the list
     let matchingFID = [];   
     // Filter suggestions based on query and exclude already locked filters
     matchingFID = possibleFID.filter((fid) => {
-        let searchableName = fidToSearch[fid];
-        if (fid >= fidThreshold[2] && fid < fidThreshold[8]) { // Search via category for later categories
-          searchableName = `${fidToCategory(fid).toLowerCase().replace(/[.’'\s-]/g,'')}${searchableName}`;  
-        } else if (fid >= fidThreshold[8] && offerFamilies.includes(fid)) {
-          return !lockedFilters.some((f) => f == fid);
-        }
+        if (lockedFilters.some((f) => f == fid)) return false;
+        if (fid >= fidThreshold[9] && offerFamilies.includes(fid)) return true
         // Suggest if it contains the search query and is not already locked
-        return searchableName.includes(query) && !lockedFilters.some((f) => f == fid);
+        return fidToSearch[fid].includes(query);
     });
     if (matchingFID.length > 22) matchingFID = []; // Erase the list of suggestions if it is too large
     
@@ -817,9 +809,9 @@ function lockFilter(newLockFID) {
     lockedFilters.push(newLockFID); // Add the filter to the locked filters container
     let filterMod = null;
     if (lockedFilters.length > 1) {
-      const familyOR = (newLockFID >= fidThreshold[8] && lockedFilters[lockedFilters.length-2] >= fidThreshold[8]);
-      filterMod = document.createElement("span"); filterMod.toggleOR = familyOR;
-      filterMod.className = "filter-mod";         filterMod.innerHTML = (familyOR?'OR':'&');
+      const defaultOR = (newLockFID >= fidThreshold[8] && lockedFilters[lockedFilters.length-2] >= fidThreshold[8]);
+      filterMod = document.createElement("span"); filterMod.toggleOR = defaultOR;
+      filterMod.className = "filter-mod";         filterMod.innerHTML = (defaultOR?'OR':'&');
       filterMod.addEventListener("click", () => toggleOR(filterMod));
       lockedFilterMods.push(filterMod); filterContainer.appendChild(filterMod);
     }
