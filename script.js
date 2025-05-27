@@ -591,8 +591,8 @@ function showDescSplash(fid) {
         const procStages = ((thisProc[2]=='0')?'':` ${(thisProc[0]==-2?'× ':(thisProc[2]>0?'+':''))}${thisProc[2]}${thisProc[0]==-3?'%':''}`);
         splashMoveTags.innerHTML += `<p>${procChance}${procToDesc[thisProc[1]]}${procStages}</p>`;
       });
-      if (thisProcs[1].includes(0)) splashMoveTags.innerHTML += "<p style='color:rgb(239, 131, 131);'>Not Implemented</p>";
-      if (thisProcs[1].includes(1)) splashMoveTags.innerHTML += "<p style='color:rgb(240, 230, 140);'>Partially Implemented</p>";
+      if (thisProcs[1].includes(51)) splashMoveTags.innerHTML += "<p style='color:rgb(240, 230, 140);'>Partially Implemented</p>";
+      if (thisProcs[1].includes(50)) splashMoveTags.innerHTML += "<p style='color:rgb(239, 131, 131);'>Not Implemented</p>";
       if (thisProcs[1].includes(2)) splashMoveTags.innerHTML += "<p>Can't be suppressed</p>";
       if (thisProcs[1].includes(3)) splashMoveTags.innerHTML += "<p>Can't be replaced</p>";
       if (thisProcs[1].includes(4)) splashMoveTags.innerHTML += "<p>Can't be ignored</p>";
@@ -619,6 +619,18 @@ function showDescSplash(fid) {
       } else if (thisProcs[5] < 0) {
         splashMoveTags.innerHTML += `<p style="color:rgb(239, 131, 131);">Priority: ${thisProcs[5]}</p>`;
       }
+      // Reworked
+      // tagToDesc.forEach((thisDesc,index) => {
+      //   if (thisProcs[7].includes(index)) splashMoveTags.innerHTML += `<p>${thisDesc}</p>`;
+      //   if (index == 2) { // Show procs after targets
+      //     thisProcs[6].forEach((thisProc) => { // Procs for stats, status, flinch, etc.
+      //       const procChance = ((thisProc[0] == '-1') ? '' : `${thisProc[0]}% `);
+      //       const procStages = ((thisProc[2] == '0') ? '' : ` ${(thisProc[2] > 0 ? '+' : '')}${thisProc[2]}`);
+      //       splashMoveTags.innerHTML += `<p>${procChance}${procToDesc[thisProc[1]]}${procStages}</p>`;
+      //     });
+      //   }
+      // });
+      // Original
       if (thisProcs[7].includes(20)) {splashMoveTags.innerHTML += '<p style="color:rgb(216, 143, 205);">Targets: Random Enemy</p>';};
       if (thisProcs[7].includes(21)) {splashMoveTags.innerHTML += '<p style="color:rgb(239, 131, 131);">Targets: All Enemies</p>';};
       if (thisProcs[7].includes(22)) {splashMoveTags.innerHTML += '<p style="color:rgb(247, 82, 49);">Targets: Entire Field</p>';};
@@ -631,11 +643,11 @@ function showDescSplash(fid) {
       if (thisProcs[7].includes(0))  {splashMoveTags.innerHTML += "<p>High Critical Ratio</p>";};
       if (thisProcs[7].includes(1))  {splashMoveTags.innerHTML += "<p>Guaranteed Critical Hit</p>";};
       if (thisProcs[7].includes(2))  {splashMoveTags.innerHTML += "<p>User Critical Rate +2</p>";};
-      if (thisProcs[7].includes(35)) {splashMoveTags.innerHTML += "<p>Costs 50% of HP</p>";};
       if (thisProcs[7].includes(59)) {splashMoveTags.innerHTML += "<p>Costs 33% of HP</p>";};
+      if (thisProcs[7].includes(35)) {splashMoveTags.innerHTML += "<p>Costs 50% of HP</p>";};
       if (thisProcs[7].includes(34)) {splashMoveTags.innerHTML += "<p>Recoil 50% of HP</p>";};
-      if (thisProcs[7].includes(36)) {splashMoveTags.innerHTML += "<p>Recoil 33% of damage</p>";};
       if (thisProcs[7].includes(37)) {splashMoveTags.innerHTML += "<p>Recoil 50% of damage</p>";};
+      if (thisProcs[7].includes(36)) {splashMoveTags.innerHTML += "<p>Recoil 33% of damage</p>";};
       if (thisProcs[7].includes(53)) {splashMoveTags.innerHTML += "<p>Recoil 25% of damage</p>";};
       if (thisProcs[7].includes(46)) {splashMoveTags.innerHTML += "<p>30% deal 2x damage</p>";};
       if (thisProcs[7].includes(27)) {splashMoveTags.innerHTML += "<p>Heals Status Effects</p>";};
@@ -646,21 +658,21 @@ function showDescSplash(fid) {
       if (thisProcs[7].includes(32)) {splashMoveTags.innerHTML += "<p>Heals Burn</p>";};
       if (thisProcs[7].includes(39)) {splashMoveTags.innerHTML += "<p>Heals 100% damage dealt</p>";};
       if (thisProcs[7].includes(40)) {splashMoveTags.innerHTML += "<p>Heals 75% damage dealt</p>";};
-      if (thisProcs[7].includes(41)) {splashMoveTags.innerHTML += "<p>Heals by target's Atk</p>";};
       if (thisProcs[7].includes(42)) {splashMoveTags.innerHTML += "<p>Heals 50% damage dealt</p>";};
-      if (thisProcs[7].includes(13)) {splashMoveTags.innerHTML += "<p>Triage gives priority</p>";};
+      if (thisProcs[7].includes(41)) {splashMoveTags.innerHTML += "<p>Heals by target's Atk</p>";};
       if (thisProcs[7].includes(5))  {splashMoveTags.innerHTML += "<p>No effect on Grass/Overcoat</p>";};
       if (thisProcs[7].includes(55)) {splashMoveTags.innerHTML += "<p>No seeding on Grass Types</p>";};
+      if (thisProcs[7].includes(13)) {splashMoveTags.innerHTML += "<p>Triggers Triage ability</p>";};
+      if (thisProcs[7].includes(9))  {splashMoveTags.innerHTML += "<p>Triggers Dancer ability</p>";};
+      if (thisProcs[7].includes(16)) {splashMoveTags.innerHTML += "<p>Triggers Wind Rider</p>";};
       if (thisProcs[7].includes(7))  {splashMoveTags.innerHTML += "<p>Boosted by Sharpness</p>";};
       if (thisProcs[7].includes(8))  {splashMoveTags.innerHTML += "<p>Boosted by Iron Fist</p>";};
-      if (thisProcs[7].includes(9))  {splashMoveTags.innerHTML += "<p>Triggers Dancer ability</p>";};
-      if (thisProcs[7].includes(10)) {splashMoveTags.innerHTML += "<p>No effect on Bulletproof</p>";};
       if (thisProcs[7].includes(11)) {splashMoveTags.innerHTML += "<p>Boosted by Mega Launcher</p>";};
       if (thisProcs[7].includes(12)) {splashMoveTags.innerHTML += "<p>Boosted by Strong Jaw</p>";};
       if (thisProcs[7].includes(33)) {splashMoveTags.innerHTML += "<p>Boosted by Reckless</p>";};
+      if (thisProcs[7].includes(10)) {splashMoveTags.innerHTML += "<p>No effect on Bulletproof</p>";};
       if (thisProcs[7].includes(14)) {splashMoveTags.innerHTML += "<p>Sound based move</p><p>Ignores Substitute</p>";};
       if (thisProcs[7].includes(15)) {splashMoveTags.innerHTML += "<p>Prevented by Damp ability</p>";};
-      if (thisProcs[7].includes(16)) {splashMoveTags.innerHTML += "<p>Triggers Wind Rider</p>";};
       if (thisProcs[7].includes(54)) {splashMoveTags.innerHTML += "<p>Ignores Abilities</p>";};
       if (thisProcs[7].includes(17)) {splashMoveTags.innerHTML += "<p>Ignores Protect</p>";};
       if (thisProcs[7].includes(18)) {splashMoveTags.innerHTML += "<p>Ignores Substitute</p>";};
@@ -671,7 +683,7 @@ function showDescSplash(fid) {
       if (thisProcs[7].includes(25)) {splashMoveTags.innerHTML += "<p>Hits 10 times</p>";};
       if (thisProcs[7].includes(26)) {splashMoveTags.innerHTML += "<p>Hits 2-5 times</p>";};
       if (thisProcs[7].includes(38)) {splashMoveTags.innerHTML += "<p>Repeats for 2-3 turns</p>";};
-      if (thisProcs[7].includes(43)) {splashMoveTags.innerHTML += "<p>One Hit KO move</p><p>Modified against Bosses</p>";};
+      if (thisProcs[7].includes(43)) {splashMoveTags.innerHTML += "<p>One Hit KO move</p><p style='color:rgb(240, 230, 140);'>Modified against Bosses</p>";};
       if (thisProcs[7].includes(44)) {splashMoveTags.innerHTML += "<p>Removes hazards</p>";};
       if (thisProcs[7].includes(45)) {splashMoveTags.innerHTML += "<p>Traps and damages target</p>";};
       // if (thisProcLine[7].includes(6)) {splashMoveTags.innerHTML += "<p>Can be reflected</p>";};
@@ -680,7 +692,7 @@ function showDescSplash(fid) {
       if (thisProcs[7].includes(56)) {splashMoveTags.innerHTML += "<p>User can't switch out</p>";};
       if (thisProcs[7].includes(57)) {splashMoveTags.innerHTML += "<p>Target can't switch out</p>";};
       if (thisProcs[7].includes(58)) {splashMoveTags.innerHTML += "<p>User & Target can't switch out</p>";};
-      if (thisProcs[7].includes(49)) {splashMoveTags.innerHTML += "<p>No effect on Bosses</p>";};
+      if (thisProcs[7].includes(49)) {splashMoveTags.innerHTML += "<p style='color:rgb(239, 131, 131);'>No effect on Bosses</p>";};
       if (thisProcs[7].includes(4))  {splashMoveTags.innerHTML += "<p>Makes Contact</p>";};
       if (thisProcs[7].includes(51)) {splashMoveTags.innerHTML += "<p style='color:rgb(240, 230, 140);'>Partially Implemented</p>";};
       if (thisProcs[7].includes(50)) {splashMoveTags.innerHTML += "<p style='color:rgb(239, 131, 131);'>Not Implemented</p>";};
