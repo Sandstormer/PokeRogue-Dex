@@ -620,20 +620,25 @@ function showDescSplash(fid) {
         splashMoveTags.innerHTML += `<p style="color:rgb(239, 131, 131);">Priority: ${thisProcs[5]}</p>`;
       }
       // Reworked
-      // tagToDesc.forEach((thisDesc,index) => {
-      //   if (thisProcs[7].includes(index)) splashMoveTags.innerHTML += `<p>${thisDesc}</p>`;
-      //   if (index == 2) { // Show procs after targets
-      //     thisProcs[6].forEach((thisProc) => { // Procs for stats, status, flinch, etc.
-      //       const procChance = ((thisProc[0] == '-1') ? '' : `${thisProc[0]}% `);
-      //       const procStages = ((thisProc[2] == '0') ? '' : ` ${(thisProc[2] > 0 ? '+' : '')}${thisProc[2]}`);
-      //       splashMoveTags.innerHTML += `<p>${procChance}${procToDesc[thisProc[1]]}${procStages}</p>`;
-      //     });
-      //   }
-      // });
+      tagToDesc.forEach((thisDesc,index) => {
+        const tagColor = '';
+        if (index==0) tagColor = "rgb(216, 143, 205)";
+        if (index==1) tagColor = "rgb(239, 131, 131)";
+        if (index==2) tagColor = "rgb(247, 82, 49)";
+        if (tagColor) tagColor = ` style="color:${tagColor};"`;
+        if (thisProcs[7].includes(index)) splashMoveTags.innerHTML += `<p${tagColor}>${thisDesc}</p>`;
+        if (index == 2) { // Show procs after targets
+          thisProcs[6].forEach((thisProc) => { // Procs for stats, status, flinch, etc.
+            const procChance = ((thisProc[0] == '-1') ? '' : `${thisProc[0]}% `);
+            const procStages = ((thisProc[2] == '0') ? '' : ` ${(thisProc[2] > 0 ? '+' : '')}${thisProc[2]}`);
+            splashMoveTags.innerHTML += `<p>${procChance}${procToDesc[thisProc[1]]}${procStages}</p>`;
+          });
+        }
+      });
       // Original
-      if (thisProcs[7].includes(20)) {splashMoveTags.innerHTML += '<p style="color:rgb(216, 143, 205);">Targets: Random Enemy</p>';};
-      if (thisProcs[7].includes(21)) {splashMoveTags.innerHTML += '<p style="color:rgb(239, 131, 131);">Targets: All Enemies</p>';};
-      if (thisProcs[7].includes(22)) {splashMoveTags.innerHTML += '<p style="color:rgb(247, 82, 49);">Targets: Entire Field</p>';};
+      // if (thisProcs[7].includes(20)) {splashMoveTags.innerHTML += '<p style="color:rgb(216, 143, 205);">Targets: Random Enemy</p>';};
+      // if (thisProcs[7].includes(21)) {splashMoveTags.innerHTML += '<p style="color:rgb(239, 131, 131);">Targets: All Enemies</p>';};
+      // if (thisProcs[7].includes(22)) {splashMoveTags.innerHTML += '<p style="color:rgb(247, 82, 49);">Targets: Entire Field</p>';};
       thisProcs[6].forEach((thisProc) => { // Procs for stats, status, flinch, etc.
         const procChance = ((thisProc[0] == '-1') ? '' : `${thisProc[0]}% `);
         const procStages = ((thisProc[2] == '0') ? '' : ` ${(thisProc[2] > 0 ? '+' : '')}${thisProc[2]}`);
