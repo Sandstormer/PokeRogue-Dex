@@ -1,6 +1,6 @@
-headerNames = ['Núm.','Shiny','Nombre','Tipo','Habilidades','Mov. Huevo','Coste','Total','PS','Atq.','Def.','AtqEs.','DefEs.','Veloc.'];
+headerNames = ['Núm.','Shiny','Nombre','Tipo','Habilidades','Mov. Huevo','Coste','Total','PS','Atq','Def','AtqEs','DefEs','Vel'];
 altText = ['Movimientos','Normal','Oculta','Pasiva','Introduce el nombre','Potencia','Precisión','PP','Ir a filtros','Seta Recuerdo','Evoluciones','Mov. Huevo','Raro Mov. Huevo','Común','Súper','Ultra','Movimientos de MT','Nv.','','Huevo'];
-catToName = ['Tipo','Habilid','Movimiento','Gen.','Coste','Género','Modo','Huevo','Nuevo','Bioma','Evoluciones'];
+catToName = ['Tipo','Habilidad','Movimiento','Gen.','Coste','Género','Modo','Huevo','Nuevo','Bioma','Evoluciones'];
 biomeText = ['Común','Poco común','Raro','Super raro','Ultra raro','Jefe','Común','Poco común','Raro','Super raro','Ultra raro','Amanecer','Día','Atardecer','Noche'];
 infoText = ['Amistad','Pasiva','Reducción de coste','Comprar Huevo','Habilidad oculta','Huevo Exclusivo','','','','Biomas'];
 fidToDesc = [

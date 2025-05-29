@@ -795,7 +795,7 @@ fidToDesc = [
 'Le lanceur utilise les pouvoirs de la nature pour attaquer la cible, ce qui peut aussi baisser la Défense Spéciale de celle-ci.',
 'Le lanceur crée un clone en sacrifiant des PV, puis il revient et échange sa place avec un Pokémon de l’équipe prêt à combattre.',
 'Le lanceur porte un coup de poing à la cible, ce qui peut baisser la Défense de celle-ci.',
-'Le lanceur attaque la cible et vole son objet. Le lanceur ne peut rien voler s’il tient déjà un objet.',
+'Le lanceur attaque la cible et a 30% de chance de voler son objet.',
 'Si la cible est du sexe opposé, elle tombe amoureuse et rechigne alors à attaquer.',
 'Le lanceur aspire la force vitale de la cible par un baiser qui rend au lanceur un nombre de PV supérieur ou égal à la moitié des dégâts infligés.',
 'Pendant cinq tours, les Pokémon au sol ne peuvent pas subir d’altération de statut et les dégâts infligés par les capacités de type Dragon sont divisés par deux.',

@@ -46,12 +46,18 @@ let isMobile = false; // Change display for mobile devices
 let filteredItemIDs = null; // List of all displayed row numbers
 let headerState = { shiny: 0, ability: 0, biome: 0 } // Global state of shiny(0,1,2,3), ability(0,1,2,3), biome(0,1)
 let sortState = { column: null, ascending: true, target: null }; // Track the current sort state
-let splashState = { species: -1, page: 0 }
+let splashState = { species: -1, page: 0 } // Species shown, page(moveset=0,biome=1)
 // const spreadMoves = possibleFID.filter((fid) => fid >= fidThreshold[1] && fid < fidThreshold[2]
 //   && (fidToProc[fid-fidThreshold[0]][7].includes(21) || fidToProc[fid-fidThreshold[0]][7].includes(22)));
-// filteredItemIDs = filteredItemIDs.filter((thisID) => spreadMoves.some((thisMove) => thisMove in items[thisID]));
-// const moveTagFID = { // List of move FIDs for spread/healing/setup
-//   999:
+// filteredItemIDs = filteredItemIDs.filter((thisID) => TagToFID[999].some((f) => f in items[thisID]));
+// const TagToFID = { // List of ability/move FIDs that match specific tag filters
+//   999: [222]
+//   // Spread moves
+//   // Ignores abilities
+//   // Switches out target
+//   // Healing
+//   // Setup
+//   // Priority
 // }
 
 procToDesc = [
@@ -134,7 +140,7 @@ function refreshAllItems() { // Display items based on query and locked filters 
         ([0,1].includes(headerState.ability) && fidToSearch[items[specID].a1]?.includes(query)) ||
         ([0,1].includes(headerState.ability) && fidToSearch[items[specID].a2]?.includes(query)) ||
         ([0,2].includes(headerState.ability) && fidToSearch[items[specID].ha]?.includes(query)) ||
-        ([0,3].includes(headerState.ability) && fidToSearch[items[specID].pa]?.includes(query)) )
+        ([0,3].includes(headerState.ability) && fidToSearch[items[specID].pa]?.includes(query)) );
     }
   } 
   // Filter from headers ==============
@@ -146,7 +152,7 @@ function refreshAllItems() { // Display items based on query and locked filters 
     filteredItemIDs = filteredItemIDs.filter(specID => // Search for filters with their fid as key
       lockedFilterGroups.every(thisGroup => // Match at least one filter from each group
         thisGroup.some(fid => {
-          if (headerState.ability != 0 && fid >= fidThreshold[0] && fid < fidThreshold[1])
+          if (headerState.ability != 0 && fid >= fidThreshold[0] && fid < fidThreshold[1]) // Restricted ability filter
             return items[specID]?.[fid] == 309+headerState.ability || (headerState.ability == 1 && items[specID]?.[fid] == 309)
           if (fid  <  fidThreshold[2]) return fid in items[specID]; // Type/Ability/Move filters
           if (fid  <  fidThreshold[3]) return items[specID].ge === fid - fidThreshold[2] + 1; // Gen filters
@@ -160,7 +166,7 @@ function refreshAllItems() { // Display items based on query and locked filters 
           if (fid === fidThreshold[7]) return 'nv' in items[specID]; // New variants
           if (fid  <  fidThreshold[9]) return fid in items[specID]; // Biome filter
           if (fid  <  fidThreshold[10]) return items[specID]?.fa === fid; // Family filter
-          console.warn('Filter error');return fid in items[specID];
+          console.warn('Filter error'); return fid in items[specID];
         }))) 
       }
   // Add moves to track in the move column  ==============
@@ -180,7 +186,7 @@ function refreshAllItems() { // Display items based on query and locked filters 
         const getLearnLevel = (ID) => 
           showMoveLearn.reduce((total, move) => total + (move in items[ID] ? 
             (move >= fidThreshold[8] ? (items[ID][move][1] ? ~~(items[ID][move][0]/20)*0.9+~~(items[ID][move][1]/20)/10 
-                : ~~(items[ID][move][0]/20)) : items[ID][move]) : 500), 0);
+              : ~~(items[ID][move][0]/20)) : items[ID][move]) : 500), 0);
         aValue = getLearnLevel(a);
         bValue = getLearnLevel(b);
       } else if (sortState.column == 'type') { // Sort by type combinations
@@ -188,8 +194,8 @@ function refreshAllItems() { // Display items based on query and locked filters 
         const aEntry = items[a]; const bEntry = items[b];
         aValue = (aEntry.t1+1)*(typeMult*!lockedFilters.includes(aEntry.t1));
         bValue = (bEntry.t1+1)*(typeMult*!lockedFilters.includes(bEntry.t1));
-        if ('t2' in aEntry) {aValue += (aEntry.t2*2+1)*!lockedFilters.includes(aEntry.t2)}
-        if ('t2' in bEntry) {bValue += (bEntry.t2*2+1)*!lockedFilters.includes(bEntry.t2)}
+        if ('t2' in aEntry) aValue += (aEntry.t2*2+1)*!lockedFilters.includes(aEntry.t2);
+        if ('t2' in bEntry) bValue += (bEntry.t2*2+1)*!lockedFilters.includes(bEntry.t2);
       } else if (sortState.column == 'sp') { // Sort by species names alphabetically
         aValue = speciesNames[a]; bValue = speciesNames[b];
       } else if (sortState.column != 'row') { // If anything OTHER than row number
@@ -234,6 +240,8 @@ function refreshAllItems() { // Display items based on query and locked filters 
         helpMessage.innerHTML += '<b>There are no Pokemon that match the filters and the search term.</b><br>Adding another filter may change the results.';
       }
     }
+    // helpMessage.innerHTML += (suggestions.innerHTML ? (lockedFilters ? warningText[3] : warningText[4]) : (lockedFilters ? 
+    //   (query ? warningText[5] : warningText[6]) : warningText[7]));
   helpMessage.innerHTML += '<br><span style="color:rgb(145, 145, 145);">Click to see the instructions.</span><hr>'
   helpMessage.addEventListener('click', () => openHelpMenu());
   itemList.appendChild(helpMessage)
@@ -795,7 +803,7 @@ function updateHeader(clickTarget = null, ignoreFlip = false) {
     headerState.ability = (headerState.ability+1)%4;
     if (headerState.ability) {
       headerColumns[4].innerHTML = `<span style="color:rgb(140, 130, 240);">${headerNames[4]}</span>`;
-      if      (headerState.ability == 1) headerColumns[4].innerHTML += `<span style="color:rgb(255, 255, 255); font-size:12px;">(${altText[1]})</span>`;
+      if      (headerState.ability == 1) headerColumns[4].innerHTML += `<span style="color:${col.wh}; font-size:12px;">(${altText[1]})</span>`;
       else if (headerState.ability == 2) headerColumns[4].innerHTML += `<span style="color:rgb(240, 230, 140); font-size:12px;">(${altText[2]})</span>`;
       else if (headerState.ability == 3) headerColumns[4].innerHTML += `<span style="color:rgb(140, 130, 240); font-size:12px;">(${altText[3]})</span>`;
     } else headerColumns[4].innerHTML = headerNames[4];
