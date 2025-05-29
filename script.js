@@ -1,11 +1,11 @@
 // script.js
 // pokedex_data.js: items
-// filters_global.js: typeColors, fidThreshold, fidToProc
+// filters_global.js: typeColors, fidThreshold, fidToProc, tagToDesc
 // lang/en.js: headerNames, altText, catToName, fidToDesc, speciesNames, fidToName, helpMenuText
   // headerNames = ['Dex','Shiny','Species','Types','Abilities','Egg Moves','Cost','BST','HP','Atk','Def','SpA','SpD','Spe'];
   // altText = ['Moves','(Main Only)','(Hidden Only)','(Passive Only)','Search','Pow','Acc','PP'];
   // catToName = ['Type','Ability','Move','Generation','Cost','Gender','Mode','Egg Tier'];
-// TBD: procToDesc, warningText, menuText, tagDesc
+// TBD: procToDesc, warningText, menuText
     
 const itemList = document.getElementById('itemList');
 const searchBox = document.getElementById('searchBox');
@@ -25,8 +25,12 @@ const possibleFID = [...Array(fidThreshold[fidThreshold.length-1]).keys()];
 const possibleSID = [...Array(items.length).keys()];
 const supportedLangs = ["en","fr","ko","zh-CN","ja"];//"it","es-ES","pt-BR","de"];
 const LanguageNames  = ["English","Français","한국어 (Hangugeo)","简体中文 (Jiǎntǐ Zhōngwén)","日本語 (Nihongo)"];//"Italiano","Español (España)","Português (Brasil)","Deutsch","繁體中文 (Fántǐ Zhōngwén)"];
-const moveCatColor = ['rgb(251, 173, 124)','rgb(131, 182, 239)','rgb(255, 255, 255)'];
-const tmColors = ['rgb(255, 255, 255)','rgb(131, 182, 239)','rgb(240, 230, 140)'];
+const col = {pu:'rgb(140, 130, 240)', wh:'rgb(255, 255, 255)', ga:'rgb(145, 145, 145)', dg:'rgb(105, 105, 105)',
+             bl:'rgb(131, 182, 239)', ye:'rgb(240, 230, 140)', re:'rgb(239, 131, 131)', pi:'rgb(216, 143, 205)',
+             ge:'rgb(143, 214, 154)', or:'rgb(251, 173, 124)', cy:'rgb( 83, 237, 229)', dr:'rgb(247, 82,  49)'};
+const tagColors = {0:col.pi, 1:col.re, 2:col.dr, 57:col.ye, 58:col.re, 60:col.ye, 61:col.re};
+const moveCatColor = [col.or,col.bl,col.wh];
+const tmColors = [col.wh,col.bl,col.ye];
 const flipStats = {bst:'bst',hp:'spe',atk:'spd',def:'spa',spa:'def',spd:'atk',spe:'hp'};
 const REMchance = [24,12,6,6,3];
 let increment = 10;     // Number of items to load at a time
@@ -50,7 +54,6 @@ let splashState = { species: -1, page: 0 }
 //   999:
 // }
 
-// biomeText = ['Common','Uncommon','Rare','Super Rare','Ultra Rare','Boss','Com.','UC','Rare','SR','UR','Dawn','Day','Dusk','Night'] 
 procToDesc = [
   "User Atk","User Def","User SpAtk","User SpDef","User Speed","User Accuracy","User Evasion",
   "Atk","Def","SpAtk","SpDef","Speed","Accuracy","Evasion",
@@ -237,7 +240,7 @@ function refreshAllItems() { // Display items based on query and locked filters 
   }
 }
 
-function renderMoreItems() { // Create each list item, with rows and columns of info **************************
+function renderMoreItems() { // Create each list item, with columns of info **************************
   // console.log('Rendering more items');
   renderLimit += increment;
   let slicedItemIDs = filteredItemIDs.slice(renderLimit-increment,renderLimit)
@@ -368,7 +371,7 @@ function renderMoreItems() { // Create each list item, with rows and columns of 
           clickableRow.addEventListener('click', () => showDescSplash(thisFID));
         };
         // Show the move name, with click event for splash screen
-        clickableRow.innerHTML = `<p style="color:rgb(140, 130, 240); margin: 0;">${fidToName[thisFID]}:<br>${srcText}</span></p>`;
+        clickableRow.innerHTML = `<p style="color:${col.pu}; margin: 0;">${fidToName[thisFID]}:<br>${srcText}</span></p>`;
         moveColumn.appendChild(clickableRow);
       }
     });
@@ -397,7 +400,7 @@ function renderMoreItems() { // Create each list item, with rows and columns of 
         ['e1','e2','e3','e4'].forEach((name) => {
           // Show the move name, with click event for splash screen
           const clickableRow = document.createElement('div');  clickableRow.className = 'clickable-name';
-          if (name == 'e4') clickableRow.style.color = 'rgb(240, 230, 140)';
+          if (name == 'e4') clickableRow.style.color = col.ye;
           clickableRow.innerHTML = fidToName[item[name]];
           clickableRow.addEventListener('click', () => showDescSplash(item[name]));
           moveColumn.appendChild(clickableRow);
@@ -443,7 +446,7 @@ function makeBiomeDesc(src, isSmall=0) {
   else if (src == 9) return `rgb(216, 143, 205);">${biomeText[5]} ${biomeText[4+offset]}`;
 }
 
-function makeMovesetHeader(specID) {
+function makeMovesetHeader(specID) { // Create the moveset/info splash **************************
   movesetHeader.innerHTML = '';
   const item = items[specID]; splashState.species = specID;
   
@@ -478,7 +481,7 @@ function showInfoSplash(specID, overridePage=null) {
   makeMovesetHeader(specID);
   movesetScrollable.innerHTML = '';
   if (splashState.page) { // Show biomes
-    if ('ee' in item) {
+    if ('ee' in item) { // Description of pokemon with no biomes
       if (item.ee == 1) movesetScrollable.innerHTML += '<b>This Pokemon is <span style="color:rgb(143, 214, 154);">Egg Exclusive</span>.</b><br>It does not appear in any biomes, and can only be obtained from eggs.';
       if (item.ee == 2) movesetScrollable.innerHTML += '<b>This is a <span style="color:rgb(216, 143, 205);">Baby Pokemon</span>.</b><br>It does not appear in any biomes, but can be unlocked by encountering its evolution.';
       if (item.ee == 3) movesetScrollable.innerHTML += '<b>This <span style="color:rgb(239, 131, 131);">Paradox Pokemon</span> is <span style="color:rgb(143, 214, 154);">Egg Exclusive</span>.</b><br>It can only be obtained from eggs, but can afterward be caught in Classic mode.';
@@ -503,9 +506,10 @@ function showInfoSplash(specID, overridePage=null) {
       });
     movesetScrollable.appendChild(document.createElement('hr'));
     const splashCostInfo = document.createElement('div');  splashCostInfo.className = 'splash-move-tags';
+    // Info on friendship and candy
     splashCostInfo.innerHTML = `
       <p>${infoText[0]}: <span style="color:rgb(239, 131, 131)";>${upgradeCosts[item.co-1][4]}</span> <img src="ui/fren.png"></p>
-      <p>${infoText[1]}: <span style="color:rgb(140, 130, 240)";>${upgradeCosts[item.co-1][0]}</span> <img src="ui/candy.png" style="margin-bottom:-2px;"></p>
+      <p>${infoText[1]}: <span style="color:${col.pu}";>${upgradeCosts[item.co-1][0]}</span> <img src="ui/candy.png" style="margin-bottom:-2px;"></p>
       <p>${infoText[2]}: <span style="color:rgb(131, 182, 239)";>${upgradeCosts[item.co-1][1]}</span> &
         <span style="color:rgb(240, 230, 140)";> ${upgradeCosts[item.co-1][2]}<span> <img src="ui/candy.png" style="margin-bottom:-2px;"></p>
       <p>${infoText[3]}: ${upgradeCosts[item.co-1][3]} <img src="ui/candy.png" style="margin-bottom:-2px;">
@@ -543,25 +547,24 @@ function showInfoSplash(specID, overridePage=null) {
 }
 function makeMovesetRow(fid, item, table) {
   const moveRow = document.createElement('div');  moveRow.className = 'moveset-row';
-  const thisProcs = fidToProc[fid-fidThreshold[0]];
+  const procs = fidToProc[fid-fidThreshold[0]];
   moveRow.innerHTML = `<div style="color:${moveSrcText(item[fid],table)}</div>
-    <div style="color:${typeColors[thisProcs[0]]};">${fidToName[fid]}</div>
-    <div style="color:${moveCatColor[thisProcs[1]]}">${(thisProcs[2]==-1?'-':thisProcs[2])}</div>
-    <div style="color:${thisProcs[7].includes(21)?'rgb(239, 131, 131)'
-      :(thisProcs[7].includes(22)?'rgb(247, 82, 49)':(thisProcs[7].includes(20)?'rgb(216, 143, 205)'
-      :'rgb(255, 255, 255)'))};">${(thisProcs[3]==-1?'-':thisProcs[3])}</div>
-    <div>${thisProcs[4]}</div>`;
+    <div style="color:${typeColors[procs[0]]};">${fidToName[fid]}</div>
+    <div style="color:${moveCatColor[procs[1]]}">${(procs[2]==-1?'-':procs[2])}</div>
+    <div style="color:${procs[7].includes(1)?col.re:(procs[7].includes(2)?col.dr:(procs[7].includes(0)?col.pi:col.wh))};">
+      ${(procs[3]==-1?'-':procs[3])}</div>
+    <div>${procs[4]}</div>`;
   moveRow.addEventListener('click', () => showDescSplash(fid));
   movesetScrollable.appendChild(moveRow);
 }
 function moveSrcText(src, table) {
   // src = -1:mushroom, 0:evo, 1-200:level, 201-203:egg/TM, 204:egg, 205-207:rare/TM, 208:rare, 209-211:TM
   if (table == 0) { // Level moves
-    if (src == -1 ) return `rgb(251, 173, 124);"><img src="ui/mem.png"></img>`;
-    if (src ==  0 ) return `rgb(131, 182, 239);">${altText[18]}`;
-    else return `rgb(255, 255, 255);">${src}`;
+    if (src == -1) return `${col.or};"><img src="ui/mem.png"></img>`;
+    if (src ==  0) return `${col.bl};">${altText[18]}`;
+    else return `${col.wh};">${src}`;
   } else if (table == 1) { // Egg moves
-    return `${src < 205 ? 'rgb(255, 255, 255)':'rgb(240, 230, 140)'};">${altText[19]}`
+    return `${src < 205 ? col.wh:col.ye};">${altText[19]}`
   } else { // TM moves
     return `${tmColors[src%4-1]};">${(altText[16].length > 2 ? 'TM' : altText[16])}`
   }
@@ -574,31 +577,11 @@ function changeMoveset(indexChange) {
     }
 }
 
-function showDescSplash(fid) {
+function showDescSplash(fid) { // Create the ability/move splash **************************
   splashContent.style.width = '300px';
-  const thisDesc = fidToDesc[fid-fidThreshold[0]];
   splashContent.innerHTML = `<b>${fidToName[fid]}</b><hr>`; // Name header
-  const thisProcs = fidToProc[fid-fidThreshold[0]];
-  if (fid<fidThreshold[1]) { // For abilities
-    splashContent.innerHTML = `<b>${fidToName[fid]}</b><hr>${thisDesc}<br>`;
-    // if (thisDesc[1]) { // If there is a custom description
-    //   splashContent.innerHTML += `<p style="color:rgb(145, 145, 145); margin:0px; margin-top:8px;">${thisDesc[1]}</p>`;
-    // }
-    if (thisProcs[0] || thisProcs[1]) {
-      const splashMoveTags = document.createElement('div');  splashMoveTags.className = 'splash-move-tags';
-      thisProcs[0].forEach((thisProc) => { // Procs for stat boosts etc.
-        const procChance = ((thisProc[0]>0)?`${thisProc[0]}% `:'');
-        const procStages = ((thisProc[2]=='0')?'':` ${(thisProc[0]==-2?'× ':(thisProc[2]>0?'+':''))}${thisProc[2]}${thisProc[0]==-3?'%':''}`);
-        splashMoveTags.innerHTML += `<p>${procChance}${procToDesc[thisProc[1]]}${procStages}</p>`;
-      });
-      if (thisProcs[1].includes(51)) splashMoveTags.innerHTML += "<p style='color:rgb(240, 230, 140);'>Partially Implemented</p>";
-      if (thisProcs[1].includes(50)) splashMoveTags.innerHTML += "<p style='color:rgb(239, 131, 131);'>Not Implemented</p>";
-      if (thisProcs[1].includes(2)) splashMoveTags.innerHTML += "<p>Can't be suppressed</p>";
-      if (thisProcs[1].includes(3)) splashMoveTags.innerHTML += "<p>Can't be replaced</p>";
-      if (thisProcs[1].includes(4)) splashMoveTags.innerHTML += "<p>Can't be ignored</p>";
-      splashContent.appendChild(splashMoveTags);
-    }
-  } else { // For moves
+  const thisProcs = fidToProc[fid-fidThreshold[0]]; // List of atts, procs, tags
+  if (fid>=fidThreshold[1]) { // For moves only
     const splashMoveRow = document.createElement('div');  splashMoveRow.className = 'splash-move-row';
     altText.slice(4,8).forEach((attName,index) => { // Show type and damage category, then Power, Accuracy, PP
       const splashMoveCol = document.createElement('div');
@@ -606,103 +589,26 @@ function showDescSplash(fid) {
       else splashMoveCol.innerHTML = `${attName}<br>${(thisProcs[1+index]==-1 ? '-' : thisProcs[1+index])}`;
       splashMoveRow.appendChild(splashMoveCol);
     });
-    splashContent.appendChild(splashMoveRow);
-    splashContent.innerHTML += `<hr>${thisDesc}`; // Show move description
-    // if (thisDesc[1]) { // If there is a custom description
-    //   splashContent.innerHTML += `<p style="color:rgb(145, 145, 145); margin:0px; margin-top:8px;">${thisDesc[1]}</p>`;
-    // }
-    // Add all descriptions for priority, targets, procs, tags
-    if (thisProcs[5] || thisProcs[6] || thisProcs[7]) {
-      const splashMoveTags = document.createElement('div');  splashMoveTags.className = 'splash-move-tags';
-      if (thisProcs[5] > 0) { // If non-zero priority
-        splashMoveTags.innerHTML += `<p style="color:rgb(143, 214, 154);">Priority: +${thisProcs[5]}</p>`;
-      } else if (thisProcs[5] < 0) {
-        splashMoveTags.innerHTML += `<p style="color:rgb(239, 131, 131);">Priority: ${thisProcs[5]}</p>`;
-      }
-      // Reworked
-      tagToDesc.forEach((thisDesc,index) => {
-        const tagColor = '';
-        if (index==0) tagColor = "rgb(216, 143, 205)";
-        if (index==1) tagColor = "rgb(239, 131, 131)";
-        if (index==2) tagColor = "rgb(247, 82, 49)";
-        if (tagColor) tagColor = ` style="color:${tagColor};"`;
-        if (thisProcs[7].includes(index)) splashMoveTags.innerHTML += `<p${tagColor}>${thisDesc}</p>`;
-        if (index == 2) { // Show procs after targets
-          thisProcs[6].forEach((thisProc) => { // Procs for stats, status, flinch, etc.
-            const procChance = ((thisProc[0] == '-1') ? '' : `${thisProc[0]}% `);
-            const procStages = ((thisProc[2] == '0') ? '' : ` ${(thisProc[2] > 0 ? '+' : '')}${thisProc[2]}`);
-            splashMoveTags.innerHTML += `<p>${procChance}${procToDesc[thisProc[1]]}${procStages}</p>`;
-          });
-        }
-      });
-      // Original
-      // if (thisProcs[7].includes(20)) {splashMoveTags.innerHTML += '<p style="color:rgb(216, 143, 205);">Targets: Random Enemy</p>';};
-      // if (thisProcs[7].includes(21)) {splashMoveTags.innerHTML += '<p style="color:rgb(239, 131, 131);">Targets: All Enemies</p>';};
-      // if (thisProcs[7].includes(22)) {splashMoveTags.innerHTML += '<p style="color:rgb(247, 82, 49);">Targets: Entire Field</p>';};
-      thisProcs[6].forEach((thisProc) => { // Procs for stats, status, flinch, etc.
-        const procChance = ((thisProc[0] == '-1') ? '' : `${thisProc[0]}% `);
-        const procStages = ((thisProc[2] == '0') ? '' : ` ${(thisProc[2] > 0 ? '+' : '')}${thisProc[2]}`);
-        splashMoveTags.innerHTML += `<p>${procChance}${procToDesc[thisProc[1]]}${procStages}</p>`;
-      });
-      if (thisProcs[7].includes(60)) {splashMoveTags.innerHTML += "<p>User Atk maxed</p>";};
-      if (thisProcs[7].includes(0))  {splashMoveTags.innerHTML += "<p>High Critical Ratio</p>";};
-      if (thisProcs[7].includes(1))  {splashMoveTags.innerHTML += "<p>Guaranteed Critical Hit</p>";};
-      if (thisProcs[7].includes(2))  {splashMoveTags.innerHTML += "<p>User Critical Rate +2</p>";};
-      if (thisProcs[7].includes(59)) {splashMoveTags.innerHTML += "<p>Costs 33% of HP</p>";};
-      if (thisProcs[7].includes(35)) {splashMoveTags.innerHTML += "<p>Costs 50% of HP</p>";};
-      if (thisProcs[7].includes(34)) {splashMoveTags.innerHTML += "<p>Recoil 50% of HP</p>";};
-      if (thisProcs[7].includes(37)) {splashMoveTags.innerHTML += "<p>Recoil 50% of damage</p>";};
-      if (thisProcs[7].includes(36)) {splashMoveTags.innerHTML += "<p>Recoil 33% of damage</p>";};
-      if (thisProcs[7].includes(53)) {splashMoveTags.innerHTML += "<p>Recoil 25% of damage</p>";};
-      if (thisProcs[7].includes(46)) {splashMoveTags.innerHTML += "<p>30% deal 2x damage</p>";};
-      if (thisProcs[7].includes(27)) {splashMoveTags.innerHTML += "<p>Heals Status Effects</p>";};
-      if (thisProcs[7].includes(28)) {splashMoveTags.innerHTML += "<p>Heals Status Effects</p>";};
-      if (thisProcs[7].includes(29)) {splashMoveTags.innerHTML += "<p>Heals Sleep</p>";};
-      if (thisProcs[7].includes(30)) {splashMoveTags.innerHTML += "<p>Heals Freeze</p>";};
-      if (thisProcs[7].includes(31)) {splashMoveTags.innerHTML += "<p>Heals Paralysis</p>";};
-      if (thisProcs[7].includes(32)) {splashMoveTags.innerHTML += "<p>Heals Burn</p>";};
-      if (thisProcs[7].includes(39)) {splashMoveTags.innerHTML += "<p>Heals 100% damage dealt</p>";};
-      if (thisProcs[7].includes(40)) {splashMoveTags.innerHTML += "<p>Heals 75% damage dealt</p>";};
-      if (thisProcs[7].includes(42)) {splashMoveTags.innerHTML += "<p>Heals 50% damage dealt</p>";};
-      if (thisProcs[7].includes(41)) {splashMoveTags.innerHTML += "<p>Heals by target's Atk</p>";};
-      if (thisProcs[7].includes(5))  {splashMoveTags.innerHTML += "<p>No effect on Grass/Overcoat</p>";};
-      if (thisProcs[7].includes(55)) {splashMoveTags.innerHTML += "<p>No seeding on Grass Types</p>";};
-      if (thisProcs[7].includes(13)) {splashMoveTags.innerHTML += "<p>Triggers Triage ability</p>";};
-      if (thisProcs[7].includes(9))  {splashMoveTags.innerHTML += "<p>Triggers Dancer ability</p>";};
-      if (thisProcs[7].includes(16)) {splashMoveTags.innerHTML += "<p>Triggers Wind Rider</p>";};
-      if (thisProcs[7].includes(7))  {splashMoveTags.innerHTML += "<p>Boosted by Sharpness</p>";};
-      if (thisProcs[7].includes(8))  {splashMoveTags.innerHTML += "<p>Boosted by Iron Fist</p>";};
-      if (thisProcs[7].includes(11)) {splashMoveTags.innerHTML += "<p>Boosted by Mega Launcher</p>";};
-      if (thisProcs[7].includes(12)) {splashMoveTags.innerHTML += "<p>Boosted by Strong Jaw</p>";};
-      if (thisProcs[7].includes(33)) {splashMoveTags.innerHTML += "<p>Boosted by Reckless</p>";};
-      if (thisProcs[7].includes(10)) {splashMoveTags.innerHTML += "<p>No effect on Bulletproof</p>";};
-      if (thisProcs[7].includes(14)) {splashMoveTags.innerHTML += "<p>Sound based move</p><p>Ignores Substitute</p>";};
-      if (thisProcs[7].includes(15)) {splashMoveTags.innerHTML += "<p>Prevented by Damp ability</p>";};
-      if (thisProcs[7].includes(54)) {splashMoveTags.innerHTML += "<p>Ignores Abilities</p>";};
-      if (thisProcs[7].includes(17)) {splashMoveTags.innerHTML += "<p>Ignores Protect</p>";};
-      if (thisProcs[7].includes(18)) {splashMoveTags.innerHTML += "<p>Ignores Substitute</p>";};
-      if (thisProcs[7].includes(19)) {splashMoveTags.innerHTML += "<p>Target switches out</p>";};
-      if (thisProcs[7].includes(52)) {splashMoveTags.innerHTML += "<p>User switches out</p>";};
-      if (thisProcs[7].includes(23)) {splashMoveTags.innerHTML += "<p>Hits 2 times</p>";};
-      if (thisProcs[7].includes(24)) {splashMoveTags.innerHTML += "<p>Hits 3 times</p>";};
-      if (thisProcs[7].includes(25)) {splashMoveTags.innerHTML += "<p>Hits 10 times</p>";};
-      if (thisProcs[7].includes(26)) {splashMoveTags.innerHTML += "<p>Hits 2-5 times</p>";};
-      if (thisProcs[7].includes(38)) {splashMoveTags.innerHTML += "<p>Repeats for 2-3 turns</p>";};
-      if (thisProcs[7].includes(43)) {splashMoveTags.innerHTML += "<p>One Hit KO move</p><p style='color:rgb(240, 230, 140);'>Modified against Bosses</p>";};
-      if (thisProcs[7].includes(44)) {splashMoveTags.innerHTML += "<p>Removes hazards</p>";};
-      if (thisProcs[7].includes(45)) {splashMoveTags.innerHTML += "<p>Traps and damages target</p>";};
-      // if (thisProcLine[7].includes(6)) {splashMoveTags.innerHTML += "<p>Can be reflected</p>";};
-      if (thisProcs[7].includes(47)) {splashMoveTags.innerHTML += "<p>Can't be redirected</p>";};
-      if (thisProcs[7].includes(48)) {splashMoveTags.innerHTML += "<p>Always hits in Rain</p>";};
-      if (thisProcs[7].includes(56)) {splashMoveTags.innerHTML += "<p>User can't switch out</p>";};
-      if (thisProcs[7].includes(57)) {splashMoveTags.innerHTML += "<p>Target can't switch out</p>";};
-      if (thisProcs[7].includes(58)) {splashMoveTags.innerHTML += "<p>User & Target can't switch out</p>";};
-      if (thisProcs[7].includes(49)) {splashMoveTags.innerHTML += "<p style='color:rgb(239, 131, 131);'>No effect on Bosses</p>";};
-      if (thisProcs[7].includes(4))  {splashMoveTags.innerHTML += "<p>Makes Contact</p>";};
-      if (thisProcs[7].includes(51)) {splashMoveTags.innerHTML += "<p style='color:rgb(240, 230, 140);'>Partially Implemented</p>";};
-      if (thisProcs[7].includes(50)) {splashMoveTags.innerHTML += "<p style='color:rgb(239, 131, 131);'>Not Implemented</p>";};
-      splashContent.appendChild(splashMoveTags);
+    splashContent.appendChild(splashMoveRow);  splashContent.appendChild(document.createElement('hr'));
+  }
+  splashContent.innerHTML += fidToDesc[fid-fidThreshold[0]]; // Description of ability/move
+  if (fid>=fidThreshold[1] ? thisProcs[5]||thisProcs[6]||thisProcs[7] : thisProcs[0]||thisProcs[1]) {
+    const splashMoveTags = document.createElement('div');  splashMoveTags.className = 'splash-move-tags';
+    if (fid>=fidThreshold[1] && thisProcs[5] != 0) { // If a non-zero priority move
+      splashMoveTags.innerHTML += `<p style="color:${thisProcs[5]>0?col.ge:col.re};">Priority: ${thisProcs[5]>0?'+':''}${thisProcs[5]}</p>`;
     }
+    tagToDesc.forEach((thisDesc,index) => { // Check all tags for a match
+      const tagColor = (index in tagColors ? ` style="color:${tagColors[index]};"` : '');
+      if (thisProcs[7-6*(fid<fidThreshold[1])].includes(index)) splashMoveTags.innerHTML += `<p${tagColor}>${thisDesc}</p>`;
+      if (index == 2) { // Show procs after targets
+        thisProcs[6-6*(fid<fidThreshold[1])].forEach((thisProc) => { // Procs for stat boost, status, flinch, etc.
+          const procChance = ((thisProc[0]>0)?`${thisProc[0]}% `:'');
+          const procStages = ((thisProc[2]=='0')?'':` ${(thisProc[0]==-2?'× ':(thisProc[2]>0?'+':''))}${thisProc[2]}${thisProc[0]==-3?'%':''}`);
+          splashMoveTags.innerHTML += `<p>${procChance}${procToDesc[thisProc[1]]}${procStages}</p>`;
+        });
+      }
+    });
+    splashContent.appendChild(splashMoveTags);
   }
   if (!lockedFilters.includes(fid)) { // Button to add ability/move directly to filters
     const splashButton = document.createElement('div'); splashButton.className = 'splash-button'; 
@@ -713,37 +619,38 @@ function showDescSplash(fid) {
   }
   splashScreen.classList.add("show");
 }
+
 function fidToCategory(fid) {
   for (let index = 0; index < catToName.length; index++) {
     if (fid < fidThreshold[index]) return catToName[index]
   }
 }
 function fidToColor(fid) {
-  if (fid < fidThreshold[0]) return ['rgb(255, 255, 255)', typeColors[fid]];
-  if (fid < fidThreshold[1]) return ['rgb(140, 130, 240)', 'rgb(255, 255, 255)'];
-  if (fid < fidThreshold[2]) return ['rgb(145, 145, 145)', 'rgb(255, 255, 255)'];
-  if (fid < fidThreshold[3]) return ['rgb(131, 182, 239)', 'rgb(255, 255, 255)'];
-  if (fid < fidThreshold[4]) return ['rgb(240, 230, 140)', 'rgb(255, 255, 255)'];
-  if (fid < fidThreshold[5]) return ['rgb(216, 143, 205)', 'rgb(255, 255, 255)'];
-  if (fid < fidThreshold[6]) return ['rgb(255, 255, 255)', 'rgb(239, 131, 131)'];
-  if (fid < fidThreshold[7]) return ['rgb(255, 255, 255)', eggTierColors(fid)]
-  if (fid < fidThreshold[8]) return ['rgb( 83, 237, 229)', 'rgb(229, 80, 120)'];
-  if (fid < fidThreshold[9]) return ['rgb(143, 214, 154)', 'rgb(255, 255, 255)'];
-  else return ['rgb(255, 255, 255)', 'rgb(140, 130, 240)']; 
+  if (fid < fidThreshold[0]) return [col.wh, typeColors[fid]];
+  if (fid < fidThreshold[1]) return [col.pu, col.wh];
+  if (fid < fidThreshold[2]) return [col.ga, col.wh];
+  if (fid < fidThreshold[3]) return [col.bl, col.wh];
+  if (fid < fidThreshold[4]) return [col.ye, col.wh];
+  if (fid < fidThreshold[5]) return [col.pi, col.wh];
+  if (fid < fidThreshold[6]) return [col.wh, col.re];
+  if (fid < fidThreshold[7]) return [col.wh, eggTierColors(fid)]
+  if (fid < fidThreshold[8]) return [col.cy, col.dr];
+  if (fid < fidThreshold[9]) return [col.ge, col.wh];
+  else return [col.wh, col.pu]; 
 }
 function abToColor(src) {
-  if (src == 'ha') return ([0,2].includes(headerState.ability) ? 'rgb(240, 230, 140)':'rgb(105,105,105)')
-  if (src == 'pa') return ([0,3].includes(headerState.ability) ? 'rgb(140, 130, 240)':'rgb(145,145,145)')
-  return ([0,1].includes(headerState.ability) ? 'rgb(255, 255, 255)':'rgb(145,145,145)')
+  if (src == 'ha') return ([0,2].includes(headerState.ability) ? col.ye:col.dg)
+  if (src == 'pa') return ([0,3].includes(headerState.ability) ? col.pu:col.ga)
+  return ([0,1].includes(headerState.ability) ? col.wh:col.ga)
 }
 function eggTierColors(fid) {
   if (fid >= fidThreshold[6]) fid -= fidThreshold[6];
-  if (fid == 0) return 'rgb(255, 255, 255)';
-  if (fid == 1) return 'rgb(131, 182, 239)';
-  if (fid == 2) return 'rgb(240, 230, 140)';
-  if (fid == 3) return 'rgb(239, 131, 131)';
-  if (fid == 4) return 'rgb(216, 143, 205)';
-  if (fid == 5) return 'rgb(143, 214, 154)';
+  if (fid == 0) return col.wh;
+  if (fid == 1) return col.bl;
+  if (fid == 2) return col.ye;
+  if (fid == 3) return col.re;
+  if (fid == 4) return col.pi;
+  if (fid == 5) return col.ge;
   else { console.log('Invalid egg tier'); return null; }
 }
 function isMoveOrBiome(fid) {
@@ -788,7 +695,7 @@ function displaySuggestions() { // Get search query and clear the list
       newSugg.innerHTML = `<span style="color:${fidToColor(fid)[0]}; display:inline;">${fidToCategory(fid)}: 
                            <span style="color:${fidToColor(fid)[1]}; display:inline;">${fidToName[fid]}</span></span>`;
       newSugg.addEventListener("click", () => lockFilter(fid));
-      if (filterToEnter == fid && tabSelect != -1) newSugg.style.borderColor = 'rgb(140, 130, 240)';
+      if (filterToEnter == fid && tabSelect != -1) newSugg.style.borderColor = col.pu;
       suggestions.appendChild(newSugg);
     });
   }
@@ -869,7 +776,7 @@ function updateHeader(clickTarget = null, ignoreFlip = false) {
   const sortAttribute = clickTarget?.sortattr;
   const hasMovesBiomes = lockedFilters.some(f => isMoveOrBiome(f));
   // If clicking move column, with no moves/biomes filtered, toggle between egg moves and biomes
-  if (sortAttribute == 'moves' && !hasMovesBiomes) headerState.biome = !headerState.biome;
+  if (sortAttribute == 'moves' && !hasMovesBiomes && !ignoreFlip) headerState.biome = !headerState.biome;
   // Set the text of the move column, depending on if a move is filtered
   headerColumns[5].textDef = (hasMovesBiomes?`<span style="color:rgb(140, 130, 240);">${altText[0]}</span>`:
     (headerState.biome?`<span style="color:rgb(140, 130, 240);">${infoText[9]}</span>`:headerNames[5]));
