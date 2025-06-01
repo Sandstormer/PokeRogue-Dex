@@ -1,11 +1,8 @@
 // script.js
 // pokedex_data.js: items
-// filters_global.js: typeColors, fidThreshold, fidToProc, tagToDesc
-// lang/en.js: headerNames, altText, catToName, fidToDesc, speciesNames, fidToName, helpMenuText
-  // headerNames = ['Dex','Shiny','Species','Types','Abilities','Egg Moves','Cost','BST','HP','Atk','Def','SpA','SpD','Spe'];
-  // altText = ['Moves','(Main Only)','(Hidden Only)','(Passive Only)','Search','Pow','Acc','PP'];
-  // catToName = ['Type','Ability','Move','Generation','Cost','Gender','Mode','Egg Tier'];
-// TBD: procToDesc, warningText, menuText
+// filters_global.js: typeColors, fidThreshold, fidToProc
+// lang/en.js: headerNames, altText, catToName, fidToDesc, speciesNames, fidToName, helpMenuText, procTodesc, fidToDesc
+// TBD: warningText
     
 const itemList = document.getElementById('itemList');
 const searchBox = document.getElementById('searchBox');
@@ -28,7 +25,7 @@ const LanguageNames  = ["English","Français","한국어 (Hangugeo)","简体中�
 const col = {pu:'rgb(140, 130, 240)', wh:'rgb(255, 255, 255)', ga:'rgb(145, 145, 145)', dg:'rgb(105, 105, 105)',
              bl:'rgb(131, 182, 239)', ye:'rgb(240, 230, 140)', re:'rgb(239, 131, 131)', pi:'rgb(216, 143, 205)',
              ge:'rgb(143, 214, 154)', or:'rgb(251, 173, 124)', cy:'rgb( 83, 237, 229)', dr:'rgb(247, 82,  49)'};
-const tagColors = {0:col.pi, 1:col.re, 2:col.dr, 57:col.ye, 58:col.re, 60:col.ye, 61:col.re};
+const tagColors = {0:col.pi, 1:col.re, 2:col.dr, 57:col.ye, 58:col.re, 61:col.ye, 62:col.re};
 const moveCatColor = [col.or,col.bl,col.wh];
 const tmColors = [col.wh,col.bl,col.ye];
 const flipStats = {bst:'bst',hp:'spe',atk:'spd',def:'spa',spa:'def',spd:'atk',spe:'hp'};
@@ -59,12 +56,6 @@ let splashState = { species: -1, page: 0 } // Species shown, page(moveset=0,biom
 //   // Setup
 //   // Priority
 // }
-
-procToDesc = [
-  "User Atk","User Def","User SpAtk","User SpDef","User Speed","User Accuracy","User Evasion",
-  "Atk","Def","SpAtk","SpDef","Speed","Accuracy","Evasion",
-  "Applies Poison","Applies Toxic","Applies Sleep","Applies Freeze","Applies Paralysis","Applies Burn","Applies Confuse",
-  "Flinch","User Atk/Def/SpA/SpD/Spe","Poison/Para/Sleep","Burn/Para/Freeze","Stellar User Atk/SpAtk","Damage"];
   
 // Perform initial display with detected language
 let pageLang = detectLanguage();
@@ -145,8 +136,6 @@ function refreshAllItems() { // Display items based on query and locked filters 
   } 
   // Filter from headers ==============
   if (headerState.ability == 2) filteredItemIDs = filteredItemIDs.filter(fid => 'ha' in items[fid]);
-  // Only show items that have that tier of shiny
-  if (headerState.shiny > 1)    filteredItemIDs = filteredItemIDs.filter(fid => items[fid].sh >= headerState.shiny);
   // Filter from locked filters ==============
   if (lockedFilters.length > 0) {
     filteredItemIDs = filteredItemIDs.filter(specID => // Search for filters with their fid as key
@@ -164,6 +153,8 @@ function refreshAllItems() { // Display items based on query and locked filters 
           if (fid  <  fidThreshold[7]-1) return items[specID].et === fid - fidThreshold[6]; // Egg tier filter
           if (fid === fidThreshold[7]-1) return [1,2,3].includes(items[specID]?.ee); // Egg exclusive
           if (fid === fidThreshold[7]) return 'nv' in items[specID]; // New variants
+          if (fid === fidThreshold[7]+1) return items[specID].sh == 3; // All variants
+          if (fid === fidThreshold[7]+2) return items[specID].sh == 1; // No variants
           if (fid  <  fidThreshold[9]) return fid in items[specID]; // Biome filter
           if (fid  <  fidThreshold[10]) return items[specID]?.fa === fid; // Family filter
           console.warn('Filter error'); return fid in items[specID];
@@ -443,15 +434,15 @@ function renderMoreItems() { // Create each list item, with columns of info ****
 }
 function makeBiomeDesc(src, isSmall=0) {
   const offset = isSmall*6;
-  if      (src == 1) return `rgb(255, 255, 255);">${biomeText[0+offset]}`;
-  else if (src == 2) return `rgb(131, 182, 239);">${biomeText[1+offset]}`;
-  else if (src == 3) return `rgb(131, 182, 239);">${biomeText[5]} ${biomeText[0+offset]}`;
-  else if (src == 4) return `rgb(240, 230, 140);">${biomeText[2+offset]}`;
-  else if (src == 5) return `rgb(240, 230, 140);">${biomeText[5]} ${biomeText[2+offset]}`;
-  else if (src == 6) return `rgb(239, 131, 131);">${biomeText[3+offset]}`;
-  else if (src == 7) return `rgb(239, 131, 131);">${biomeText[5]} ${biomeText[3+offset]}`;
-  else if (src == 8) return `rgb(216, 143, 205);">${biomeText[4+offset]}`;
-  else if (src == 9) return `rgb(216, 143, 205);">${biomeText[5]} ${biomeText[4+offset]}`;
+  if      (src == 1) return `${col.wh};">${biomeText[0+offset]}`;
+  else if (src == 2) return `${col.bl};">${biomeText[1+offset]}`;
+  else if (src == 3) return `${col.bl};">${biomeText[5]} ${biomeText[0+offset]}`;
+  else if (src == 4) return `${col.ye};">${biomeText[2+offset]}`;
+  else if (src == 5) return `${col.ye};">${biomeText[5]} ${biomeText[2+offset]}`;
+  else if (src == 6) return `${col.re};">${biomeText[3+offset]}`;
+  else if (src == 7) return `${col.re};">${biomeText[5]} ${biomeText[3+offset]}`;
+  else if (src == 8) return `${col.pi};">${biomeText[4+offset]}`;
+  else if (src == 9) return `${col.pi};">${biomeText[5]} ${biomeText[4+offset]}`;
 }
 
 function makeMovesetHeader(specID) { // Create the moveset/info splash **************************
@@ -516,12 +507,12 @@ function showInfoSplash(specID, overridePage=null) {
     const splashCostInfo = document.createElement('div');  splashCostInfo.className = 'splash-move-tags';
     // Info on friendship and candy
     splashCostInfo.innerHTML = `
-      <p>${infoText[0]}: <span style="color:rgb(239, 131, 131)";>${upgradeCosts[item.co-1][4]}</span> <img src="ui/fren.png"></p>
+      <p>${infoText[0]}: <span style="color:${col.re}";>${upgradeCosts[item.co-1][4]}</span> <img src="ui/fren.png"></p>
       <p>${infoText[1]}: <span style="color:${col.pu}";>${upgradeCosts[item.co-1][0]}</span> <img src="ui/candy.png" style="margin-bottom:-2px;"></p>
-      <p>${infoText[2]}: <span style="color:rgb(131, 182, 239)";>${upgradeCosts[item.co-1][1]}</span> &
-        <span style="color:rgb(240, 230, 140)";> ${upgradeCosts[item.co-1][2]}<span> <img src="ui/candy.png" style="margin-bottom:-2px;"></p>
+      <p>${infoText[2]}: <span style="color:${col.bl}";>${upgradeCosts[item.co-1][1]}</span> &
+        <span style="color:${col.ye}";> ${upgradeCosts[item.co-1][2]}<span> <img src="ui/candy.png" style="margin-bottom:-2px;"></p>
       <p>${infoText[3]}: ${upgradeCosts[item.co-1][3]} <img src="ui/candy.png" style="margin-bottom:-2px;">
-      <span style="color:rgb(145, 145, 145); font-size:12px;"><br>${altText[12]}: 1 in ${REMchance[item.et]}</span></p>
+      <span style="color:${col.ga}; font-size:12px;"><br>${altText[12]}: 1 in ${REMchance[item.et]}</span></p>
       `;
     movesetScrollable.appendChild(splashCostInfo);
   } else { // Show moveset
@@ -603,7 +594,7 @@ function showDescSplash(fid) { // Create the ability/move splash ***************
   if (fid>=fidThreshold[1] ? thisProcs[5]||thisProcs[6]||thisProcs[7] : thisProcs[0]||thisProcs[1]) {
     const splashMoveTags = document.createElement('div');  splashMoveTags.className = 'splash-move-tags';
     if (fid>=fidThreshold[1] && thisProcs[5] != 0) { // If a non-zero priority move
-      splashMoveTags.innerHTML += `<p style="color:${thisProcs[5]>0?col.ge:col.re};">Priority: ${thisProcs[5]>0?'+':''}${thisProcs[5]}</p>`;
+      splashMoveTags.innerHTML += `<p style="color:${thisProcs[5]>0?col.ge:col.re};">${procToDesc[27]}: ${thisProcs[5]>0?'+':''}${thisProcs[5]}</p>`;
     }
     tagToDesc.forEach((thisDesc,index) => { // Check all tags for a match
       const tagColor = (index in tagColors ? ` style="color:${tagColors[index]};"` : '');
@@ -642,7 +633,7 @@ function fidToColor(fid) {
   if (fid < fidThreshold[5]) return [col.pi, col.wh];
   if (fid < fidThreshold[6]) return [col.wh, col.re];
   if (fid < fidThreshold[7]) return [col.wh, eggTierColors(fid)]
-  if (fid < fidThreshold[8]) return [col.cy, col.dr];
+  if (fid < fidThreshold[8]) return [col.cy, col.wh];
   if (fid < fidThreshold[9]) return [col.ge, col.wh];
   else return [col.wh, col.pu]; 
 }
@@ -729,8 +720,11 @@ function lockFilter(newLockFID) {
     // Clear the search bar after locking
     searchBox.value = ""; 
     updateFilterGroups();   
-    if (newLockFID === fidThreshold[7] && headerState.shiny == 0) updateHeader(headerColumns[1]);
-    if (sortState.column === 'row' && isMoveOrBiome(newLockFID)) {
+    if ((newLockFID == fidThreshold[7] || newLockFID == fidThreshold[7]+1) && headerState.shiny == 0) {
+      updateHeader(headerColumns[1]);
+    } else if (newLockFID == fidThreshold[7]+2 && headerState.shiny > 1) {
+      headerState.shiny = 0; updateHeader(headerColumns[1]);
+    } else if (sortState.column === 'row' && isMoveOrBiome(newLockFID)) {
       updateHeader(headerColumns[5]);
     } else {
       updateHeader(null, true); // Update header, then refresh items and suggestions
@@ -747,7 +741,9 @@ function removeFilter(fidToRemove, filterTag, filterModToRemove) {
   lockedFilterMods = lockedFilterMods.filter( (f) => f != filterModToRemove ); // Remove from the mod list
   if (filterModToRemove) filterModToRemove.remove(); // Remove the actual mod element
   updateFilterGroups();  
-  if (fidToRemove == fidThreshold[7] && headerState.shiny == 3) { headerState.shiny = 0;  headerColumns[1].innerHTML = headerNames[1]; }
+  if ((fidToRemove == fidThreshold[7] || fidToRemove == fidThreshold[7]+1) && headerState.shiny > 1) { 
+    headerState.shiny = 0;  headerColumns[1].innerHTML = headerNames[1]; 
+  }
   // Reset the sorting if there aren't any more locked moves
   if (sortState.column === 'moves' && !lockedFilters.some(f => (f >= isMoveOrBiome(f)))) { 
     updateHeader(headerColumns[0]); 
@@ -790,12 +786,15 @@ function updateHeader(clickTarget = null, ignoreFlip = false) {
     (headerState.biome?`<span style="color:rgb(140, 130, 240);">${infoText[9]}</span>`:headerNames[5]));
   // Find the new sorting attribute, and update the headers
   if (sortAttribute == 'shiny') { // Toggle the global shiny state
-    headerState.shiny = (headerState.shiny+3)%4;
+    headerState.shiny = (headerState.shiny+3)%(4-2*lockedFilters.some(f => f == fidThreshold[7]+2));
     if (headerState.shiny) {
       headerColumns[1].innerHTML = `<span style="color:rgb(140, 130, 240);">${headerNames[1]}</span>`;
       const starImg = document.createElement('img');  starImg.className = 'star-header';
       starImg.src = `ui/shiny${headerState.shiny}.png`;
       headerColumns[1].appendChild(starImg);
+      if (headerState.shiny == 3 && !lockedFilters.some(f => f == fidThreshold[7] || f == fidThreshold[7]+1)) {
+        lockFilter(fidThreshold[7]+1);
+      }
     } else {
       headerColumns[1].innerHTML = headerNames[1];
     }
