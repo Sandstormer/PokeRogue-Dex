@@ -77,7 +77,7 @@ tagToDesc = [
 "Hits 2 times",
 "Hits 3 times",
 "Hits 10 times",
-"Hits 2-5 times",
+"Hits 2 to 5 times",
 "Repeats for 2-3 turns",
 "Removes hazards",
 "Traps and damages target",
@@ -4328,13 +4328,15 @@ helpMenuText = `
 <hr>
 <p style="margin: 10px; font-weight: bold;">使用 <span style="color:rgb(140, 130, 240);">搜索栏</span> 添加筛选条件：<br></p>
 <p style="margin: 10px; font-weight: bold;"><span style="color:${typeColors[9]};">${catToName[0]}</span>, 
-<span style="color:${fidToColor(fidThreshold[0])[0]};">${catToName[1]}</span>, 
-<span style="color:${fidToColor(fidThreshold[1])[0]};">${catToName[2]}</span>, 
-<span style="color:${fidToColor(fidThreshold[2])[0]};">${catToName[3]}</span>, 
-<span style="color:${fidToColor(fidThreshold[3])[0]};">${catToName[4]}</span>,<br>
-<span style="color:${fidToColor(fidThreshold[4])[0]};">${catToName[5]}</span>,  
-<span style="color:${fidToColor(fidThreshold[5])[1]};">${fidToName[fidThreshold[5]]}</span>,
-<span style="color:${eggTierColors(1)};">${catToName[7]}</span></p>
+<span style="color:${fidToColor(fidThreshold[0])[0]};">${catToName[1]}</span>,
+<span style="color:${fidToColor(fidThreshold[1])[0]};">${catToName[2]}</span>,
+<span style="color:${fidToColor(fidThreshold[2])[0]};">${catToName[3]}</span>,
+<span style="color:${fidToColor(fidThreshold[3])[0]};">${catToName[4]}</span>,
+<span style="color:${fidToColor(fidThreshold[4])[0]};">${catToName[5]}</span>,<br>
+<span style="color:${fidToColor(fidThreshold[5])[1]};">${catToName[6]}</span>,
+<span style="color:${eggTierColors(2)};">${catToName[7]}</span>,
+<span style="color:${fidToColor(fidThreshold[7])[0]};">${headerNames[1]}</span>, or
+<span style="color:${fidToColor(fidThreshold[8])[0]};">${catToName[9]}</span></p>
 组合多个筛选条件以获得所需结果 <br>
 <span style="color:rgb(145, 145, 145);">点击筛选条件之间以匹配任意一个</span>
 <hr>
