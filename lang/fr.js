@@ -4351,7 +4351,7 @@ Combinez plusieurs filtres pour affiner la recherche <br>
 <p style="margin: 10px;"><b>${headerNames[6]}</b> affiche la couleur de <b>${catToName[7]}</b>:<br>
 <b>${fidToName[fidThreshold[6]]}</b>, <span style="color:rgb(131, 182, 239);"><b>${fidToName[fidThreshold[6]+1]}</b></span>, <span style="color:rgb(240, 230, 140);"><b>${fidToName[fidThreshold[6]+2]}</b></span>, <span style="color:rgb(239, 131, 131);"><b>${fidToName[fidThreshold[6]+3]}</b></span>, <span style="color:rgb(216, 143, 205);"><b>${fidToName[fidThreshold[6]+4]}</b></span></p>
 <hr>
-<p style="margin: 10px;">Cliquez pour <span style="color:rgb(240, 230, 140); font-weight: bold;">Épingler</span>, ou voir <a href="https://wiki.pokerogue.net/start" target="_blank"><b>Wiki</b></a> ou <span style="color:rgb(240, 230, 140); font-weight: bold;">Variantes</span></p>
+<p style="margin: 10px;">Cliquez pour <span style="color:rgb(240, 230, 140); font-weight: bold;">Épingler</span>, ou voir <a href="https://wiki.pokerogue.net/start" target="_blank"><b>Wiki</b></a> ou <span style="color:${fidToColor(fidThreshold[7])[0]}; font-weight: bold;">Variantes</span></p>
 <p style="margin: 10px;">Cliquez un <span style="color:rgb(140, 130, 240); font-weight: bold;">${catToName[1]}</span> ou <span style="color:rgb(140, 130, 240); font-weight: bold;">${catToName[2]}</span> pour descriptions</p>
 <hr style="margin-bottom: 10px;">
 <span style="color:rgb(145, 145, 145); font-size:11px">Ce site a été créé par Sandstorm, et traduit de l'anglais. Je ne collecte pas de données personnelles. Les images et données proviennent de Pokerogue Github. Tous les droits sont réservés à leurs créateurs.</span>`;

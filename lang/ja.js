@@ -4324,36 +4324,37 @@ fidToName = [
 'パルデアのケンタロス'
 ];
 helpMenuText = `
-<b>This is a <span style="color:rgb(140, 130, 240);">fast and powerful search</span> for PokeRogue</b>
+<b>PokeRogue 用の <span style="color:rgb(140, 130, 240);">高速・強力な検索</span></b>
 <hr>
-<p style="margin: 10px; font-weight: bold;">Use the <span style="color:rgb(140, 130, 240);">Search Bar</span> to add filters:<br></p>
+<p style="margin: 10px; font-weight: bold;">検索バーを使ってフィルターを追加：</p>
 <p style="margin: 10px; font-weight: bold;"><span style="color:${typeColors[9]};">${catToName[0]}</span>, 
-<span style="color:${fidToColor(fidThreshold[0])[0]};">${catToName[1]}</span>,
-<span style="color:${fidToColor(fidThreshold[1])[0]};">${catToName[2]}</span>,
-<span style="color:${fidToColor(fidThreshold[2])[0]};">${catToName[3]}</span>,
-<span style="color:${fidToColor(fidThreshold[3])[0]};">${catToName[4]}</span>,
-<span style="color:${fidToColor(fidThreshold[4])[0]};">${catToName[5]}</span>,<br>
-<span style="color:${fidToColor(fidThreshold[5])[1]};">${catToName[6]}</span>,
-<span style="color:${eggTierColors(2)};">${catToName[7]}</span>,
-<span style="color:${fidToColor(fidThreshold[7])[0]};">${headerNames[1]}</span>, or
+<span style="color:${fidToColor(fidThreshold[0])[0]};">${catToName[1]}</span>, 
+<span style="color:${fidToColor(fidThreshold[1])[0]};">${catToName[2]}</span>, 
+<span style="color:${fidToColor(fidThreshold[2])[0]};">${catToName[3]}</span>, 
+<span style="color:${fidToColor(fidThreshold[3])[0]};">${catToName[4]}</span>, 
+<span style="color:${fidToColor(fidThreshold[4])[0]};">${catToName[5]}</span>, <br>
+<span style="color:${fidToColor(fidThreshold[5])[1]};">${catToName[6]}</span>, 
+<span style="color:${eggTierColors(2)};">${catToName[7]}</span>, 
+<span style="color:${fidToColor(fidThreshold[7])[0]};">${headerNames[1]}</span>, 
 <span style="color:${fidToColor(fidThreshold[8])[0]};">${catToName[9]}</span></p>
-Combine multiple filters to get what you want <br>
-<span style="color:rgb(145, 145, 145);">Click between filters to match either filter</span>
+フィルターを組み合わせて検索<br>
+<span style="color:rgb(145, 145, 145);">クリックで「または」条件に変更</span>
 <hr>
-<p style="margin: 10px; font-weight: bold;">Click the <span style="color:rgb(140, 130, 240);">Headers</span> to sort results</p>
-<b>${headerNames[1]}</b> column can restrict to shiny variants
-<p style="margin: 10px;"><b>${headerNames[4]}</b> column can restrict to one slot:<br>
-<b>Main Abilities</b>, 
-<span style="color:rgb(240, 230, 140); font-weight: bold;">Hidden Ability</span>, or 
-<span style="color:rgb(140, 130, 240); font-weight: bold;">Passive</span></p>
-<b>${headerNames[5]}</b> are shown as <b>${fidToName[fidThreshold[6]]}</b> and <span style="color:rgb(240, 230, 140); font-weight: bold;">${fidToName[fidThreshold[6]+1]}</span><br> 
-<span style="color:rgb(145, 145, 145);">Can also show the source of filtered moves</span>
-<p style="margin: 10px;"><b>${headerNames[6]}</b> column shows color of <b>${catToName[7]}</b>:<br> 
+<p style="margin: 10px; font-weight: bold;"><span style="color:rgb(140, 130, 240);">ヘッダー</span> をクリックで並び替え</p>
+<b>${headerNames[1]}</b> 列では色違い（シャイニー）に限定可能です  
+<p style="margin: 10px;"><b>${headerNames[4]}</b> 列はスロット1つに絞れます: <br>
+<b>メイン特性</b>,  
+<span style="color:rgb(240, 230, 140); font-weight: bold;">${infoText[4]}</span>,  
+<span style="color:rgb(140, 130, 240); font-weight: bold;">${infoText[1]}</span></p>
+<b>${headerNames[5]}</b> は <b>${fidToName[fidThreshold[6]]}</b> と <span style="color:rgb(240, 230, 140); font-weight: bold;">${fidToName[fidThreshold[6]+1]}</span> として表示されます<br> 
+<span style="color:rgb(145, 145, 145);">フィルターされた技の入手元も表示可能です</span>
+<p style="margin: 10px;"><b>${headerNames[6]}</b> 列では <b>${catToName[7]}</b> の色を示します：<br> 
 <b>${fidToName[fidThreshold[6]]}</b>, <span style="color:rgb(131, 182, 239);"><b>${fidToName[fidThreshold[6]+1]}</b></span>, <span style="color:rgb(240, 230, 140);"><b>${fidToName[fidThreshold[6]+2]}</b></span>, <span style="color:rgb(239, 131, 131);"><b>${fidToName[fidThreshold[6]+3]}</b></span>, <span style="color:rgb(216, 143, 205);"><b>${fidToName[fidThreshold[6]+4]}</b></span></p>
 <hr>
-<p style="margin: 10px;">Click to <span style="color:rgb(240, 230, 140); font-weight: bold;">Pin</span> a Pokemon, or to see <a href="https://wiki.pokerogue.net/start" target="_blank"><b>Wiki</b></a> or <span style="color:rgb(240, 230, 140); font-weight: bold;">Shinies</span></p>
-<p style="margin: 10px;">Click an
-<span style="color:rgb(140, 130, 240); font-weight: bold;">${catToName[1]}</span> or 
-<span style="color:rgb(140, 130, 240); font-weight: bold;">${catToName[2]}</span> to see descriptions</p>
+<p style="margin: 10px;">ポケモンを <span style="color:rgb(240, 230, 140); font-weight: bold;">ピン留め</span> する, <a href="https://wiki.pokerogue.net/start" target="_blank"><b>Wiki</b></a> を見る,<br>または <span style="color:${fidToColor(fidThreshold[7])[0]}; font-weight: bold;">色違い</span> を確認できます</p><p style="margin: 10px;">以下をクリックして詳細を表示：<br>
+<span style="color:${col.wh}; font-weight: bold;">名前</span>, 
+<span style="color:${fidToColor(fidThreshold[3])[0]}; font-weight: bold;">${headerNames[6]}</span>, 
+<span style="color:${col.pu}; font-weight: bold;">${catToName[1]}</span>, 
+<span style="color:${col.pu}; font-weight: bold;">${catToName[2]}</span></p>
 <hr style="margin-bottom: 10px;">
-<span style="color:rgb(145, 145, 145); font-size:11px">This site was created by Sandstorm, with a lot of hard work. I do not store any cookies or collect any personal data. Images and game data are from the PokeRogue GitHub. All asset rights are retained by their original creators.</span>`;
+<span style="color:rgb(145, 145, 145); font-size:11px">このサイトは Sandstorm によって多大な努力のもと作成されました。クッキーは保存しておらず, 個人データの収集も行っていません。画像とゲームデータは PokeRogue の GitHub から取得しています。すべてのアセットの著作権は元の制作者に帰属します。</span>`;

@@ -4351,7 +4351,7 @@ helpMenuText = `
 <p style="margin: 10px;"><b>${headerNames[6]}</b> 열은 <b>${catToName[7]}</b>의 색상을 표시합니다:<br> 
 <b>${fidToName[fidThreshold[6]]}</b>, <span style="color:rgb(131, 182, 239);"><b>${fidToName[fidThreshold[6]+1]}</b></span>, <span style="color:rgb(240, 230, 140);"><b>${fidToName[fidThreshold[6]+2]}</b></span>, <span style="color:rgb(239, 131, 131);"><b>${fidToName[fidThreshold[6]+3]}</b></span>, <span style="color:rgb(216, 143, 205);"><b>${fidToName[fidThreshold[6]+4]}</b></span></p>
 <hr>
-<p style="margin: 10px;">포켓몬을 <span style="color:rgb(240, 230, 140); font-weight: bold;">고정</span> 하거나, <a href="https://wiki.pokerogue.net/start" target="_blank"><b>위키</b></a> 또는 <span style="color:rgb(240, 230, 140); font-weight: bold;">이로치</span> 확인.</p>
+<p style="margin: 10px;">포켓몬을 <span style="color:rgb(240, 230, 140); font-weight: bold;">고정</span> 하거나, <a href="https://wiki.pokerogue.net/start" target="_blank"><b>위키</b></a> 또는 <span style="color:${fidToColor(fidThreshold[7])[0]}; font-weight: bold;">이로치</span> 확인.</p>
 <p style="margin: 10px;">클릭하면
 <span style="color:rgb(140, 130, 240); font-weight: bold;">${catToName[1]}</span> 또는 
 <span style="color:rgb(140, 130, 240); font-weight: bold;">${catToName[2]}</span> 의 설명을 볼 수 있습니다.</p>
