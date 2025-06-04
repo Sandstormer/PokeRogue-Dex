@@ -1,6 +1,6 @@
 headerNames = ['Dex','Shiny','Species','Types','Abilities','Egg Moves','Cost','BST','HP','Atk','Def','SpA','SpD','Spe'];
 altText = ['Moves','Main Only','Hidden Only','Passive Only','Search','Pow','Acc','PP','Add to filters','Memory','Evolution','Egg Move','Rare Egg Move','Common','Great','Ultra','TM','Lv.','Evo','Egg'];
-catToName = ['Type','Ability','Move','Gen','Cost','Gender','Mode','Egg Tier','Shiny Variants','Biome','Related To'];
+catToName = ['Type','Ability','Move','Gen','Cost','Gender','Mode','Egg Tier','Shiny Variants','Biome','Related To','Tag'];
 biomeText = ['Common','Uncommon','Rare','Super Rare','Ultra Rare','Boss','Com.','Unc.','Rare','SR','UR','Dawn','Day','Dusk','Night'];
 infoText = ['Friendship per Candy','Passive','Cost Reduction','Species Egg','Hidden Ability','Egg Exclusive','Baby Exclusive','Paradox Pokemon','Form Change','Biomes'];
 procToDesc = [
@@ -4321,7 +4321,12 @@ fidToName = [
 'Hisui Growlithe',
 'Hisui Voltorb',
 'Hisui Zorua',
-'Paldea Tauros'
+'Paldea Tauros',
+'Lure Ability',
+'Ignores Abilities',
+'Ignores Abilities (Move)',
+'Target Switches Out',
+'Spread Moves'
 ];
 helpMenuText = `
 <b>This is a <span style="color:rgb(140, 130, 240);">fast and powerful search</span> for PokeRogue</b>
@@ -4338,7 +4343,7 @@ helpMenuText = `
 <span style="color:${fidToColor(fidThreshold[7])[0]};">${headerNames[1]}</span>, or
 <span style="color:${fidToColor(fidThreshold[8])[0]};">${catToName[9]}</span></p>
 Combine multiple filters to get what you want <br>
-<span style="color:rgb(145, 145, 145);">Click between filters to match either filter</span>
+<span style="color:rgb(145, 145, 145);">Click between filters to use the "OR" condition</span>
 <hr>
 <p style="margin: 10px; font-weight: bold;">Click the <span style="color:rgb(140, 130, 240);">Headers</span> to sort results</p>
 <b>${headerNames[1]}</b> column can restrict to shiny variants

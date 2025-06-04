@@ -18,10 +18,10 @@ const movesetScrollable = document.getElementById("movesetScrollable");
 const openHelpButton = document.getElementById("help-img");
 const openLangButton = document.getElementById("lang-img");
 const sortAttributes = ['row','shiny','sp','type','ab','moves','co','bst','hp','atk','def','spa','spd','spe'];
-const possibleFID = [...Array(fidThreshold[fidThreshold.length-1]).keys()];
+const possibleFID = [...Array(fidThreshold[fidThreshold.length-1]-3).keys()]; // Remove -3 *********
 const possibleSID = [...Array(items.length).keys()];
-const supportedLangs = ["en","fr","ko","zh-CN","ja"];//"it","es-ES","pt-BR","de"];
-const LanguageNames  = ["English","Français","한국어 (Hangugeo)","简体中文 (Jiǎntǐ Zhōngwén)","日本語 (Nihongo)"];//"Italiano","Español (España)","Português (Brasil)","Deutsch","繁體中文 (Fántǐ Zhōngwén)"];
+const supportedLangs = ["en","fr","es-ES","ko","zh-CN","ja"];//"it","es-ES","pt-BR","de"];
+const LanguageNames  = ["English","Français","Español (España)","한국어 (Hangugeo)","简体中文 (Jiǎntǐ Zhōngwén)","日本語 (Nihongo)"];//"Italiano","Português (Brasil)","Deutsch","繁體中文 (Fántǐ Zhōngwén)"];
 const col = {pu:'rgb(140, 130, 240)', wh:'rgb(255, 255, 255)', ga:'rgb(145, 145, 145)', dg:'rgb(105, 105, 105)',
              bl:'rgb(131, 182, 239)', ye:'rgb(240, 230, 140)', re:'rgb(239, 131, 131)', pi:'rgb(216, 143, 205)',
              ge:'rgb(143, 214, 154)', or:'rgb(251, 173, 124)', cy:'rgb( 83, 237, 229)', dr:'rgb(247, 82,  49)'};
@@ -36,7 +36,7 @@ let showMoveLearn = []; // Filtered moves/biomes to show sources
 let filterToEnter = null;  // Filter to apply when hitting Enter
 let tabSelect = -1;        // Filter that is tab selected
 let lockedFilters = [];    // List of all locked filters
-let lockedFilterMods = []; // List of filter mod objects
+let lockedMods = []; // List of filter mod objects
 let lockedFilterGroups = [[]]; // Grouped together for OR
 let pinnedRows = [];  // List of pinned row numbers
 let isMobile = false; // Change display for mobile devices
@@ -44,18 +44,22 @@ let filteredItemIDs = null; // List of all displayed row numbers
 let headerState = { shiny: 0, ability: 0, biome: 0 } // Global state of shiny(0,1,2,3), ability(0,1,2,3), biome(0,1)
 let sortState = { column: null, ascending: true, target: null }; // Track the current sort state
 let splashState = { species: -1, page: 0 } // Species shown, page(moveset=0,biome=1)
-// const spreadMoves = possibleFID.filter((fid) => fid >= fidThreshold[1] && fid < fidThreshold[2]
-//   && (fidToProc[fid-fidThreshold[0]][7].includes(21) || fidToProc[fid-fidThreshold[0]][7].includes(22)));
-// filteredItemIDs = filteredItemIDs.filter((thisID) => TagToFID[999].some((f) => f in items[thisID]));
-// const TagToFID = { // List of ability/move FIDs that match specific tag filters
-//   999: [222]
-//   // Spread moves
-//   // Ignores abilities
-//   // Switches out target
-//   // Healing
-//   // Setup
-//   // Priority
-// }
+const TagToFID = { // List of ability/move FIDs that match specific tag filters
+  [fidThreshold[10]]: possibleFID.filter((fid) => fid >= fidThreshold[0] && fid < fidThreshold[1] && (fidToProc[fid-fidThreshold[0]][1].includes(59))),
+  [fidThreshold[10]+1]: possibleFID.filter((fid) => fid >= fidThreshold[0] && fid < fidThreshold[1] && (fidToProc[fid-fidThreshold[0]][1].includes(37))),
+  [fidThreshold[10]+2]: possibleFID.filter((fid) => fid >= fidThreshold[1] && fid < fidThreshold[2] && (fidToProc[fid-fidThreshold[0]][7].includes(37))),
+  [fidThreshold[10]+3]: possibleFID.filter((fid) => fid >= fidThreshold[1] && fid < fidThreshold[2] && (fidToProc[fid-fidThreshold[0]][7].includes(40))),
+  // [fidThreshold[10]+3]: possibleFID.filter((fid) => fid >= fidThreshold[1] && fid < fidThreshold[2] && fidToProc[fid-fidThreshold[0]][5]>0 && fidToProc[fid-fidThreshold[0]][1]<2),
+  [fidThreshold[10]+4]: possibleFID.filter((fid) => fid >= fidThreshold[1] && fid < fidThreshold[2] && fidToProc[fid-fidThreshold[0]][1]<2
+    && (fidToProc[fid-fidThreshold[0]][7].includes(1) || fidToProc[fid-fidThreshold[0]][7].includes(2))),
+  // Lure ability
+  // Ignores abilities
+  // Switches out target
+  // Spread moves
+  // Healing
+  // Setup
+  // Priority
+}
   
 // Perform initial display with detected language
 let pageLang = detectLanguage();
@@ -84,7 +88,7 @@ function loadAndApplyLanguage(lang) {
     
     // Initialize some arrays
     fidToSearch = fidToName.map((thisName, fid) => makeSearchable( // Search via category for later categories
-      fid >= fidThreshold[2] && fid < fidThreshold[8] ? `${fidToCategory(fid)}${thisName}` : thisName
+      (fid >= fidThreshold[2] && fid < fidThreshold[8])||(fid >= fidThreshold[10]) ? `${fidToCategory(fid)}${thisName}` : thisName
     ));
     specToSearch = speciesNames.map(s => makeSearchable(s));
     searchBox.placeholder = `${altText[4]} ${headerNames[2]} / ${headerNames[3]} / ${headerNames[4]} / ${altText[0]} ...`;
@@ -157,11 +161,18 @@ function refreshAllItems() { // Display items based on query and locked filters 
           if (fid === fidThreshold[7]+2) return items[specID].sh == 1; // No variants
           if (fid  <  fidThreshold[9]) return fid in items[specID]; // Biome filter
           if (fid  <  fidThreshold[10]) return items[specID]?.fa === fid; // Family filter
+          if (fid < fidThreshold[10]+2 && headerState.ability) // Ability tag filter
+            return TagToFID[fid].some(f => items[specID]?.[f] == 309+headerState.ability 
+              || (headerState.ability == 1 && items[specID]?.[f] == 309)); // Tag filter
+          if (fid  <  fidThreshold[11]) return TagToFID[fid].some(f => f in items[specID]); // Other tag filters
           console.warn('Filter error'); return fid in items[specID];
         }))) 
       }
   // Add moves to track in the move column  ==============
   showMoveLearn = lockedFilters.filter(fid => isMoveOrBiome(fid));
+  lockedFilters.filter(f => f>fidThreshold[10]+1).forEach(f => // For the tag filters, add the associated FIDs
+    showMoveLearn.push(...TagToFID[f].filter(fid => !showMoveLearn.some(ff => ff == fid))));
+    
   // Remove the pinned items for now ==============
   if (pinnedRows) filteredItemIDs = filteredItemIDs.filter((thisID) => !pinnedRows.includes(thisID));
 
@@ -200,7 +211,7 @@ function refreshAllItems() { // Display items based on query and locked filters 
 
   // Add pinned rows, they are not sorted ==============
   if (pinnedRows) {
-    let rowsToAdd = pinnedRows.filter((ID) => (!filteredItemIDs.includes(ID)));
+    let rowsToAdd = pinnedRows.filter((ID) => !filteredItemIDs.includes(ID));
     filteredItemIDs = [...rowsToAdd, ...filteredItemIDs];
   }
 
@@ -335,12 +346,12 @@ function renderMoreItems() { // Create each list item, with columns of info ****
       }
     });
     
-    // Show the column of egg moves, or filtered moves and their sources
+    // Show the column of egg moves, biomes, or filtered moves/biomes and their sources
     const moveColumn = document.createElement('div');  moveColumn.className = 'item-column';  moveColumn.innerHTML = '';
     let numMovesShown = 0;
     showMoveLearn.forEach((thisFID) => { // Show filtered moves/biomes
-    if (thisFID in item && numMovesShown < 2) {
-        numMovesShown += 1;
+      if (thisFID in item && numMovesShown < 3) {
+        numMovesShown += 2;
         let src = item[thisFID];  let srcText = '<span style="color:';
         const clickableRow = document.createElement('div');  clickableRow.className = 'clickable-name';
         if (thisFID >= fidThreshold[8]) { // For biomes
@@ -350,7 +361,7 @@ function renderMoreItems() { // Create each list item, with columns of info ****
           } else { // Show the only rarity
             srcText += makeBiomeDesc(rarityN);
           }
-          clickableRow.addEventListener('click', () => showInfoSplash(thisID, 1));
+          clickableRow.addEventListener('click', () => showInfoSplash(thisID,1));
           // biomeText = ['Common','Uncommon','Rare','Super Rare','Ultra Rare','Boss','Com','Unc','Rare','SR','UR','Dawn','Day','Dusk','Night']
         } else { // For moves
           if (src == -1) srcText += `rgb(251, 173, 124);">${altText[9]}`;
@@ -374,37 +385,39 @@ function renderMoreItems() { // Create each list item, with columns of info ****
         moveColumn.appendChild(clickableRow);
       }
     });
-    if (showMoveLearn.length == 0) { // If there are no filtered moves/biomes
-      if (headerState.biome) { // Show all biomes
+    // Show biomes if toggled, and if column is empty or if peeking over a move
+    if (headerState.biome && (numMovesShown == 0 || (showMoveLearn.every(fid => isMoveOrBiome(fid)==1) && numMovesShown < 4))) {
+      if ([1,2].includes(item?.ee)) { // Show text for egg exclusives
+        const clickableRow = document.createElement('div');  clickableRow.className = 'clickable-name';
+        if (item.ee == 1) clickableRow.innerHTML += `<span style="color:rgb(143, 214, 154);">${infoText[5]}</span>`;
+        if (item.ee == 2) clickableRow.innerHTML += `<span style="color:rgb(216, 143, 205);">${infoText[6]}</span>`;
+        moveColumn.appendChild(clickableRow);
+      } else {
         possibleFID.slice(fidThreshold[8],fidThreshold[9]).forEach((fid) => {
           if (fid in item) {
             if (numMovesShown < 4) {
-              numMovesShown += 1;
               const clickableRow = document.createElement('div');  clickableRow.className = 'clickable-name';
+              if (showMoveLearn.length > 0) clickableRow.style.color = col.ga;
               clickableRow.innerHTML = fidToName[fid];
+              clickableRow.addEventListener('click', () => showInfoSplash(thisID,1));
               moveColumn.appendChild(clickableRow);
-            } else {
+            } else if (numMovesShown == 4) {
               moveColumn.lastChild.innerHTML += ' ...';
             }
+            numMovesShown += 1;
           }
         });
-        if (!numMovesShown && [1,2].includes(item?.ee)) { // Show text for egg exclusives
-          const clickableRow = document.createElement('div');  clickableRow.className = 'clickable-name';
-          if (item.ee == 1) clickableRow.innerHTML += `<span style="color:rgb(143, 214, 154);">${infoText[5]}</span>`;
-          if (item.ee == 2) clickableRow.innerHTML += `<span style="color:rgb(216, 143, 205);">${infoText[6]}</span>`;
-          // if (item.ee == 4) clickableRow.innerHTML += '<span style="color:rgb(131, 182, 239);">Form Change</span>'
-          moveColumn.appendChild(clickableRow);
-        }
-      } else { // Show egg moves
-        ['e1','e2','e3','e4'].forEach((name) => {
-          // Show the move name, with click event for splash screen
-          const clickableRow = document.createElement('div');  clickableRow.className = 'clickable-name';
-          if (name == 'e4') clickableRow.style.color = col.ye;
-          clickableRow.innerHTML = fidToName[item[name]];
-          clickableRow.addEventListener('click', () => showDescSplash(item[name]));
-          moveColumn.appendChild(clickableRow);
-        });
+        if (numMovesShown == 3) moveColumn.lastChild.style.marginTop = '6px';
       }
+    } else if (showMoveLearn.length == 0) { // Show egg moves if there are no filtered moves/biomes
+      ['e1','e2','e3','e4'].forEach((name) => {
+        // Show the move name, with click event for splash screen
+        const clickableRow = document.createElement('div');  clickableRow.className = 'clickable-name';
+        if (name == 'e4') clickableRow.style.color = col.ye;
+        clickableRow.innerHTML = fidToName[item[name]];
+        clickableRow.addEventListener('click', () => showDescSplash(item[name]));
+        moveColumn.appendChild(clickableRow);
+      });
     }
 
     // Show the cost, colored by the egg tier
@@ -416,7 +429,7 @@ function renderMoreItems() { // Create each list item, with columns of info ****
     const flipped = lockedFilters.includes(fidThreshold[5]+2);
     sortAttributes.slice(7,14).forEach((thisAtt,index) => {
       const newColumn = document.createElement('div');  newColumn.className = 'item-column';
-      newColumn.innerHTML = `${headerNames[index+7]}<br>${(flipped?item[flipStats[thisAtt]]:item[thisAtt])}`;
+      newColumn.innerHTML = `${headerNames[index+7]}<br>${item[(flipped?flipStats[thisAtt]:thisAtt)]}`;
       statColumns.push(newColumn);
     });
     // Append all the columns, according to the layout
@@ -449,14 +462,13 @@ function makeMovesetHeader(specID) { // Create the moveset/info splash *********
   movesetHeader.innerHTML = '';
   const item = items[specID]; splashState.species = specID;
   
-  const headerRow = document.createElement('div'); headerRow.className = 'moveset-big-header';
+  const headerRow = document.createElement('div'); headerRow.className = 'moveset-big-header'; // rework **********************
   const arrowL = createArrow(false);  const arrowR = createArrow(true);
   const msImg = document.createElement('img'); msImg.src = `images/${item.img}_0.png`; msImg.className = 'moveset-image';
-  headerRow.appendChild(arrowL); headerRow.appendChild(msImg); 
   const nameAndType = document.createElement('div'); nameAndType.style.maxHeight = '46px';
   const typeTwoText = ('t2' in item ? ` / <span style="color:${typeColors[item.t2]}; display:inline">${fidToName[item.t2]}</span>` : '')
   nameAndType.innerHTML = `${speciesNames[specID]}<br><span style="color:${typeColors[item.t1]}; display:inline">${fidToName[item.t1]}</span>${typeTwoText}`;
-  headerRow.appendChild(nameAndType); headerRow.appendChild(arrowR);
+  headerRow.appendChild(arrowL); headerRow.appendChild(msImg); headerRow.appendChild(nameAndType); headerRow.appendChild(arrowR);
   movesetHeader.appendChild(headerRow); 
   movesetHeader.appendChild(document.createElement('hr'));
   
@@ -598,6 +610,7 @@ function showDescSplash(fid) { // Create the ability/move splash ***************
     }
     tagToDesc.forEach((thisDesc,index) => { // Check all tags for a match
       const tagColor = (index in tagColors ? ` style="color:${tagColors[index]};"` : '');
+      if (index == 44) thisDesc += `<br><span style="color:${col.ga}; font-size:12px;">35% / 35% / 15% / 15%</span>`;
       if (thisProcs[7-6*(fid<fidThreshold[1])].includes(index)) splashMoveTags.innerHTML += `<p${tagColor}>${thisDesc}</p>`;
       if (index == 2) { // Show procs after targets
         thisProcs[6-6*(fid<fidThreshold[1])].forEach((thisProc) => { // Procs for stat boost, status, flinch, etc.
@@ -635,7 +648,8 @@ function fidToColor(fid) {
   if (fid < fidThreshold[7]) return [col.wh, eggTierColors(fid)]
   if (fid < fidThreshold[8]) return [col.cy, col.wh];
   if (fid < fidThreshold[9]) return [col.ge, col.wh];
-  else return [col.wh, col.pu]; 
+  if (fid < fidThreshold[10])return [col.wh, col.pu];
+  else return [col.ga, col.or];
 }
 function abToColor(src) {
   if (src == 'ha') return ([0,2].includes(headerState.ability) ? col.ye:col.dg)
@@ -653,7 +667,7 @@ function eggTierColors(fid) {
   else { console.log('Invalid egg tier'); return null; }
 }
 function isMoveOrBiome(fid) {
-  return (fid >= fidThreshold[1] && fid < fidThreshold[2]) || (fid >= fidThreshold[8] && fid < fidThreshold[9])
+  return ((fid >= fidThreshold[1] && fid < fidThreshold[2]) ? 1 : ((fid >= fidThreshold[8] && fid < fidThreshold[9]) ? 2 : 0));
 }
 
 // Display the filter suggestions *************************
@@ -670,13 +684,16 @@ function displaySuggestions() { // Get search query and clear the list
     let matchingFID = [];   
     // Filter suggestions based on query and exclude already locked filters
     matchingFID = possibleFID.filter((fid) => {
-        if (lockedFilters.some((f) => f == fid)) return false;
-        if (fid >= fidThreshold[9] && offerFamilies.includes(fid)) return true
-        // Suggest if it contains the search query and is not already locked
-        return fidToSearch[fid].includes(query);
+        if (lockedFilters.some((f) => f == fid)) return false; // Don't suggest if already locked
+        if (fid >= fidThreshold[9] && offerFamilies.includes(fid)) return true; // Suggest matching families
+        if (fid >= fidThreshold[10] && TagToFID[fid].some(f => fidToSearch[f].includes(query))) return true; // Suggest related tags
+        return fidToSearch[fid].includes(query); // Suggest if it contains the search query
     });
+    // Object.keys(TagToFID).forEach(fid => { // Add tag filters that are related to the query
+    //   if (!matchingFID.includes(fid) && TagToFID[fid].some(f => matchingFID.includes(f))) matchingFID.push(fid);
+    // });
     if (matchingFID.length > 22) matchingFID = []; // Erase the list of suggestions if it is too large
-    
+
     if (lockedFilters.length > 0) { // If there is at least one locked filter, re-sort the list
       // (If there are no locked filters, the list is already presorted)
       // Count how many hits each suggestion has
@@ -686,7 +703,7 @@ function displaySuggestions() { // Get search query and clear the list
 
     // Highlight a suggestion if tab is hit
     if (matchingFID.length > 0) {
-      if (tabSelect > matchingFID.length-1) {tabSelect -= matchingFID.length;}
+      if (tabSelect > matchingFID.length-1) tabSelect -= matchingFID.length;
       filterToEnter = matchingFID[(tabSelect == -1 ? 0 : tabSelect)];
     } 
     matchingFID.forEach((fid) => { // Create the suggestion tag elements
@@ -710,7 +727,7 @@ function lockFilter(newLockFID) {
       filterMod = document.createElement("span"); filterMod.toggleOR = defaultOR;
       filterMod.className = "filter-mod";         filterMod.innerHTML = (defaultOR?'OR':'&');
       filterMod.addEventListener("click", () => toggleOR(filterMod));
-      lockedFilterMods.push(filterMod); filterContainer.appendChild(filterMod);
+      lockedMods.push(filterMod); filterContainer.appendChild(filterMod);
     }
     const filterTag = document.createElement("span"); filterTag.className = "filter-tag";
     const img = document.createElement('img');        img.src = 'ui/lock.png';    filterTag.appendChild(img);
@@ -733,13 +750,13 @@ function lockFilter(newLockFID) {
 }
 
 // Remove a filter **************************
-function removeFilter(fidToRemove, filterTag, filterModToRemove) {
+function removeFilter(fidToRemove, tagToRemove, modToRemove) {
   // If removing first filter, also remove mod attached to second filter
-  if (lockedFilters.length > 1 && fidToRemove == lockedFilters[0]) filterModToRemove = lockedFilterMods[0];
-  // Remove the filter from the filter list, and remove the actual filter tag
-  lockedFilters = lockedFilters.filter( (f) => f != fidToRemove );  filterTag.remove();
-  lockedFilterMods = lockedFilterMods.filter( (f) => f != filterModToRemove ); // Remove from the mod list
-  if (filterModToRemove) filterModToRemove.remove(); // Remove the actual mod element
+  if (lockedFilters.length > 1 && fidToRemove == lockedFilters[0]) modToRemove = lockedMods[0];
+  // Remove the fid from the filter list, the actual filter tag, the mod from the mod list, and the actual mod
+  lockedFilters = lockedFilters.filter((f) => f != fidToRemove);  tagToRemove.remove();
+  lockedMods = lockedMods.filter((f) => f != modToRemove); 
+  if (modToRemove) modToRemove.remove();
   updateFilterGroups();  
   if ((fidToRemove == fidThreshold[7] || fidToRemove == fidThreshold[7]+1) && headerState.shiny > 1) { 
     headerState.shiny = 0;  headerColumns[1].innerHTML = headerNames[1]; 
@@ -761,8 +778,8 @@ function updateFilterGroups() { // Updates the grouping of filters based on AND/
   lockedFilterGroups = [[]];
   let group = 0;
   lockedFilterGroups[group].push(lockedFilters[0]);
-  for (let i = 0; i < lockedFilterMods.length; i++) { // New group for AND, same group for OR
-    if (!lockedFilterMods[i].toggleOR) { group += 1;  lockedFilterGroups.push([]); } 
+  for (let i = 0; i < lockedMods.length; i++) { // New group for AND, same group for OR
+    if (!lockedMods[i].toggleOR) { group += 1;  lockedFilterGroups.push([]); } 
     lockedFilterGroups[group].push(lockedFilters[i+1]);
   }
 }
@@ -778,7 +795,7 @@ function toggleOR(filterMod) { // Click a filter to toggle it between AND and OR
 function updateHeader(clickTarget = null, ignoreFlip = false) {
   if (clickTarget == null) { clickTarget = sortState.target; ignoreFlip = true; }
   const sortAttribute = clickTarget?.sortattr;
-  const hasMovesBiomes = lockedFilters.some(f => isMoveOrBiome(f));
+  const hasMovesBiomes = lockedFilters.some(f => isMoveOrBiome(f) || f > fidThreshold[10]+1);
   // If clicking move column, with no moves/biomes filtered, toggle between egg moves and biomes
   if (sortAttribute == 'moves' && !hasMovesBiomes && !ignoreFlip) headerState.biome = !headerState.biome;
   // Set the text of the move column, depending on if a move is filtered
@@ -803,12 +820,12 @@ function updateHeader(clickTarget = null, ignoreFlip = false) {
     if (headerState.ability) {
       headerColumns[4].innerHTML = `<span style="color:rgb(140, 130, 240);">${headerNames[4]}</span>`;
       if      (headerState.ability == 1) headerColumns[4].innerHTML += `<span style="color:${col.wh}; font-size:12px;">(${altText[1]})</span>`;
-      else if (headerState.ability == 2) headerColumns[4].innerHTML += `<span style="color:rgb(240, 230, 140); font-size:12px;">(${altText[2]})</span>`;
-      else if (headerState.ability == 3) headerColumns[4].innerHTML += `<span style="color:rgb(140, 130, 240); font-size:12px;">(${altText[3]})</span>`;
+      else if (headerState.ability == 2) headerColumns[4].innerHTML += `<span style="color:${col.ye}; font-size:12px;">(${altText[2]})</span>`;
+      else if (headerState.ability == 3) headerColumns[4].innerHTML += `<span style="color:${col.pu}; font-size:12px;">(${altText[3]})</span>`;
     } else headerColumns[4].innerHTML = headerNames[4];
   } else {
     headerColumns[5].innerHTML = headerColumns[5].textDef;
-    if (sortAttribute && !(sortAttribute == 'moves' && !hasMovesBiomes)) { 
+    if (sortAttribute && (sortAttribute != 'moves' || hasMovesBiomes)) { 
       // Clicked on a header that can actually be sorted
       if (sortState.column === sortAttribute) {
         if (!ignoreFlip) {
@@ -823,7 +840,7 @@ function updateHeader(clickTarget = null, ignoreFlip = false) {
         }
       }
       sortState.target = clickTarget; // Draw arrow on new target
-      clickTarget.innerHTML = `${clickTarget.textDef}<span style="color:rgb(140, 130, 240); font-family: serif;">${(sortState.ascending?"&#9650;":"&#9660;")}</span>`;
+      clickTarget.innerHTML = `${clickTarget.textDef}<span style="color:${col.pu}; font-family: serif;">${(sortState.ascending?"&#9650;":"&#9660;")}</span>`;
     }
   }
   refreshAllItems(); // Update the display
@@ -902,7 +919,7 @@ document.addEventListener('keydown', (event) => {
       const lastFilter = lockedFilters[lockedFilters.length - 1];
       const filterTags = document.querySelectorAll(".filter-tag");
       const lastTag = filterTags[filterTags.length - 1];
-      const lastMod = lockedFilterMods[lockedFilterMods.length - 1];
+      const lastMod = lockedMods[lockedMods.length - 1];
       removeFilter(lastFilter, lastTag, lastMod); // Remove last filter
     } else if (headerState.shiny || headerState.ability) { // Clear header restrictions
       headerState.shiny = 0;   headerColumns[1].innerHTML = headerNames[1];

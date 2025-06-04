@@ -1,6 +1,6 @@
 headerNames = ['N°','Chrom.','Nom','Type','Talents','Capacités Œuf','Cout','Total','PV','Atq','Déf','ASp','DSp','Vit'];
 altText = ['Capacités','Principaux','Caché','Passif','Entrez','Puis.','Préc.','PP','Ajouter aux filtres','Champi Mémoriel','Évolutions','Capacités Œuf','Rare Capac. Œuf','Commun','Super','Hyper','CT','N.','Évo','Œuf'];
-catToName = ['Type','Talent','Capacité','Gen','Cout','Sexe','Mode','Œuf','Variantes Chromatique','Biome','Lié à'];
+catToName = ['Type','Talent','Capacité','Gen','Cout','Sexe','Mode','Œuf','Variantes Chromatique','Biome','Lié à','Étiquette'];
 biomeText = ['Commun','Peu Commun','Rare','Super Rare','Hyper Rare','Boss','Com.','PC','Rare','SR','HR','Aube','Jour','Crépuscule','Nuit'];
 infoText = ['Bonheur par Bonbon','Passif','Cout réduit','Acheter un Œuf','Talent Caché','Exclusif à l’Œuf','Exclusif aux Bébés','Pokémon Paradoxe','Changement de forme','Biomes'];
 procToDesc = [
@@ -4321,7 +4321,12 @@ fidToName = [
 'Caninos de Hisui',
 'Voltorbe de Hisui',
 'Zorua de Hisui',
-'Tauros de Paldea'
+'Tauros de Paldea',
+'Talent d’Appât',
+'Ignore les Talents',
+'Ignore les Talents',
+'Force le Changement',
+'Attaques de Zone'
 ];
 helpMenuText = `
 <b><span style="color:rgb(140, 130, 240);">Recherche rapide et puissante</span> pour PokeRogue</b>

@@ -1,8 +1,8 @@
-headerNames = ['Núm.','Shiny','Nombre','Tipo','Habilidades','Mov. Huevo','Coste','Total','PS','Atq','Def','AtqEs','DefEs','Vel'];
-altText = ['Movimientos','Normal','Oculta','Pasiva','Introduce el nombre','Potencia','Precisión','PP','Ir a filtros','Seta Recuerdo','Evoluciones','Mov. Huevo','Raro Mov. Huevo','Común','Súper','Ultra','Movimientos de MT','Nv.','','Huevo'];
-catToName = ['Tipo','Habilidad','Movimiento','Gen.','Coste','Género','Modo','Huevo','Variantes Shiny','Bioma','Evoluciones'];
-biomeText = ['Común','Poco común','Raro','Super raro','Ultra raro','Jefe','Común','Poco común','Raro','Super raro','Ultra raro','Amanecer','Día','Atardecer','Noche'];
-infoText = ['Amistad','Pasiva','Reducción de coste','Comprar Huevo','Habilidad oculta','Huevo Exclusivo','','','','Biomas'];
+headerNames = ['Dex','Shiny','Especie','Tipos','Habilidades','Mov. Huevo','Coste','Total','PS','Atq','Def','AtE','DfE','Vel'];
+altText = ['Movimientos','Solo Principal','Solo Oculta','Solo Pasiva','Buscar','Pot.','Prec.','PP','Añadir a filtros','Recuerdo','Evolución','Mov. Huevo','Mov. Huevo Raro','Común','Súper','Ultra','MT','Nv.','Evo','Huevo'];
+catToName = ['Tipo','Habilidad','Movimiento','Gen','Coste','Género','Modo','Nivel de Huevo','Variantes Shiny','Bioma','Relacionado con','Etiqueta'];
+biomeText = ['Común','Poco Común','Raro','Super Raro','Ultra Raro','Jefe','Com.','PCom.','Raro','SR','UR','Amanecer','Día','Atardecer','Noche'];
+infoText = ['Amistad por Caramelo','Pasiva','Reducción de Coste','Huevo de Especie','Habilidad Oculta','Exclusivo de Huevo','Exclusivo de Cría','Pokémon Paradoja','Cambio de Forma','Biomas'];
 procToDesc = [
 "User Atk",
 "User Def",
@@ -4321,41 +4321,46 @@ fidToName = [
 'Growlithe de Hisui',
 'Voltorb de Hisui',
 'Zorua de Hisui',
-'Tauros de Galar'
+'Tauros de Galar',
+'Habilidad de Colonia',
+'Ignora Habilidades',
+'Ignora Habilidades',
+'Cambia al Objetivo',
+'Movimientos de Área'
 ];
 helpMenuText = `
-<b>This is a <span style="color:rgb(140, 130, 240);">fast and powerful search</span> for PokeRogue</b>
+<b><span style="color:rgb(140, 130, 240);">Búsqueda rápida y potente</span> para PokeRogue</b>
 <hr>
-<p style="margin: 10px; font-weight: bold;">Use the <span style="color:rgb(140, 130, 240);">Search Bar</span> to add filters:<br></p>
+<p style="margin: 10px; font-weight: bold;">Usa la <span style="color:rgb(140, 130, 240);">Barra de Búsqueda</span> para añadir filtros:<br></p>
 <p style="margin: 10px; font-weight: bold;"><span style="color:${typeColors[9]};">${catToName[0]}</span>, 
 <span style="color:${fidToColor(fidThreshold[0])[0]};">${catToName[1]}</span>,
 <span style="color:${fidToColor(fidThreshold[1])[0]};">${catToName[2]}</span>,
 <span style="color:${fidToColor(fidThreshold[2])[0]};">${catToName[3]}</span>,
-<span style="color:${fidToColor(fidThreshold[3])[0]};">${catToName[4]}</span>,
-<span style="color:${fidToColor(fidThreshold[4])[0]};">${catToName[5]}</span>,<br>
+<span style="color:${fidToColor(fidThreshold[3])[0]};">${catToName[4]}</span>,<br>
+<span style="color:${fidToColor(fidThreshold[4])[0]};">${catToName[5]}</span>,
 <span style="color:${fidToColor(fidThreshold[5])[1]};">${catToName[6]}</span>,
 <span style="color:${eggTierColors(2)};">${catToName[7]}</span>,
-<span style="color:${fidToColor(fidThreshold[7])[0]};">${headerNames[1]}</span>, or
+<span style="color:${fidToColor(fidThreshold[7])[0]};">${headerNames[1]}</span>, 
 <span style="color:${fidToColor(fidThreshold[8])[0]};">${catToName[9]}</span></p>
-Combine multiple filters to get what you want <br>
-<span style="color:rgb(145, 145, 145);">Click between filters to match either filter</span>
+Puedes combinar múltiples filtros<br>
+<span style="color:rgb(145, 145, 145);">Haz clic entre filtros para usar la condición “o”</span>
 <hr>
-<p style="margin: 10px; font-weight: bold;">Click the <span style="color:rgb(140, 130, 240);">Headers</span> to sort results</p>
-<b>${headerNames[1]}</b> column can restrict to shiny variants
-<p style="margin: 10px;"><b>${headerNames[4]}</b> column can restrict to one slot:<br>
-<b>Main Abilities</b>, 
-<span style="color:rgb(240, 230, 140); font-weight: bold;">Hidden Ability</span>, or 
-<span style="color:rgb(140, 130, 240); font-weight: bold;">Passive</span></p>
-<b>${headerNames[5]}</b> are shown as <b>${fidToName[fidThreshold[6]]}</b> and <span style="color:rgb(240, 230, 140); font-weight: bold;">${fidToName[fidThreshold[6]+1]}</span><br> 
-<span style="color:rgb(145, 145, 145);">Can also show biomes, or filtered moves/biomes</span>
-<p style="margin: 10px;"><b>${headerNames[6]}</b> column shows color of <b>${catToName[7]}</b>:<br> 
+<p style="margin: 10px; font-weight: bold;">Haz clic en las <span style="color:rgb(140, 130, 240);">Cabeceras</span> para reordenar</p>
+Columna <b>${headerNames[1]}</b> puede filtrar las variantes
+<p style="margin: 10px;">Columna <b>${headerNames[4]}</b> puede limitarse a:<br>
+<b>Habilidad Principal</b>, 
+<span style="color:rgb(240, 230, 140); font-weight: bold;">${infoText[4]}</span>, 
+<span style="color:rgb(140, 130, 240); font-weight: bold;">${infoText[1]}</span></p>
+<b>${headerNames[5]}</b> aparecen como <b>${fidToName[fidThreshold[6]]}</b> y <span style="color:rgb(240, 230, 140); font-weight: bold;">${fidToName[fidThreshold[6]+1]}</span><br> 
+<span style="color:rgb(145, 145, 145);">Haz clic en Mov. Huevo para ver biomas<br>Muestra los movimientos o biomas filtrados</span>
+<p style="margin: 10px;">Columna <b>${headerNames[6]}</b> coloreado por <b>${catToName[7]}</b>:<br> 
 <b>${fidToName[fidThreshold[6]]}</b>, <span style="color:rgb(131, 182, 239);"><b>${fidToName[fidThreshold[6]+1]}</b></span>, <span style="color:rgb(240, 230, 140);"><b>${fidToName[fidThreshold[6]+2]}</b></span>, <span style="color:rgb(239, 131, 131);"><b>${fidToName[fidThreshold[6]+3]}</b></span>, <span style="color:rgb(216, 143, 205);"><b>${fidToName[fidThreshold[6]+4]}</b></span></p>
 <hr>
-<p style="margin: 10px;">Click to <span style="color:rgb(240, 230, 140); font-weight: bold;">Pin</span> a Pokemon, or see <a href="https://wiki.pokerogue.net/start" target="_blank"><b>Wiki</b></a>, or <span style="color:${fidToColor(fidThreshold[7])[0]}; font-weight: bold;">Shiny</span></p>
-<p style="margin: 10px;">Click a 
-<span style="color:${col.wh}; font-weight: bold;">Name</span>, 
+<p style="margin: 10px;">Haz clic para <span style="color:rgb(240, 230, 140); font-weight: bold;">Fijar</span> un Pokémon, ver <a href="https://wiki.pokerogue.net/start" target="_blank"><b>Wiki</b></a>, o <span style="color:${fidToColor(fidThreshold[7])[0]}; font-weight: bold;">Shiny</span></p>
+<p style="margin: 10px;">Haz clic en 
+<span style="color:${col.wh}; font-weight: bold;">el Nombre</span>, 
 <span style="color:${fidToColor(fidThreshold[3])[0]}; font-weight: bold;">${headerNames[6]}</span>, 
-<span style="color:${col.pu}; font-weight: bold;">${catToName[1]}</span> or 
-<span style="color:${col.pu}; font-weight: bold;">${catToName[2]}</span> to see details</p>
+<span style="color:${col.pu}; font-weight: bold;">${catToName[1]}</span> o 
+<span style="color:${col.pu}; font-weight: bold;">${catToName[2]}</span> para ver más detalles</p>
 <hr style="margin-bottom: 10px;">
-<span style="color:rgb(145, 145, 145); font-size:11px">This site was created by Sandstorm, with a lot of hard work. I do not store any cookies or collect any personal data. Images and game data are from the PokeRogue GitHub. All asset rights are retained by their original creators.</span>`;
+<span style="color:rgb(145, 145, 145); font-size:11px">Este sitio fue creado por Sandstorm, con mucho esfuerzo. No almaceno cookies ni recojo ningún dato personal. Las imágenes y los datos del juego provienen del GitHub de PokeRogue. Todos los derechos de los recursos pertenecen a sus creadores originales.</span>`;
