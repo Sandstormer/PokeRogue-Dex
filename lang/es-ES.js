@@ -1,4 +1,4 @@
-headerNames = ['Dex','Shiny','Especie','Tipos','Habilidades','Mov. Huevo','Coste','Total','PS','Atq','Def','AtE','DfE','Vel'];
+headerNames = ['Dex','Shiny','Especie','Tipos','Habilidades','Mov. Huevo','Coste','BST','PS','Atq','Def','AtE','DfE','Vel'];
 altText = ['Movimientos','Solo Principal','Solo Oculta','Solo Pasiva','Buscar','Pot.','Prec.','PP','Añadir a filtros','Recuerdo','Evolución','Mov. Huevo','Mov. Huevo Raro','Común','Súper','Ultra','MT','Nv.','Evo','Huevo'];
 catToName = ['Tipo','Habilidad','Movimiento','Gen','Coste','Género','Modo','Nivel de Huevo','Variantes Shiny','Bioma','Relacionado con','Etiqueta'];
 biomeText = ['Común','Poco Común','Raro','Super Raro','Ultra Raro','Jefe','Com.','PCom.','Raro','SR','UR','Amanecer','Día','Atardecer','Noche'];
@@ -4356,7 +4356,7 @@ Columna <b>${headerNames[1]}</b> puede filtrar las variantes
 <p style="margin: 10px;">Columna <b>${headerNames[6]}</b> coloreado por <b>${catToName[7]}</b>:<br> 
 <b>${fidToName[fidThreshold[6]]}</b>, <span style="color:rgb(131, 182, 239);"><b>${fidToName[fidThreshold[6]+1]}</b></span>, <span style="color:rgb(240, 230, 140);"><b>${fidToName[fidThreshold[6]+2]}</b></span>, <span style="color:rgb(239, 131, 131);"><b>${fidToName[fidThreshold[6]+3]}</b></span>, <span style="color:rgb(216, 143, 205);"><b>${fidToName[fidThreshold[6]+4]}</b></span></p>
 <hr>
-<p style="margin: 10px;">Haz clic para <span style="color:rgb(240, 230, 140); font-weight: bold;">Fijar</span> un Pokémon, ver <a href="https://wiki.pokerogue.net/start" target="_blank"><b>Wiki</b></a>, o <span style="color:${fidToColor(fidThreshold[7])[0]}; font-weight: bold;">Shiny</span></p>
+<p style="margin: 10px;">Haz clic para <span style="color:rgb(240, 230, 140); font-weight: bold;">Fijar</span> Pokémon, ver <a href="https://wiki.pokerogue.net/start" target="_blank"><b>Wiki</b></a> o <span style="color:${fidToColor(fidThreshold[7])[0]}; font-weight: bold;">Shiny</span></p>
 <p style="margin: 10px;">Haz clic en 
 <span style="color:${col.wh}; font-weight: bold;">el Nombre</span>, 
 <span style="color:${fidToColor(fidThreshold[3])[0]}; font-weight: bold;">${headerNames[6]}</span>, 

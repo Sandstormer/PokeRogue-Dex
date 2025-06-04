@@ -4356,7 +4356,7 @@ Combine multiple filters to get what you want <br>
 <p style="margin: 10px;"><b>${headerNames[6]}</b> column shows color of <b>${catToName[7]}</b>:<br> 
 <b>${fidToName[fidThreshold[6]]}</b>, <span style="color:rgb(131, 182, 239);"><b>${fidToName[fidThreshold[6]+1]}</b></span>, <span style="color:rgb(240, 230, 140);"><b>${fidToName[fidThreshold[6]+2]}</b></span>, <span style="color:rgb(239, 131, 131);"><b>${fidToName[fidThreshold[6]+3]}</b></span>, <span style="color:rgb(216, 143, 205);"><b>${fidToName[fidThreshold[6]+4]}</b></span></p>
 <hr>
-<p style="margin: 10px;">Click to <span style="color:rgb(240, 230, 140); font-weight: bold;">Pin</span> a Pokemon, or see <a href="https://wiki.pokerogue.net/start" target="_blank"><b>Wiki</b></a>, or <span style="color:${fidToColor(fidThreshold[7])[0]}; font-weight: bold;">Shiny</span></p>
+<p style="margin: 10px;">Click to <span style="color:rgb(240, 230, 140); font-weight: bold;">Pin</span> a Pokemon, or see <a href="https://wiki.pokerogue.net/start" target="_blank"><b>Wiki</b></a> or <span style="color:${fidToColor(fidThreshold[7])[0]}; font-weight: bold;">Shiny</span></p>
 <p style="margin: 10px;">Click a 
 <span style="color:${col.wh}; font-weight: bold;">Name</span>, 
 <span style="color:${fidToColor(fidThreshold[3])[0]}; font-weight: bold;">${headerNames[6]}</span>, 
