@@ -387,13 +387,13 @@ function renderMoreItems() { // Create each list item, with columns of info ****
     });
     // Show biomes if toggled, and if column is empty or if peeking over a move
     if (headerState.biome && (numMovesShown == 0 || (showMoveLearn.every(fid => isMoveOrBiome(fid)==1) && numMovesShown < 4))) {
-      if ([1,2].includes(item?.ee)) { // Show text for egg exclusives
+      if ([1,2].includes(item?.ee) && numMovesShown == 0) { // Show egg exclusives only if blank
         const clickableRow = document.createElement('div');  clickableRow.className = 'clickable-name';
         if (item.ee == 1) clickableRow.innerHTML += `<span style="color:rgb(143, 214, 154);">${infoText[5]}</span>`;
         if (item.ee == 2) clickableRow.innerHTML += `<span style="color:rgb(216, 143, 205);">${infoText[6]}</span>`;
         moveColumn.appendChild(clickableRow);
       } else {
-        possibleFID.slice(fidThreshold[8],fidThreshold[9]).forEach((fid) => {
+        possibleFID.slice(fidThreshold[8],fidThreshold[9]).forEach((fid) => { // Show biomes, even if peeking
           if (fid in item) {
             if (numMovesShown < 4) {
               const clickableRow = document.createElement('div');  clickableRow.className = 'clickable-name';
@@ -401,20 +401,19 @@ function renderMoreItems() { // Create each list item, with columns of info ****
               clickableRow.innerHTML = fidToName[fid];
               clickableRow.addEventListener('click', () => showInfoSplash(thisID,1));
               moveColumn.appendChild(clickableRow);
-            } else if (numMovesShown == 4) {
+            } else if (numMovesShown == 4) { // Add dots if there is no room
               moveColumn.lastChild.innerHTML += ' ...';
             }
             numMovesShown += 1;
           }
         });
-        if (numMovesShown == 3) moveColumn.lastChild.style.marginTop = '6px';
+        if (numMovesShown == 3) moveColumn.lastChild.style.marginTop = '6px'; // Vertically center if only one peeking
       }
     } else if (showMoveLearn.length == 0) { // Show egg moves if there are no filtered moves/biomes
       ['e1','e2','e3','e4'].forEach((name) => {
-        // Show the move name, with click event for splash screen
         const clickableRow = document.createElement('div');  clickableRow.className = 'clickable-name';
         if (name == 'e4') clickableRow.style.color = col.ye;
-        clickableRow.innerHTML = fidToName[item[name]];
+        clickableRow.innerHTML = fidToName[item[name]]; // Show the move name, with click event for splash screen
         clickableRow.addEventListener('click', () => showDescSplash(item[name]));
         moveColumn.appendChild(clickableRow);
       });
