@@ -86,7 +86,7 @@ function loadAndApplyLanguage(lang) {
   script.onload = () => {
     console.log(`${lang}.js loaded successfully`);
     
-    // Initialize some arrays
+    // Initialize the searchable names
     fidToSearch = fidToName.map((thisName, fid) => makeSearchable( // Search via category for later categories
       (fid >= fidThreshold[2] && fid < fidThreshold[8])||(fid >= fidThreshold[10]) ? `${fidToCategory(fid)}${thisName}` : thisName
     ));
@@ -161,9 +161,9 @@ function refreshAllItems() { // Display items based on query and locked filters 
           if (fid === fidThreshold[7]+2) return items[specID].sh == 1; // No variants
           if (fid  <  fidThreshold[9]) return fid in items[specID]; // Biome filter
           if (fid  <  fidThreshold[10]) return items[specID]?.fa === fid; // Family filter
-          if (fid < fidThreshold[10]+2 && headerState.ability) // Ability tag filter
+          if (fid < fidThreshold[10]+2 && headerState.ability) // Restricted ability tag filter
             return TagToFID[fid].some(f => items[specID]?.[f] == 309+headerState.ability 
-              || (headerState.ability == 1 && items[specID]?.[f] == 309)); // Tag filter
+              || (headerState.ability == 1 && items[specID]?.[f] == 309));
           if (fid  <  fidThreshold[11]) return TagToFID[fid].some(f => f in items[specID]); // Other tag filters
           console.warn('Filter error'); return fid in items[specID];
         }))) 
@@ -717,7 +717,7 @@ function displaySuggestions() { // Get search query and clear the list
 }
 
 // Lock a filter *************************
-function lockFilter(newLockFID) {
+function lockFilter(newLockFID, clearQuery = true) {
   if (!lockedFilters.some((f) => f == newLockFID)) {
     lockedFilters.push(newLockFID); // Add the filter to the locked filters container
     let filterMod = null;
@@ -734,7 +734,7 @@ function lockFilter(newLockFID) {
     filterTag.addEventListener("click", () => removeFilter(newLockFID, filterTag, filterMod));
     filterContainer.appendChild(filterTag);
     // Clear the search bar after locking
-    searchBox.value = ""; 
+    if (clearQuery) searchBox.value = ""; 
     updateFilterGroups();   
     if ((newLockFID == fidThreshold[7] || newLockFID == fidThreshold[7]+1) && headerState.shiny == 0) {
       updateHeader(headerColumns[1]);
@@ -809,7 +809,7 @@ function updateHeader(clickTarget = null, ignoreFlip = false) {
       starImg.src = `ui/shiny${headerState.shiny}.png`;
       headerColumns[1].appendChild(starImg);
       if (headerState.shiny == 3 && !lockedFilters.some(f => f == fidThreshold[7] || f == fidThreshold[7]+1)) {
-        lockFilter(fidThreshold[7]+1);
+        lockFilter(fidThreshold[7]+1,false);
       }
     } else {
       headerColumns[1].innerHTML = headerNames[1];
