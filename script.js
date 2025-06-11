@@ -307,9 +307,10 @@ function renderMoreItems() { // Create each list item, with columns of info ****
         pokeImg.stars.push(starImg);
       }
     }
+    const wikiLink = `<a href="https://wiki.pokerogue.net/pokedex:${item.dex}" target="_blank">#${item.dex}</a><br>`;
     if (isMobile) { // Append to three different columns on mobile
       pinColumn.appendChild(pinImg);
-      dexColumn.innerHTML = `<a href="https://wiki.pokerogue.net/pokedex:${item.dex}" target="_blank">#${item.dex}</a><br>`;
+      dexColumn.innerHTML = wikiLink;
       pokeImg.stars.forEach((thisStar) => starColumn.appendChild(thisStar));
       if (item?.fe == 1) {
         femImg.className = 'star-img';
@@ -319,7 +320,7 @@ function renderMoreItems() { // Create each list item, with columns of info ****
       dexColumn.appendChild(pinImg);
       if (item?.fe == 1) dexColumn.appendChild(femImg);
       const dexText = document.createElement('div');
-      dexText.innerHTML = `<a href="https://wiki.pokerogue.net/pokedex:${item.dex}" target="_blank">#${item.dex}</a><br>`;
+      dexText.innerHTML = wikiLink;
       dexColumn.appendChild(dexText);
       pokeImg.stars.forEach((thisStar) => dexColumn.appendChild(thisStar));
     }

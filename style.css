@@ -2,6 +2,15 @@
 html {
   font-size: 16px;
 }
+a {
+  color: #0066cc;
+}
+a:hover {
+  color: rgb(240, 230, 140) !important;
+}
+a:visited {
+  color: #0066cc;
+}
 body {
   background-color: #0E0C0F;
   margin: 0px;
@@ -9,6 +18,9 @@ body {
   width: 100vw;
   min-height: calc(100vh - 20px);
   overflow-x: hidden;
+  color: #ffffff;
+  font-family: Arial, Helvetica, sans-serif, sans-serif;
+  font-size: 16px;
 }
 div {
   line-height: 1.125;
@@ -30,6 +42,8 @@ h1 {
   padding-left: 5px;
   padding-right: 5px;
   display: grid;
+  text-align: center;
+  font-family: Verdana, sans-serif;
 }
 .colorful-text span {
   display: inline-block;
@@ -240,21 +254,21 @@ h1 {
 @media (max-width: 768px) { /* Mobile View - Triple Row Layout */
   h1 {
     font-size: 20px;
-    grid-template-columns: 48px 1fr 30px 18px;
+    grid-template-columns: 46px 1fr 26px 20px;
   }
   .header-icon-img {
-    width: 20px;
-    height: 20px;
+    width: 22px;
+    height: 22px;
     object-fit: scale-down;
     margin-right: -2px;
-    margin-bottom: -2px;
+    margin-bottom: -3px;
   }
   .header-click-img {
-    width: 18px;
-    height: 18px;
+    width: 22px;
+    height: 22px;
     object-fit: scale-down;
-    margin-right: -2px;
-    margin-bottom: -1px;
+    padding: 5px 2px;
+    margin: -5px 0px -8px 0px;
     cursor: pointer;
   }
   .container {
