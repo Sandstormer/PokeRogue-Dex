@@ -67,6 +67,20 @@ h1 {
   margin-right: 4px;
   outline: 2px solid rgb(140, 130, 240);
   outline-offset: 2px;
+  width: calc(100% - 30px);
+}
+.search-container {
+  position: relative;
+  display: inline-block;
+}
+.clear-icon {
+  position: absolute;
+  right: 0.5em;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  font-size: 1em;
+  color: gray;
 }
 
 /* Filters and Suggestions */
