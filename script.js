@@ -228,6 +228,7 @@ function refreshAllItems() { // Display items based on query and locked filters 
     if (suggestions.innerHTML === '') { // No suggestions
       if (lockedFilters.length == 0) { // No locked filters
         helpMessage.innerHTML += '<b>There are no Pokemon or filters' + (isMobile ? '<br>' : ' ') + 'that match the search term' + (headerState.shiny > 1 ? ' and have shiny variants.</b>' : '.</b><br>Please check your spelling and try again.');
+        // Suggest language???
       } else {
         if (query === '') {
           helpMessage.innerHTML += '<b>There are no Pokemon that match the filters.</b><br>Remove filters, or change the connections to "OR".';
