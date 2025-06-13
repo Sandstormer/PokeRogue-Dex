@@ -264,6 +264,7 @@ function renderMoreItems() { // Create each list item, with columns of info ****
     pokeImg.shinyOverride = (item.sh >= headerState.shiny ? headerState.shiny : (headerState.shiny > 0)*1);  
     pokeImg.femOverride = (item?.fe == 1 ? lockedFilters.some((f) => f == fidThreshold[4]) : 0);
     pokeImg.src = `images/${item.img}_${pokeImg.shinyOverride}${(pokeImg.femOverride ? 'f' : '')}.png`; 
+    // pokeImg.addEventListener('click', () => zoomImage(pokeImg.src));
     
     // Create the dex column, with stars and pin only on desktop
     const dexColumn = document.createElement('div');  dexColumn.className = 'item-column';
@@ -458,6 +459,19 @@ function makeBiomeDesc(src, isSmall=0) {
   else if (src == 9) return `${col.pi};">${biomeText[5]} ${biomeText[4+offset]}`;
 }
 
+function zoomImage(src) {
+  splashContent.innerHTML = '';//`<img class="zoom-img" src="${src}">`;
+  const img = document.createElement('img');
+  img.src = src;  img.className = "zoom-img";
+  img.onload = () => {
+    img.style.width  = img.naturalWidth  * 3 + "px";
+    img.style.height = img.naturalHeight * 3 + "px";
+  };
+  splashContent.appendChild(img);
+  splashContent.style.width = '382px';
+  splashScreen.classList.add("show");
+}
+
 function makeMovesetHeader(specID) { // Create the moveset/info splash **************************
   movesetHeader.innerHTML = '';
   const item = items[specID]; splashState.species = specID;
@@ -571,7 +585,7 @@ function makeMovesetRow(fid, item, table) {
 function moveSrcText(src, table) {
   // src = -1:mushroom, 0:evo, 1-200:level, 201-203:egg/TM, 204:egg, 205-207:rare/TM, 208:rare, 209-211:TM
   if (table == 0) { // Level moves
-    if (src == -1) return `${col.or};"><img src="ui/mem.png"></img>`;
+    if (src == -1) return `${col.or};"><img src="ui/mem.png">`;
     if (src ==  0) return `${col.bl};">${altText[18]}`;
     else return `${col.wh};">${src}`;
   } else if (table == 1) { // Egg moves
@@ -596,7 +610,7 @@ function showDescSplash(fid) { // Create the ability/move splash ***************
     const splashMoveRow = document.createElement('div');  splashMoveRow.className = 'splash-move-row';
     altText.slice(4,8).forEach((attName,index) => { // Show type and damage category, then Power, Accuracy, PP
       const splashMoveCol = document.createElement('div');
-      if (!index) splashMoveCol.innerHTML = `<span style="color:${typeColors[thisProcs[0]]};">${fidToName[thisProcs[0]]}</span><br><img src="ui/cat${thisProcs[1]}.png"></img>`;
+      if (!index) splashMoveCol.innerHTML = `<span style="color:${typeColors[thisProcs[0]]};">${fidToName[thisProcs[0]]}</span><br><img src="ui/cat${thisProcs[1]}.png">`;
       else splashMoveCol.innerHTML = `${attName}<br>${(thisProcs[1+index]==-1 ? '-' : thisProcs[1+index])}`;
       splashMoveRow.appendChild(splashMoveCol);
     });
@@ -948,7 +962,7 @@ openLangButton.addEventListener('mouseout',  () => openLangButton.src = `ui/glob
 openLangButton.addEventListener("click",     () => openLangMenu());
 function openLangMenu() {
   splashContent.style.width = '270px';
-  splashContent.innerHTML = '<img src="ui/globe.png" class="lang-head-img"></img>&nbsp<b>Change Language</b><hr style="margin-bottom: 0px;">';
+  splashContent.innerHTML = '<img src="ui/globe.png" class="lang-head-img">&nbsp<b>Change Language</b><hr style="margin-bottom: 0px;">';
   supportedLangs.forEach((thisLang, index) => {
     const thisLangRow = document.createElement('div'); thisLangRow.className = "splash-button";
     if (pageLang == thisLang) thisLangRow.style.color = "rgb(140, 130, 240)";

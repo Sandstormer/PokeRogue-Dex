@@ -239,6 +239,7 @@ h1 {
   .item-image {
     margin-left: 0px;
     margin-right: 0px;
+    /* cursor: pointer; */
   }
   .pin-img {
     margin: 0px;
@@ -353,6 +354,7 @@ h1 {
   .item-image {
     margin-left: -10px;
     margin-right: -15px;
+    /* cursor: pointer; */
   }
   .pin-img {
     margin: 0px;
@@ -535,6 +537,18 @@ h1 {
   height: 76px; 
   object-fit: contain;
   cursor: pointer;
+}
+
+.zoom-img {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: -webkit-optimize-contrast;
+  -ms-interpolation-mode: nearest-neighbor;
+  /* transform: scale(3); */
+  /* width: 382px; */
+  /* width: 300%; /* or width: 3 * original size in px */
+  /* height: auto; keep aspect ratio */
 }
 
 hr {
