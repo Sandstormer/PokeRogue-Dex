@@ -417,6 +417,8 @@ h1 {
   margin-top: -5px;
   margin-bottom: -5px;
   object-fit: none;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
 }
 
 #splashScreen, #movesetScreen {
