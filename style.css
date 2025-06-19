@@ -251,11 +251,12 @@ h1 {
     /* outline: 1px solid red; */
   }
   .star-img {
+    width: 11px;
+    height: 11px;
+    padding: 4px 1px 5px 1px;
     margin: 0px;
-    width: 13px;
-    height: 18px;
-    margin-top: 8px;
-    margin-bottom: -3px;
+    margin-top: 7px;
+    margin-bottom: -4px;
     object-fit: none;
     cursor: pointer;
     /* outline: 1px solid red; */
@@ -388,7 +389,6 @@ h1 {
   min-height: 36px;
   line-height: 1.125;
   cursor: pointer;
-  /* outline: 1px solid red; */
 }
 .item-column {
   align-items: center;
@@ -541,7 +541,7 @@ h1 {
   cursor: pointer;
 }
 
-.zoom-img {
+.zoom-img, .zoom-star {
   image-rendering: pixelated;
   image-rendering: crisp-edges;
   image-rendering: -moz-crisp-edges;
@@ -551,6 +551,11 @@ h1 {
   /* width: 382px; */
   /* width: 300%; /* or width: 3 * original size in px */
   /* height: auto; keep aspect ratio */
+  /* outline: 1px solid red; */
+}
+.zoom-star {
+  width: 44px;
+  height: 44px;
 }
 
 hr {

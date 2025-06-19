@@ -265,7 +265,7 @@ function renderMoreItems() { // Create each list item, with columns of info ****
     pokeImg.shinyOverride = (item.sh >= headerState.shiny ? headerState.shiny : (headerState.shiny > 0)*1);  
     pokeImg.femOverride = (item?.fe == 1 ? lockedFilters.some((f) => f == fidThreshold[4]) : 0);
     pokeImg.src = `images/${item.img}_${pokeImg.shinyOverride}${(pokeImg.femOverride ? 'f' : '')}.png`; 
-    // pokeImg.addEventListener('click', () => zoomImage(pokeImg.src));
+    // pokeImg.addEventListener('click', () => zoomImage(pokeImg));
     
     // Create the dex column, with stars and pin only on desktop
     const dexColumn = document.createElement('div');  dexColumn.className = 'item-column';
@@ -460,15 +460,28 @@ function makeBiomeDesc(src, isSmall=0) {
   else if (src == 9) return `${col.pi};">${biomeText[5]} ${biomeText[4+offset]}`;
 }
 
-function zoomImage(src) {
+function zoomImage(pokeImg) {
   splashContent.innerHTML = '';//`<img class="zoom-img" src="${src}">`;
-  const img = document.createElement('img');
-  img.src = src;  img.className = "zoom-img";
-  img.onload = () => {
-    img.style.width  = img.naturalWidth  * 3 + "px";
-    img.style.height = img.naturalHeight * 3 + "px";
+  const zoomImg = document.createElement('img');
+  zoomImg.src = pokeImg.src;  zoomImg.className = "zoom-img";
+  zoomImg.onload = () => {
+    zoomImg.style.width  = zoomImg.naturalWidth *3 + "px";
+    zoomImg.style.height = zoomImg.naturalHeight*3 + "px";
   };
-  splashContent.appendChild(img);
+  splashContent.appendChild(zoomImg);
+  // pokeImg.stars.forEach((_,i) => {
+  //   const starImg = document.createElement('img'); starImg.className = 'zoom-star';
+  //   starImg.src = `ui/shiny${(pokeImg.shinyOverride==i+1?i+1:'g')}.png`;
+  //   starImg.addEventListener('mouseover', () => starImg.src = `ui/shiny${i+1}.png`);
+  //   starImg.addEventListener('mouseout',  () => starImg.src = `ui/shiny${(zoomImg.shinyOverride==i+1?i+1:'g')}.png`);
+  //   starImg.addEventListener('click', () => { // Add click events to all the stars, changing the poke image
+  //     zoomImg.stars.forEach((thisStar) => thisStar.src = 'ui/shinyg.png');
+  //     zoomImg.shinyOverride = (zoomImg.shinyOverride==i+1 ? 0 : i+1);
+  //     zoomImg.src = `images/${item.img}_${zoomImg.shinyOverride}${(zoomImg.femOverride ? 'f' : '')}.png`;  
+  //     starImg.src = `ui/shiny${(zoomImg.shinyOverride==i+1?i+1:'g')}.png`;
+  //   });
+  //   zoomImage.stars.push(starImg);
+  // });
   splashContent.style.width = '382px';
   splashScreen.classList.add("show");
 }
