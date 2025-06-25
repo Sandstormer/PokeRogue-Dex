@@ -126,14 +126,14 @@ function refreshAllItems() { // Display items based on query and locked filters 
   // Filter from query ==============
   if (query.length > 0) {
     if (/^\d+$/.test(query)) { // If query is only digits
-      filteredItemIDs = filteredItemIDs.filter((specID) => items[specID].dex >= parseInt(query,10));
+      filteredItemIDs = filteredItemIDs.filter(specID => items[specID].dex >= parseInt(query,10));
     } else { // For a standard query
-      filteredItemIDs = filteredItemIDs.filter((specID) => 
+      filteredItemIDs = filteredItemIDs.filter(specID => 
         specToSearch[specID].includes(query) ||
         fidToSearch[items[specID].t1]?.includes(query) ||
         fidToSearch[items[specID].t2]?.includes(query) ||
-        ([0,1].includes(headerState.ability) && fidToSearch[items[specID].a1]?.includes(query)) ||
-        ([0,1].includes(headerState.ability) && fidToSearch[items[specID].a2]?.includes(query)) ||
+        ([0,1].includes(headerState.ability)
+          && (fidToSearch[items[specID].a1]?.includes(query)||fidToSearch[items[specID].a2]?.includes(query))) ||
         ([0,2].includes(headerState.ability) && fidToSearch[items[specID].ha]?.includes(query)) ||
         ([0,3].includes(headerState.ability) && fidToSearch[items[specID].pa]?.includes(query)) );
     }
@@ -145,7 +145,7 @@ function refreshAllItems() { // Display items based on query and locked filters 
     filteredItemIDs = filteredItemIDs.filter(specID => // Search for filters with their fid as key
       lockedFilterGroups.every(thisGroup => // Match at least one filter from each group
         thisGroup.some(fid => {
-          if (headerState.ability != 0 && fid >= fidThreshold[0] && fid < fidThreshold[1]) // Restricted ability filter
+          if (headerState.ability && fid >= fidThreshold[0] && fid < fidThreshold[1]) // Restricted ability filter
             return items[specID]?.[fid] == 309+headerState.ability || (headerState.ability == 1 && items[specID]?.[fid] == 309)
           if (fid  <  fidThreshold[2]) return fid in items[specID]; // Type/Ability/Move filters
           if (fid  <  fidThreshold[3]) return items[specID].ge === fid - fidThreshold[2] + 1; // Gen filters
@@ -717,9 +717,6 @@ function displaySuggestions() { // Get search query and clear the list
         if (fid >= fidThreshold[10] && TagToFID[fid].some(f => fidToSearch[f].includes(query))) return true; // Suggest related tags
         return fidToSearch[fid].includes(query); // Suggest if it contains the search query
     });
-    // Object.keys(TagToFID).forEach(fid => { // Add tag filters that are related to the query
-    //   if (!matchingFID.includes(fid) && TagToFID[fid].some(f => matchingFID.includes(f))) matchingFID.push(fid);
-    // });
     if (matchingFID.length > 22) matchingFID = []; // Erase the list of suggestions if it is too large
 
     if (lockedFilters.length > 0) { // If there is at least one locked filter, re-sort the list
