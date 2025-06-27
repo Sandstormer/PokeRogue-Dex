@@ -124,7 +124,7 @@ function refreshAllItems() { // Display items based on query and locked filters 
 
   filteredItemIDs = possibleSID;
   // Filter from query ==============
-  if (query.length > 0) {
+  if (query.length) {
     if (/^\d+$/.test(query)) { // If query is only digits
       filteredItemIDs = filteredItemIDs.filter(specID => items[specID].dex >= parseInt(query,10));
     } else { // For a standard query
@@ -141,7 +141,7 @@ function refreshAllItems() { // Display items based on query and locked filters 
   // Filter from headers ==============
   if (headerState.ability == 2) filteredItemIDs = filteredItemIDs.filter(fid => 'ha' in items[fid]);
   // Filter from locked filters ==============
-  if (lockedFilters.length > 0) {
+  if (lockedFilters.length) {
     filteredItemIDs = filteredItemIDs.filter(specID => // Search for filters with their fid as key
       lockedFilterGroups.every(thisGroup => // Match at least one filter from each group
         thisGroup.some(fid => {
@@ -220,13 +220,13 @@ function refreshAllItems() { // Display items based on query and locked filters 
   renderLimit = 0;
   renderMoreItems();
   // Show error messages if there are no results
-  if (filteredItemIDs.length == 0) { // No pokemon
+  if (!filteredItemIDs.length) { // No pokemon
     const helpMessage = document.createElement('div');  helpMessage.className = 'item-help-message';
     helpMessage.innerHTML = '<hr>';
     if (headerState.shiny > 1) helpMessage.innerHTML += '<b><span style="color:rgb(140, 130, 240);">Restricted to Pokemon that have shiny variants.</b><br><br></span>';
-    if (headerState.ability > 0) helpMessage.innerHTML += '<b><span style="color:rgb(140, 130, 240);">Abilities are restricted to only ' + (headerState.ability == 1 ? 'Main' : (headerState.ability == 2 ? 'Hidden' : 'Passive'))+ ' Abilities.</b><br><br></span>';
+    if (headerState.ability) helpMessage.innerHTML += '<b><span style="color:rgb(140, 130, 240);">Abilities are restricted to only ' + (headerState.ability == 1 ? 'Main' : (headerState.ability == 2 ? 'Hidden' : 'Passive'))+ ' Abilities.</b><br><br></span>';
     if (suggestions.innerHTML === '') { // No suggestions
-      if (lockedFilters.length == 0) { // No locked filters
+      if (!lockedFilters.length) { // No locked filters
         helpMessage.innerHTML += '<b>There are no Pokemon or filters' + (isMobile ? '<br>' : ' ') + 'that match the search term' + (headerState.shiny > 1 ? ' and have shiny variants.</b>' : '.</b><br>Please check your spelling and try again.');
         // Suggest language???
       } else {
@@ -237,7 +237,7 @@ function refreshAllItems() { // Display items based on query and locked filters 
         }
       }
     } else {
-      if (lockedFilters.length == 0) { // No locked filters
+      if (!lockedFilters.length) { // No locked filters
         helpMessage.innerHTML += '<b>Click on a suggestion to filter it.</b><br>Filter preview is only for Species/Types/Abilities.';
       } else {
         helpMessage.innerHTML += '<b>There are no Pokemon that match the filters and the search term.</b><br>Adding another filter may change the results.';
@@ -261,8 +261,8 @@ function renderMoreItems() { // Create each list item, with columns of info ****
     
     // Show image of the pokemon
     const pokeImg = document.createElement('img');  pokeImg.className = 'item-image';  
-    pokeImg.stars = []; // Keep a list of stars that can change the pokemon image
-    pokeImg.shinyOverride = (item.sh >= headerState.shiny ? headerState.shiny : (headerState.shiny > 0)*1);  
+    pokeImg.stars = []; // Keep a list of stars that can change the pokemon image 
+    pokeImg.shinyOverride = Math.min(item.sh, headerState.shiny);  
     pokeImg.femOverride = (item?.fe == 1 ? lockedFilters.some((f) => f == fidThreshold[4]) : 0);
     pokeImg.src = `images/${item.img}_${pokeImg.shinyOverride}${(pokeImg.femOverride ? 'f' : '')}.png`; 
     // pokeImg.addEventListener('click', () => zoomImage(pokeImg));
@@ -389,18 +389,19 @@ function renderMoreItems() { // Create each list item, with columns of info ****
       }
     });
     // Show biomes if toggled, and if column is empty or if peeking over a move
-    if (headerState.biome && (numMovesShown == 0 || (showMoveLearn.every(fid => isMoveOrBiome(fid)==1) && numMovesShown < 4))) {
-      if ([1,2].includes(item?.ee) && numMovesShown == 0) { // Show egg exclusives only if blank
+    if (headerState.biome && (!numMovesShown || (showMoveLearn.every(fid => isMoveOrBiome(fid)==1) && numMovesShown < 4))) {
+      if ([1,2].includes(item?.ee) && !numMovesShown) { // Show egg exclusives only if blank
         const clickableRow = document.createElement('div');  clickableRow.className = 'clickable-name';
         if (item.ee == 1) clickableRow.innerHTML += `<span style="color:rgb(143, 214, 154);">${infoText[5]}</span>`;
         if (item.ee == 2) clickableRow.innerHTML += `<span style="color:rgb(216, 143, 205);">${infoText[6]}</span>`;
+        clickableRow.addEventListener('click', () => showInfoSplash(thisID,1));
         moveColumn.appendChild(clickableRow);
       } else {
         possibleFID.slice(fidThreshold[8],fidThreshold[9]).forEach((fid) => { // Show biomes, even if peeking
           if (fid in item) {
             if (numMovesShown < 4) {
               const clickableRow = document.createElement('div');  clickableRow.className = 'clickable-name';
-              if (showMoveLearn.length > 0) clickableRow.style.color = col.ga;
+              if (showMoveLearn.length) clickableRow.style.color = col.ga;
               clickableRow.innerHTML = fidToName[fid];
               clickableRow.addEventListener('click', () => showInfoSplash(thisID,1));
               moveColumn.appendChild(clickableRow);
@@ -412,7 +413,7 @@ function renderMoreItems() { // Create each list item, with columns of info ****
         });
         if (numMovesShown == 3) moveColumn.lastChild.style.marginTop = '6px'; // Vertically center if only one peeking
       }
-    } else if (showMoveLearn.length == 0) { // Show egg moves if there are no filtered moves/biomes
+    } else if (!showMoveLearn.length) { // Show egg moves if there are no filtered moves/biomes
       ['e1','e2','e3','e4'].forEach((name) => {
         const clickableRow = document.createElement('div');  clickableRow.className = 'clickable-name';
         if (name == 'e4') clickableRow.style.color = col.ye;
@@ -449,15 +450,15 @@ function renderMoreItems() { // Create each list item, with columns of info ****
 }
 function makeBiomeDesc(src, isSmall=0) {
   const offset = isSmall*6;
-  if      (src == 1) return `${col.wh};">${biomeText[0+offset]}`;
-  else if (src == 2) return `${col.bl};">${biomeText[1+offset]}`;
-  else if (src == 3) return `${col.bl};">${biomeText[5]} ${biomeText[0+offset]}`;
-  else if (src == 4) return `${col.ye};">${biomeText[2+offset]}`;
-  else if (src == 5) return `${col.ye};">${biomeText[5]} ${biomeText[2+offset]}`;
-  else if (src == 6) return `${col.re};">${biomeText[3+offset]}`;
-  else if (src == 7) return `${col.re};">${biomeText[5]} ${biomeText[3+offset]}`;
-  else if (src == 8) return `${col.pi};">${biomeText[4+offset]}`;
-  else if (src == 9) return `${col.pi};">${biomeText[5]} ${biomeText[4+offset]}`;
+  if (src == 1) return `${col.wh};">${biomeText[0+offset]}`;
+  if (src == 2) return `${col.bl};">${biomeText[1+offset]}`;
+  if (src == 3) return `${col.bl};">${biomeText[5]} ${biomeText[0+offset]}`;
+  if (src == 4) return `${col.ye};">${biomeText[2+offset]}`;
+  if (src == 5) return `${col.ye};">${biomeText[5]} ${biomeText[2+offset]}`;
+  if (src == 6) return `${col.re};">${biomeText[3+offset]}`;
+  if (src == 7) return `${col.re};">${biomeText[5]} ${biomeText[3+offset]}`;
+  if (src == 8) return `${col.pi};">${biomeText[4+offset]}`;
+  if (src == 9) return `${col.pi};">${biomeText[5]} ${biomeText[4+offset]}`;
 }
 
 function zoomImage(pokeImg) {
@@ -545,6 +546,7 @@ function showInfoSplash(specID, overridePage=null) {
       });
     movesetScrollable.appendChild(document.createElement('hr'));
     const splashCostInfo = document.createElement('div');  splashCostInfo.className = 'splash-move-tags';
+    const HAtext = ('ha' in item ? `<br>${infoText[4]}: 1 in 8` : '');
     // Info on friendship and candy
     splashCostInfo.innerHTML = `
       <p>${infoText[0]}: <span style="color:${col.re}";>${upgradeCosts[item.co-1][4]}</span> <img src="ui/fren.png"></p>
@@ -552,7 +554,8 @@ function showInfoSplash(specID, overridePage=null) {
       <p>${infoText[2]}: <span style="color:${col.bl}";>${upgradeCosts[item.co-1][1]}</span> &
         <span style="color:${col.ye}";> ${upgradeCosts[item.co-1][2]}<span> <img src="ui/candy.png" style="margin-bottom:-2px;"></p>
       <p>${infoText[3]}: ${upgradeCosts[item.co-1][3]} <img src="ui/candy.png" style="margin-bottom:-2px;">
-      <span style="color:${col.ga}; font-size:12px;"><br>${altText[12]}: 1 in ${REMchance[item.et]}</span></p>
+      <span style="color:${col.ga}; font-size:12px;"><br>${altText[12]}: 1 in ${REMchance[item.et]}${HAtext}
+      <br>${headerNames[1]}: 1 in 12</span></p>
       `;
     movesetScrollable.appendChild(splashCostInfo);
   } else { // Show moveset
@@ -601,12 +604,11 @@ function moveSrcText(src, table) {
   if (table == 0) { // Level moves
     if (src == -1) return `${col.or};"><img src="ui/mem.png">`;
     if (src ==  0) return `${col.bl};">${altText[18]}`;
-    else return `${col.wh};">${src}`;
+    return `${col.wh};">${src}`;
   } else if (table == 1) { // Egg moves
     return `${src < 205 ? col.wh:col.ye};">${altText[19]}`
-  } else { // TM moves
-    return `${tmColors[src%4-1]};">${(altText[16].length > 2 ? 'TM' : altText[16])}`
-  }
+  } // TM moves
+  return `${tmColors[src%4-1]};">${(altText[16].length > 2 ? 'TM' : altText[16])}`
 }
 function changeMoveset(indexChange) {
   const index = filteredItemIDs.findIndex(ID => ID == splashState.species) + indexChange;
@@ -719,7 +721,7 @@ function displaySuggestions() { // Get search query and clear the list
     });
     if (matchingFID.length > 22) matchingFID = []; // Erase the list of suggestions if it is too large
 
-    if (lockedFilters.length > 0) { // If there is at least one locked filter, re-sort the list
+    if (lockedFilters.length) { // If there is at least one locked filter, re-sort the list
       // (If there are no locked filters, the list is already presorted)
       // Count how many hits each suggestion has
 
@@ -727,7 +729,7 @@ function displaySuggestions() { // Get search query and clear the list
     }
 
     // Highlight a suggestion if tab is hit
-    if (matchingFID.length > 0) {
+    if (matchingFID.length) {
       if (tabSelect > matchingFID.length-1) tabSelect -= matchingFID.length;
       filterToEnter = matchingFID[(tabSelect == -1 ? 0 : tabSelect)];
     } 
@@ -762,7 +764,7 @@ function lockFilter(newLockFID, clearQuery = true) {
     // Clear the search bar after locking
     if (clearQuery) searchBox.value = ""; 
     updateFilterGroups();   
-    if ((newLockFID == fidThreshold[7] || newLockFID == fidThreshold[7]+1) && headerState.shiny == 0) {
+    if ((newLockFID == fidThreshold[7] || newLockFID == fidThreshold[7]+1) && !headerState.shiny) {
       updateHeader(headerColumns[1]);
     } else if (newLockFID == fidThreshold[7]+2 && headerState.shiny > 1) {
       headerState.shiny = 0; updateHeader(headerColumns[1]);
@@ -792,7 +794,7 @@ function removeFilter(fidToRemove, tagToRemove, modToRemove) {
   } else { 
     updateHeader(null, true); // Update header, then refresh items and suggestions
   }
-  if (lockedFilters.length == 0) { // Reset the animation of the page title
+  if (lockedFilters.length) { // Reset the animation of the page title
     pageTitle.classList.remove('colorful-text');  void pageTitle.offsetWidth;
     pageTitle.classList.add('colorful-text');
   }
@@ -937,10 +939,10 @@ document.addEventListener('keydown', (event) => {
       movesetScreen.classList.remove("show");
     } else if (splashScreen.classList.contains("show")) { // Close splash screen
       splashScreen.classList.remove("show");
-    } else if (searchBox.value.length > 0) { // Clear text from the search box
+    } else if (searchBox.value.length) { // Clear text from the search box
       searchBox.value = '';
       refreshAllItems();
-    } else if (lockedFilters.length > 0) { // If there is locked filter
+    } else if (lockedFilters.length) { // If there is locked filter
       const lastFilter = lockedFilters[lockedFilters.length - 1];
       const filterTags = document.querySelectorAll(".filter-tag");
       const lastTag = filterTags[filterTags.length - 1];
