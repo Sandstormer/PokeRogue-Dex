@@ -184,6 +184,7 @@ h1 {
   .header-click-img {
     width: 31px;
     height: 31px;
+    object-fit: scale-down;
     margin-right: -4px;
     margin-bottom: -2px;
     cursor: pointer;
@@ -244,9 +245,10 @@ h1 {
   .pin-img {
     margin: 0px;
     width: 13px;
-    height: 18px;
+    height: 13px;
+    padding: 3px 0 2px;
     margin-bottom: 4px;
-    object-fit: none;
+    object-fit: scale-down;
     cursor: pointer;
     /* outline: 1px solid red; */
   }
@@ -336,10 +338,9 @@ h1 {
     text-align: center;
     display: grid;
     gap: 0px;
-    /* outline: 1px solid red; */
   }
   .row:first-child {
-    grid-template-columns: 50px 60px 1fr 16px;
+    grid-template-columns: 50px 60px 1fr 17px;
     margin-bottom: 9px;
     max-height: 18px;
   }
@@ -358,20 +359,22 @@ h1 {
     /* cursor: pointer; */
   }
   .pin-img {
-    margin: 0px;
-    width: 15px;
-    height: 18px;
-    margin-right: -2px;
-    object-fit: none;
+    width: 13px;
+    height: 13px;
+    padding: 6px 7px 6px 6px;
+    margin: -3px -8px -4px 0px;
+    object-fit: scale-down;
     cursor: pointer;
+    /* outline: 1px solid red; */
   }
   .star-img {
-    margin: 0px;
-    width: 15px;
-    height: 18px;
-    margin-top: 2px;
+    width: 13px;
+    height: 13px;
+    padding: 5px 1px 5px 1px;
+    margin: -2px 0px -3px 0px;
     object-fit:none;
     cursor: pointer;
+    /* outline: 1px solid red; */
   }
   #movesetScrollable {
     max-height: calc(100vh - 300px);
@@ -449,8 +452,8 @@ h1 {
   border-radius: 4px;
   background-color: #151019;
   width: 330px;
-  min-width: 270px;
-  max-width: 382px;
+  /* min-width: 270px;
+  max-width: 582px; */
   position: relative;
   overflow: scroll;
   -ms-overflow-style: none;
@@ -495,8 +498,10 @@ h1 {
   border: 2px solid rgb(140, 130, 240);
 }
 .lang-head-img {
-  margin-right: 2px;
-  margin-bottom: -9px;
+  width: 31px;
+  height: 31px;
+  object-fit: scale-down;
+  margin: 0px 2px -9px 0px;
 }
 #movesetHeader {
   font-weight: bold;

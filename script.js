@@ -43,7 +43,7 @@ let isMobile = false; // Change display for mobile devices
 let filteredItemIDs = null; // List of all displayed row numbers
 let headerState = { shiny: 0, ability: 0, biome: 0 } // Global state of shiny(0,1,2,3), ability(0,1,2,3), biome(0,1)
 let sortState = { column: null, ascending: true, target: null }; // Track the current sort state
-let splashState = { species: -1, page: 0 } // Species shown, page(moveset=0,biome=1)
+let splashState = { species: -1, page: 0, shiny: 0 } // Species shown, page(moveset,biome,family,zoom), shiny(0,1,2,3)
 const TagToFID = { // List of ability/move FIDs that match specific tag filters
   [fidThreshold[10]]: possibleFID.filter((fid) => fid >= fidThreshold[0] && fid < fidThreshold[1] && (fidToProc[fid-fidThreshold[0]][1].includes(59))),
   [fidThreshold[10]+1]: possibleFID.filter((fid) => fid >= fidThreshold[0] && fid < fidThreshold[1] && (fidToProc[fid-fidThreshold[0]][1].includes(37))),
@@ -273,16 +273,16 @@ function renderMoreItems() { // Create each list item, with columns of info ****
     const pinColumn = document.createElement('div');  pinColumn.className = 'item-column';
     const pinImg = document.createElement('img');     pinImg.className = 'pin-img';   
     const femImg = document.createElement('img');     femImg.className = 'pin-img';   
-    pinImg.src = `ui/pin${pinnedRows.includes(thisID)?'on':'off'}.png`; femImg.src = `ui/fem${(pokeImg.femOverride?'on':'off')}.png`;
-    pinImg.addEventListener('mouseover', () => pinImg.src = `ui/pinhover.png`);
-    pinImg.addEventListener('mouseout',  () => pinImg.src = `ui/pin${(pinnedRows.includes(thisID)?'on':'off')}.png`);
+    pinImg.src = `ui/pin${pinnedRows.includes(thisID)*1}.png`; femImg.src = `ui/fem${(pokeImg.femOverride?'on':'off')}.png`;
+    pinImg.addEventListener('mouseover', () => pinImg.src = `ui/pinh.png`);
+    pinImg.addEventListener('mouseout',  () => pinImg.src = `ui/pin${pinnedRows.includes(thisID)*1}.png`);
     pinImg.addEventListener('click', () => { // Add click event to the pin button
       if (pinnedRows.includes(thisID)) { // Remove this pokemon from the pins
         pinnedRows = pinnedRows.filter((thisPin) => (thisPin != thisID));
-        pinImg.src = 'ui/pinoff.png';
+        pinImg.src = 'ui/pin0.png';
       } else { // Add this pokemon to the pins
         pinnedRows.push(thisID);
-        pinImg.src = 'ui/pinon.png';
+        pinImg.src = 'ui/pin1.png';
       }
     });
     if (item?.fe == 1) {
@@ -297,14 +297,14 @@ function renderMoreItems() { // Create each list item, with columns of info ****
     for (let i = 1; i < 4; i++) { // Create up to 3 shiny stars
       if (item.sh >= i) {
         const starImg = document.createElement('img'); starImg.className = 'star-img';
-        starImg.src = `ui/shiny${(pokeImg.shinyOverride==i?i:'g')}.png`;
+        starImg.src = `ui/shiny${(pokeImg.shinyOverride==i?i:0)}.png`;
         starImg.addEventListener('mouseover', () => starImg.src = `ui/shiny${i}.png`);
-        starImg.addEventListener('mouseout',  () => starImg.src = `ui/shiny${(pokeImg.shinyOverride==i?i:'g')}.png`);
+        starImg.addEventListener('mouseout',  () => starImg.src = `ui/shiny${(pokeImg.shinyOverride==i?i:0)}.png`);
         starImg.addEventListener('click', () => { // Add click events to all the stars, changing the poke image
-          pokeImg.stars.forEach((thisStar) => thisStar.src = 'ui/shinyg.png');
-          pokeImg.shinyOverride = (pokeImg.shinyOverride==i ? 0 : i);
+          pokeImg.stars.forEach((thisStar) => thisStar.src = 'ui/shiny0.png');
+          pokeImg.shinyOverride = (pokeImg.shinyOverride==i?0:i);
           pokeImg.src = `images/${item.img}_${pokeImg.shinyOverride}${(pokeImg.femOverride ? 'f' : '')}.png`;  
-          starImg.src = `ui/shiny${(pokeImg.shinyOverride==i?i:'g')}.png`;
+          starImg.src = `ui/shiny${(pokeImg.shinyOverride==i?i:0)}.png`;
         });
         pokeImg.stars.push(starImg);
       }
@@ -470,20 +470,26 @@ function zoomImage(pokeImg) {
     zoomImg.style.height = zoomImg.naturalHeight*3 + "px";
   };
   splashContent.appendChild(zoomImg);
-  // pokeImg.stars.forEach((_,i) => {
-  //   const starImg = document.createElement('img'); starImg.className = 'zoom-star';
-  //   starImg.src = `ui/shiny${(pokeImg.shinyOverride==i+1?i+1:'g')}.png`;
-  //   starImg.addEventListener('mouseover', () => starImg.src = `ui/shiny${i+1}.png`);
-  //   starImg.addEventListener('mouseout',  () => starImg.src = `ui/shiny${(zoomImg.shinyOverride==i+1?i+1:'g')}.png`);
-  //   starImg.addEventListener('click', () => { // Add click events to all the stars, changing the poke image
-  //     zoomImg.stars.forEach((thisStar) => thisStar.src = 'ui/shinyg.png');
-  //     zoomImg.shinyOverride = (zoomImg.shinyOverride==i+1 ? 0 : i+1);
-  //     zoomImg.src = `images/${item.img}_${zoomImg.shinyOverride}${(zoomImg.femOverride ? 'f' : '')}.png`;  
-  //     starImg.src = `ui/shiny${(zoomImg.shinyOverride==i+1?i+1:'g')}.png`;
-  //   });
-  //   zoomImage.stars.push(starImg);
-  // });
-  splashContent.style.width = '382px';
+  splashContent.appendChild(document.createElement('br'));
+  pokeImg.stars.forEach((thisStar,i) => {
+    const starImg = thisStar.cloneNode(true);
+    starImg.style.transform = "scale(2)";
+    
+    // starImg.src = `ui/shiny${(pokeImg.shinyOverride==i+1?i+1:0)}.png`;
+
+    // const starImg = document.createElement('img'); starImg.className = 'zoom-star';
+    // starImg.src = thisStar.src;
+    // starImg.addEventListener('mouseover', () => starImg.src = `ui/shiny${i+1}.png`);
+    // starImg.addEventListener('mouseout',  () => starImg.src = `ui/shiny${(pokeImg.shinyOverride==i+1?i+1:0)}.png`);
+    // starImg.addEventListener('click', () => { // Add click events to all the stars, changing the poke image
+    //   zoomImg.stars.forEach((f) => f.src = 'ui/shiny0.png');
+    //   zoomImg.shinyOverride = (zoomImg.shinyOverride==i+1 ? 0 : i+1);
+    //   zoomImg.src = `images/${item.img}_${zoomImg.shinyOverride}${(zoomImg.femOverride ? 'f' : '')}.png`;  
+    //   starImg.src = `ui/shiny${(zoomImg.shinyOverride==i+1?i+1:0)}.png`;
+    // });
+    splashContent.appendChild(starImg);
+  });
+  splashContent.style.width = '582px';
   splashScreen.classList.add("show");
 }
 
@@ -517,10 +523,11 @@ function createArrow(isRight) {
 }
 function showInfoSplash(specID, overridePage=null) {
   if (overridePage != null) splashState.page = overridePage;
+  if (splashState.page == 2) return;
   const item = items[specID];
   makeMovesetHeader(specID);
   movesetScrollable.innerHTML = '';
-  if (splashState.page) { // Show biomes
+  if (splashState.page == 1) { // Show biomes
     if ('ee' in item) { // Description of pokemon with no biomes
       if (item.ee == 1) movesetScrollable.innerHTML += '<b>This Pokemon is <span style="color:rgb(143, 214, 154);">Egg Exclusive</span>.</b><br>It does not appear in any biomes, and can only be obtained from eggs.';
       if (item.ee == 2) movesetScrollable.innerHTML += '<b>This is a <span style="color:rgb(216, 143, 205);">Baby Pokemon</span>.</b><br>It does not appear in any biomes, but can be unlocked by encountering its evolution.';
@@ -535,7 +542,7 @@ function showInfoSplash(specID, overridePage=null) {
           biomeRow.innerHTML = `<b>${fidToName[fid]}:</b>`;
           item[fid].forEach(src => {
             biomeRow.innerHTML += `<br><span style="font-weight:bold; color:${makeBiomeDesc(~~(src/20))}</span>`;
-            if (src%20) {
+            if (src%20) { // If limited to time of day
               let timeText = '';
               [1,2,4,8].forEach((i,index) => timeText += ((src%20)%(2*i)>=i ? `${timeText?', ':''}${biomeText[11+index]}`:''));
               biomeRow.innerHTML += `<span style="font-size:16px;"> (${timeText})</span>`;
@@ -757,21 +764,21 @@ function lockFilter(newLockFID, clearQuery = true) {
       lockedMods.push(filterMod); filterContainer.appendChild(filterMod);
     }
     const filterTag = document.createElement("span"); filterTag.className = "filter-tag";
-    const img = document.createElement('img');        img.src = 'ui/lock.png';    filterTag.appendChild(img);
-    filterTag.innerHTML += `${fidToCategory(newLockFID)}: ${fidToName[newLockFID]}`;
+    filterTag.innerHTML = `<img src="ui/lock.png">${fidToCategory(newLockFID)}: ${fidToName[newLockFID]}`;
     filterTag.addEventListener("click", () => removeFilter(newLockFID, filterTag, filterMod));
     filterContainer.appendChild(filterTag);
     // Clear the search bar after locking
     if (clearQuery) searchBox.value = ""; 
     updateFilterGroups();   
-    if ((newLockFID == fidThreshold[7] || newLockFID == fidThreshold[7]+1) && !headerState.shiny) {
+    // Update sorting if required, then refresh items and suggestions
+    if ((newLockFID == fidThreshold[7] || newLockFID == fidThreshold[7]+1) && !headerState.shiny) { // Has variants
       updateHeader(headerColumns[1]);
-    } else if (newLockFID == fidThreshold[7]+2 && headerState.shiny > 1) {
+    } else if (newLockFID == fidThreshold[7]+2 && headerState.shiny > 1) { // No variants
       headerState.shiny = 0; updateHeader(headerColumns[1]);
-    } else if (sortState.column === 'row' && isMoveOrBiome(newLockFID)) {
+    } else if (sortState.column === 'row' && isMoveOrBiome(newLockFID)) { // Move/Biome
       updateHeader(headerColumns[5]);
     } else {
-      updateHeader(null, true); // Update header, then refresh items and suggestions
+      updateHeader(null, true);
     }
   }
 }
@@ -919,7 +926,8 @@ document.addEventListener('keydown', (event) => {
   }
   // Hit left/right to cycle moveset splash
   if (movesetScreen.classList.contains('show') && !splashScreen.classList.contains("show")) {
-    if (event.key == "ArrowLeft" || event.key == "ArrowRight") changeMoveset(event.key == "ArrowRight" ? 1 : -1);
+    if (event.key == "ArrowLeft") changeMoveset(-1);
+    if (event.key == "ArrowRight") changeMoveset(1);
   }
   if (event.key == "ArrowUp" || event.key == "ArrowDown") {
     event.preventDefault();
