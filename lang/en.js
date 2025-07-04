@@ -47,7 +47,7 @@ tagToDesc = [
 "Recoil 33% of damage",
 "Recoil 25% of damage",
 "30% deal double damage",
-"30% steal rarest item",
+"xxx",
 "Heals 100% damage dealt",
 "Heals 75% damage dealt",
 "Heals 50% damage dealt",
