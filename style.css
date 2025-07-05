@@ -59,12 +59,10 @@ h1 {
 /* Search box */
 #searchBox {
   padding: 10px;
-  margin-bottom: 14px;
   background: #ffffff;
   border: 1px solid #1B181E;
   border-radius: 4px;
-  margin-left: 4px;
-  margin-right: 4px;
+  margin: 0px 4px 14px 4px;
   outline: 2px solid rgb(140, 130, 240);
   outline-offset: 2px;
   width: calc(100% - 30px);
@@ -73,14 +71,16 @@ h1 {
   position: relative;
   display: inline-block;
 }
-.clear-icon {
+#clearIcon {
+  display: none;
   position: absolute;
-  right: 0.5em;
-  top: 50%;
-  transform: translateY(-50%);
+  height: 16px;
+  width: 30px;
+  right: 3px;
+  padding: 11px 8px 11px 6px;
   cursor: pointer;
-  font-size: 1em;
-  color: gray;
+  object-fit: scale-down;
+  /* outline: 1px solid red; */
 }
 
 /* Filters and Suggestions */
@@ -232,7 +232,6 @@ h1 {
     align-items: center;
     text-align: center;
     gap: 0px;
-    /* outline: 1px solid red; */
   }
   .row:first-child {
     grid-template-columns: 50px 107px 120px 79px 2.5fr 2.5fr 0.82fr repeat(7, 0.67fr);
@@ -445,9 +444,7 @@ h1 {
 }
 #splashContent, #movesetContent {
   text-align: center;
-  padding: 10px;
-  padding-top: 15px;
-  padding-bottom: 15px;
+  padding: 15px 10px;
   border: 1px solid #ffffff;
   border-radius: 4px;
   background-color: #151019;

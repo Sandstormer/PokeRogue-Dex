@@ -17,6 +17,7 @@ const movesetHeader = document.getElementById("movesetHeader");
 const movesetScrollable = document.getElementById("movesetScrollable");
 const openHelpButton = document.getElementById("help-img");
 const openLangButton = document.getElementById("lang-img");
+const clearIcon = document.getElementById("clearIcon");
 const sortAttributes = ['row','shiny','sp','type','ab','moves','co','bst','hp','atk','def','spa','spd','spe'];
 const possibleFID = [...Array(fidThreshold[fidThreshold.length-1]-3).keys()]; // Remove -3 *********
 const possibleSID = [...Array(items.length).keys()];
@@ -118,6 +119,7 @@ function makeSearchable(input) { // Remove punctuation, accents, and compound ch
 
 function refreshAllItems() { // Display items based on query and locked filters **************************
   const query = makeSearchable(searchBox.value);
+  clearIcon.style.display = (searchBox.value.length && isMobile ? 'inline' : 'none'); // Show clear button on mobile
 
   itemList.querySelectorAll('li').forEach(li => li.replaceWith(li.cloneNode(true))); // Clones without listeners
   while (itemList.firstChild) itemList.firstChild.remove();
@@ -913,7 +915,7 @@ searchBox.addEventListener('input', (event) => { // Typing in search box
   tabSelect = -1;
   refreshAllItems();
 });
-document.addEventListener('keydown', (event) => { 
+document.addEventListener('keydown', (event) => { // All key press events
   const ignoredKeys = ["Escape", "Tab", "Shift", "PageDown", "PageUp", "Control", "Alt", "Meta", "CapsLock", 
     "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"];
   if (!ignoredKeys.includes(event.key)) { // Ignore certain key presses
@@ -968,11 +970,15 @@ document.addEventListener('keydown', (event) => {
     event.preventDefault();
   }
 });
+// Clear search box button on mobile
+clearIcon.addEventListener("click", () => {
+  searchBox.focus();
+  searchBox.value = '';
+  refreshAllItems();
+});
 // Close splash screen when clicking outside the content box
 splashScreen.addEventListener("click", (event) => {
-  if (event.target === splashScreen) {
-    splashScreen.classList.remove("show");
-  }
+  if (event.target === splashScreen) splashScreen.classList.remove("show");
 });
 movesetScreen.addEventListener("click", (event) => {
   if (event.target === movesetScreen) movesetScreen.classList.remove("show");
