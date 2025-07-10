@@ -413,7 +413,8 @@ function renderMoreItems() { // Create each list item, with columns of info ****
             numMovesShown += 1;
           }
         });
-        if (numMovesShown == 3) moveColumn.lastChild.style.marginTop = '6px'; // Vertically center if only one peeking
+        // Vertically center if only one biome is peeking over a move
+        if (numMovesShown == 3 && showMoveLearn.length) moveColumn.lastChild.style.marginTop = '6px'; 
       }
     } else if (!showMoveLearn.length) { // Show egg moves if there are no filtered moves/biomes
       ['e1','e2','e3','e4'].forEach((name) => {
