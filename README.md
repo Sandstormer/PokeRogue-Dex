@@ -15,7 +15,9 @@ You can see which Pokémon learn a move and when they learn it, who has variant 
 🔧 I regularly update this project with new features, and to reflect changes made to [the game](https://pokerogue.net/).
 I worked really hard on this project, so if you want to use any part of my code, please let me know first.
 
-![Banner](https://github.com/Sandstormer/sandstormer.github.io/blob/main/searchdex.png)
+<a href="https://sandstormer.github.io/PokeRogue-Dex/">
+  <img src="https://github.com/Sandstormer/sandstormer.github.io/blob/main/searchdex.png">
+</a>
 
 
 ## Disclaimer
