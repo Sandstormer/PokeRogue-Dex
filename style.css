@@ -262,11 +262,7 @@ h1 {
     cursor: pointer;
     /* outline: 1px solid red; */
   }
-  #movesetContent {
-    max-height: 700px;
-    top: calc((100vh - 730px)/2);
-  }
-  #splashContent {
+  #movesetScrollable {
     max-height: 700px;
   }
 }
@@ -379,12 +375,8 @@ h1 {
     cursor: pointer;
     /* outline: 1px solid red; */
   }
-  #movesetContent {
-    max-height: calc(100vh - 150px);
-    top: 60px;
-  }
-  #splashContent {
-    max-height: calc(100vh - 150px);
+  #movesetScrollable {
+    max-height: calc(100vh - 300px);
   }
 }
 
@@ -440,11 +432,9 @@ h1 {
   height: 100%;
   padding: 10vh 0;
   background: rgba(0, 0, 0, 0.6);
+  justify-content: center;
   align-items: center;
   z-index: 999;
-}
-#splashScreen {
-  justify-content: center;
 }
 #movesetScreen {
   z-index: 990;
@@ -469,6 +459,10 @@ h1 {
   overflow: scroll;
   -ms-overflow-style: none;
 }
+#splashContent {
+  max-height: calc(100vh - 100px);
+}
+
 #splashContent::-webkit-scrollbar, #movesetContent::-webkit-scrollbar, #movesetScrollable::-webkit-scrollbar {
   width: 5px;
   height: 0px;
@@ -531,10 +525,10 @@ h1 {
   font-weight: bold;
   display: grid;
   grid-template-columns: 40px 1fr repeat(3, 40px);
-  margin-top: 5px;
   width: 100%;
 }
 .moveset-row {
+  margin-top: 5px;
   cursor: pointer;
 }
 .moveset-image {

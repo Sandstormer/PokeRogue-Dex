@@ -497,7 +497,7 @@ function showInfoSplash(specID, forcePage=null, forceShiny=null, forceFem=null) 
   const item = items[specID];
   makeMovesetHeader(specID);
   movesetScrollable.innerHTML = '';
-  movesetScrollable.style.height = 'auto';
+  // movesetScrollable.style.height = 'auto';
   movesetContent.style.width = '330px';
   if (splashState.page == 3) { // Show zoom image
     splashState.speciesID = specID;
@@ -508,13 +508,13 @@ function showInfoSplash(specID, forcePage=null, forceShiny=null, forceFem=null) 
     const zoomImg = document.createElement('img');
     zoomImg.src = `images/${item.img}_${splashState.shiny}${(splashState.fem ? 'f' : '')}.png`; 
     zoomImg.className = "zoom-img";
-    movesetScrollable.style.height = splashState.zoomImgh + "px"; // Use prev height to prevent jumping
+    // movesetScrollable.style.height = splashState.zoomImgh + "px"; // Use prev height to prevent jumping
     factor = (isMobile ? 3:6);
     zoomImg.onload = () => { // Image needs to load before reading dimensions
       zoomImg.style.width  = zoomImg.naturalWidth*factor + "px";
       zoomImg.style.height = zoomImg.naturalHeight*factor + "px";
       splashState.zoomImgh = zoomImg.naturalHeight*factor + 56;
-      movesetScrollable.style.height = splashState.zoomImgh + "px";
+      // movesetScrollable.style.height = splashState.zoomImgh + "px";
     };
     movesetScrollable.appendChild(zoomImg);
     movesetScrollable.appendChild(document.createElement('br'));
