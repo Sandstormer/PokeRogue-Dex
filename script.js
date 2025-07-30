@@ -14,6 +14,7 @@ const splashScreen = document.getElementById("splashScreen");
 const splashContent = document.getElementById("splashContent");
 const movesetScreen = document.getElementById("movesetScreen");
 const movesetHeader = document.getElementById("movesetHeader");
+const movesetContent = document.getElementById("movesetContent");
 const movesetScrollable = document.getElementById("movesetScrollable");
 const openHelpButton = document.getElementById("help-img");
 const openLangButton = document.getElementById("lang-img");
@@ -44,17 +45,16 @@ let isMobile = false; // Change display for mobile devices
 let filteredItemIDs = null; // List of all displayed row numbers
 let headerState = { shiny: 0, ability: 0, biome: 0 } // Global state of shiny(0,1,2,3), ability(0,1,2,3), biome(0,1)
 let sortState = { column: null, ascending: true, target: null }; // Track the current sort state
-let splashState = { species: -1, page: 0, shiny: 0 } // Species shown, page(moveset,biome,family,zoom), shiny(0,1,2,3)
+// State of info screen: species shown, page(moveset,biome,family,zoom), shiny(0,1,2,3), fem(0,1), zoomImageHeight
+let splashState = { speciesID: -1, page: 0, shiny: 0, fem: 0, zoomImgh: 300}
 const TagToFID = { // List of ability/move FIDs that match specific tag filters
-  [fidThreshold[10]]: possibleFID.filter((fid) => fid >= fidThreshold[0] && fid < fidThreshold[1] && (fidToProc[fid-fidThreshold[0]][1].includes(59))),
-  [fidThreshold[10]+1]: possibleFID.filter((fid) => fid >= fidThreshold[0] && fid < fidThreshold[1] && (fidToProc[fid-fidThreshold[0]][1].includes(37))),
+  [fidThreshold[10]]: possibleFID.filter((fid) => fid >= fidThreshold[0] && fid < fidThreshold[1] && (fidToProc[fid-fidThreshold[0]][1].includes(59))), // Lure ability
+  [fidThreshold[10]+1]: possibleFID.filter((fid) => fid >= fidThreshold[0] && fid < fidThreshold[1] && (fidToProc[fid-fidThreshold[0]][1].includes(37))), // Ignores abilities
   [fidThreshold[10]+2]: possibleFID.filter((fid) => fid >= fidThreshold[1] && fid < fidThreshold[2] && (fidToProc[fid-fidThreshold[0]][7].includes(37))),
   [fidThreshold[10]+3]: possibleFID.filter((fid) => fid >= fidThreshold[1] && fid < fidThreshold[2] && (fidToProc[fid-fidThreshold[0]][7].includes(40))),
   // [fidThreshold[10]+3]: possibleFID.filter((fid) => fid >= fidThreshold[1] && fid < fidThreshold[2] && fidToProc[fid-fidThreshold[0]][5]>0 && fidToProc[fid-fidThreshold[0]][1]<2),
   [fidThreshold[10]+4]: possibleFID.filter((fid) => fid >= fidThreshold[1] && fid < fidThreshold[2] && fidToProc[fid-fidThreshold[0]][1]<2
     && (fidToProc[fid-fidThreshold[0]][7].includes(1) || fidToProc[fid-fidThreshold[0]][7].includes(2))),
-  // Lure ability
-  // Ignores abilities
   // Switches out target
   // Spread moves
   // Healing
@@ -265,9 +265,9 @@ function renderMoreItems() { // Create each list item, with columns of info ****
     const pokeImg = document.createElement('img');  pokeImg.className = 'item-image';  
     pokeImg.stars = []; // Keep a list of stars that can change the pokemon image 
     pokeImg.shinyOverride = Math.min(item.sh, headerState.shiny);  
-    pokeImg.femOverride = (item?.fe == 1 ? lockedFilters.some((f) => f == fidThreshold[4]) : 0);
+    pokeImg.femOverride = (item?.fe == 1 ? +lockedFilters.some((f) => f == fidThreshold[4]) : 0);
     pokeImg.src = `images/${item.img}_${pokeImg.shinyOverride}${(pokeImg.femOverride ? 'f' : '')}.png`; 
-    // pokeImg.addEventListener('click', () => zoomImage(pokeImg));
+    pokeImg.addEventListener('click', () => showInfoSplash(thisID, 3, pokeImg.shinyOverride, pokeImg.femOverride));
     
     // Create the dex column, with stars and pin only on desktop
     const dexColumn = document.createElement('div');  dexColumn.className = 'item-column';
@@ -275,7 +275,7 @@ function renderMoreItems() { // Create each list item, with columns of info ****
     const pinColumn = document.createElement('div');  pinColumn.className = 'item-column';
     const pinImg = document.createElement('img');     pinImg.className = 'pin-img';   
     const femImg = document.createElement('img');     femImg.className = 'pin-img';   
-    pinImg.src = `ui/pin${pinnedRows.includes(thisID)*1}.png`; femImg.src = `ui/fem${(pokeImg.femOverride?'on':'off')}.png`;
+    pinImg.src = `ui/pin${pinnedRows.includes(thisID)*1}.png`; femImg.src = `ui/fem${pokeImg.femOverride}.png`;
     pinImg.addEventListener('mouseover', () => pinImg.src = `ui/pinh.png`);
     pinImg.addEventListener('mouseout',  () => pinImg.src = `ui/pin${pinnedRows.includes(thisID)*1}.png`);
     pinImg.addEventListener('click', () => { // Add click event to the pin button
@@ -288,12 +288,12 @@ function renderMoreItems() { // Create each list item, with columns of info ****
       }
     });
     if (item?.fe == 1) {
-      femImg.addEventListener('mouseover', () => femImg.src = `ui/femon.png`);
-      femImg.addEventListener('mouseout',  () => femImg.src = `ui/fem${(pokeImg.femOverride?'on':'off')}.png`);
+      femImg.addEventListener('mouseover', () => femImg.src = `ui/fem1.png`);
+      femImg.addEventListener('mouseout',  () => femImg.src = `ui/fem${pokeImg.femOverride}.png`);
       femImg.addEventListener('click', () => { // Add click event to the fem button
         pokeImg.femOverride = 1-pokeImg.femOverride; // Flip the fem state
         pokeImg.src = `images/${item.img}_${pokeImg.shinyOverride}${(pokeImg.femOverride ? 'f' : '')}.png`; 
-        femImg.src = `ui/fem${(pokeImg.femOverride ? 'on' : 'off')}.png`;
+        femImg.src = `ui/fem${pokeImg.femOverride}.png`;
       });
     }
     for (let i = 1; i < 4; i++) { // Create up to 3 shiny stars
@@ -464,51 +464,18 @@ function makeBiomeDesc(src, isSmall=0) {
   if (src == 9) return `${col.pi};">${biomeText[5]} ${biomeText[4+offset]}`;
 }
 
-function zoomImage(pokeImg) {
-  splashContent.innerHTML = '';//`<img class="zoom-img" src="${src}">`;
-  const zoomImg = document.createElement('img');
-  zoomImg.src = pokeImg.src;  zoomImg.className = "zoom-img";
-  zoomImg.onload = () => {
-    zoomImg.style.width  = zoomImg.naturalWidth *3 + "px";
-    zoomImg.style.height = zoomImg.naturalHeight*3 + "px";
-  };
-  splashContent.appendChild(zoomImg);
-  splashContent.appendChild(document.createElement('br'));
-  pokeImg.stars.forEach((thisStar,i) => {
-    const starImg = thisStar.cloneNode(true);
-    starImg.style.transform = "scale(2)";
-    
-    // starImg.src = `ui/shiny${(pokeImg.shinyOverride==i+1?i+1:0)}.png`;
-
-    // const starImg = document.createElement('img'); starImg.className = 'zoom-star';
-    // starImg.src = thisStar.src;
-    // starImg.addEventListener('mouseover', () => starImg.src = `ui/shiny${i+1}.png`);
-    // starImg.addEventListener('mouseout',  () => starImg.src = `ui/shiny${(pokeImg.shinyOverride==i+1?i+1:0)}.png`);
-    // starImg.addEventListener('click', () => { // Add click events to all the stars, changing the poke image
-    //   zoomImg.stars.forEach((f) => f.src = 'ui/shiny0.png');
-    //   zoomImg.shinyOverride = (zoomImg.shinyOverride==i+1 ? 0 : i+1);
-    //   zoomImg.src = `images/${item.img}_${zoomImg.shinyOverride}${(zoomImg.femOverride ? 'f' : '')}.png`;  
-    //   starImg.src = `ui/shiny${(zoomImg.shinyOverride==i+1?i+1:0)}.png`;
-    // });
-    splashContent.appendChild(starImg);
-  });
-  splashContent.style.width = '582px';
-  splashScreen.classList.add("show");
-}
-
 function makeMovesetHeader(specID) { // Create the moveset/info splash **************************
   movesetHeader.innerHTML = '';
-  const item = items[specID]; splashState.species = specID;
+  const item = items[specID]; splashState.speciesID = specID;
   
-  const headerRow = document.createElement('div'); headerRow.className = 'moveset-big-header'; // rework **********************
+  const headerRow = document.createElement('div'); headerRow.className = 'moveset-banner';
   const arrowL = createArrow(false);  const arrowR = createArrow(true);
   const msImg = document.createElement('img'); msImg.src = `images/${item.img}_0.png`; msImg.className = 'moveset-image';
   const nameAndType = document.createElement('div'); nameAndType.style.maxHeight = '46px';
-  const typeTwoText = ('t2' in item ? ` / <span style="color:${typeColors[item.t2]}; display:inline">${fidToName[item.t2]}</span>` : '')
-  nameAndType.innerHTML = `${speciesNames[specID]}<br><span style="color:${typeColors[item.t1]}; display:inline">${fidToName[item.t1]}</span>${typeTwoText}`;
-  headerRow.appendChild(arrowL); headerRow.appendChild(msImg); headerRow.appendChild(nameAndType); headerRow.appendChild(arrowR);
-  movesetHeader.appendChild(headerRow); 
-  movesetHeader.appendChild(document.createElement('hr'));
+  const secondTypeText = ('t2' in item ? ` / <span style="color:${typeColors[item.t2]}; display:inline">${fidToName[item.t2]}</span>` : '')
+  nameAndType.innerHTML = `${speciesNames[specID]}<br><span style="color:${typeColors[item.t1]}; display:inline">${fidToName[item.t1]}</span>${secondTypeText}`;
+  [arrowL, msImg, nameAndType, arrowR].forEach(el => headerRow.appendChild(el));
+  movesetHeader.append(headerRow, document.createElement('hr'));
   
   // const splashButton = document.createElement('div'); splashButton.className = 'splash-button'; 
   // splashButton.innerHTML = 'eeeeeeee'; splashButton.style.margin = '-10px auto -10px auto';
@@ -524,13 +491,65 @@ function createArrow(isRight) {
   arrow.addEventListener('click', () => changeMoveset(isRight ? 1 : -1));
   return arrow;
 }
-function showInfoSplash(specID, overridePage=null) {
-  if (overridePage != null) splashState.page = overridePage;
+function showInfoSplash(specID, forcePage=null, forceShiny=null, forceFem=null) {
+  if (forcePage != null) splashState.page = forcePage;
   if (splashState.page == 2) return;
   const item = items[specID];
   makeMovesetHeader(specID);
   movesetScrollable.innerHTML = '';
-  if (splashState.page == 1) { // Show biomes
+  movesetScrollable.style.height = 'auto';
+  movesetContent.style.width = '330px';
+  if (splashState.page == 3) { // Show zoom image
+    splashState.speciesID = specID;
+    if (forceShiny != null) splashState.shiny = forceShiny;
+    if (item.sh < splashState.shiny) splashState.shiny = 1;
+    if (forceFem != null) splashState.fem = forceFem;
+    if (item?.fe != 1) splashState.fem = 0;
+    const zoomImg = document.createElement('img');
+    zoomImg.src = `images/${item.img}_${splashState.shiny}${(splashState.fem ? 'f' : '')}.png`; 
+    zoomImg.className = "zoom-img";
+    movesetScrollable.style.height = splashState.zoomImgh + "px"; // Use prev height to prevent jumping
+    factor = (isMobile ? 3:6);
+    zoomImg.onload = () => { // Image needs to load before reading dimensions
+      zoomImg.style.width  = zoomImg.naturalWidth*factor + "px";
+      zoomImg.style.height = zoomImg.naturalHeight*factor + "px";
+      splashState.zoomImgh = zoomImg.naturalHeight*factor + 56;
+      movesetScrollable.style.height = splashState.zoomImgh + "px";
+    };
+    movesetScrollable.appendChild(zoomImg);
+    movesetScrollable.appendChild(document.createElement('br'));
+    movesetScrollable.stars = [];
+    for (let i = 1; i < 4; i++) { // Create up to 3 shiny stars
+      if (item.sh >= i) {
+        const starImg = document.createElement('img'); starImg.className = 'zoom-star';
+        starImg.src = `ui/shiny${(splashState.shiny==i?i:0)}.png`;
+        starImg.addEventListener('mouseover', () => starImg.src = `ui/shiny${i}.png`);
+        starImg.addEventListener('mouseout',  () => starImg.src = `ui/shiny${(splashState.shiny==i?i:0)}.png`);
+        starImg.addEventListener('click', () => { // Add click events to all the stars, changing the zoom image
+          movesetScrollable.stars.forEach((thisStar) => thisStar.src = 'ui/shiny0.png');
+          splashState.shiny = (splashState.shiny==i?0:i);
+          zoomImg.src = `images/${items[splashState.speciesID].img}_${splashState.shiny}${(splashState.fem ? 'f' : '')}.png`;  
+          starImg.src = `ui/shiny${(splashState.shiny==i?i:0)}.png`;
+        });
+        movesetScrollable.stars.push(starImg);
+        movesetScrollable.appendChild(starImg);
+      }
+    }
+    if (item?.fe == 1) {
+      const femImg = document.createElement('img'); femImg.className = 'zoom-star';
+      femImg.src = `ui/fem${splashState.fem}.png`;
+      femImg.addEventListener('mouseover', () => femImg.src = `ui/fem1.png`);
+      femImg.addEventListener('mouseout',  () => femImg.src = `ui/fem${splashState.fem}.png`);
+      femImg.addEventListener('click', () => {
+        splashState.fem = 1-splashState.fem;
+        zoomImg.src = `images/${item.img}_${splashState.shiny}${(splashState.fem ? 'f' : '')}.png`;
+        femImg.src = `ui/fem${splashState.fem}.png`;
+      });
+      movesetScrollable.appendChild(femImg);
+    }
+    movesetContent.style.width = (isMobile ? '351px':'auto');
+  }
+  else if (splashState.page == 1) { // Show biomes
     if ('ee' in item) { // Description of pokemon with no biomes
       if (item.ee == 1) movesetScrollable.innerHTML += '<b>This Pokemon is <span style="color:rgb(143, 214, 154);">Egg Exclusive</span>.</b><br>It does not appear in any biomes, and can only be obtained from eggs.';
       if (item.ee == 2) movesetScrollable.innerHTML += '<b>This is a <span style="color:rgb(216, 143, 205);">Baby Pokemon</span>.</b><br>It does not appear in any biomes, but can be unlocked by encountering its evolution.';
@@ -621,7 +640,7 @@ function moveSrcText(src, table) {
   return `${tmColors[src%4-1]};">${(altText[16].length > 2 ? 'TM' : altText[16])}`
 }
 function changeMoveset(indexChange) {
-  const index = filteredItemIDs.findIndex(ID => ID == splashState.species) + indexChange;
+  const index = filteredItemIDs.findIndex(ID => ID == splashState.speciesID) + indexChange;
     if (index >= 0 && index < filteredItemIDs.length) {
       window.scrollTo({top:(89+68*isMobile)*(index-2*!isMobile)});
       showInfoSplash(filteredItemIDs[index]);
