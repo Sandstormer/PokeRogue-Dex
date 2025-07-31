@@ -276,8 +276,8 @@ function renderMoreItems() { // Create each list item, with columns of info ****
     const pinImg = document.createElement('img');     pinImg.className = 'pin-img';   
     const femImg = document.createElement('img');     femImg.className = 'pin-img';   
     pinImg.src = `ui/pin${pinnedRows.includes(thisID)*1}.png`; femImg.src = `ui/fem${pokeImg.femOverride}.png`;
-    pinImg.addEventListener('mouseover', () => pinImg.src = `ui/pinh.png`);
-    pinImg.addEventListener('mouseout',  () => pinImg.src = `ui/pin${pinnedRows.includes(thisID)*1}.png`);
+    if (!isMobile) pinImg.addEventListener('mouseover', () => pinImg.src = `ui/pinh.png`);
+    if (!isMobile) pinImg.addEventListener('mouseout',  () => pinImg.src = `ui/pin${pinnedRows.includes(thisID)*1}.png`);
     pinImg.addEventListener('click', () => { // Add click event to the pin button
       if (pinnedRows.includes(thisID)) { // Remove this pokemon from the pins
         pinnedRows = pinnedRows.filter((thisPin) => (thisPin != thisID));
@@ -288,8 +288,8 @@ function renderMoreItems() { // Create each list item, with columns of info ****
       }
     });
     if (item?.fe == 1) {
-      femImg.addEventListener('mouseover', () => femImg.src = `ui/fem1.png`);
-      femImg.addEventListener('mouseout',  () => femImg.src = `ui/fem${pokeImg.femOverride}.png`);
+      if (!isMobile) femImg.addEventListener('mouseover', () => femImg.src = `ui/fem1.png`);
+      if (!isMobile) femImg.addEventListener('mouseout',  () => femImg.src = `ui/fem${pokeImg.femOverride}.png`);
       femImg.addEventListener('click', () => { // Add click event to the fem button
         pokeImg.femOverride = 1-pokeImg.femOverride; // Flip the fem state
         pokeImg.src = `images/${item.img}_${pokeImg.shinyOverride}${(pokeImg.femOverride ? 'f' : '')}.png`; 
@@ -300,8 +300,8 @@ function renderMoreItems() { // Create each list item, with columns of info ****
       if (item.sh >= i) {
         const starImg = document.createElement('img'); starImg.className = 'star-img';
         starImg.src = `ui/shiny${(pokeImg.shinyOverride==i?i:0)}.png`;
-        starImg.addEventListener('mouseover', () => starImg.src = `ui/shiny${i}.png`);
-        starImg.addEventListener('mouseout',  () => starImg.src = `ui/shiny${(pokeImg.shinyOverride==i?i:0)}.png`);
+        if (!isMobile) starImg.addEventListener('mouseover', () => starImg.src = `ui/shiny${i}.png`);
+        if (!isMobile) starImg.addEventListener('mouseout',  () => starImg.src = `ui/shiny${(pokeImg.shinyOverride==i?i:0)}.png`);
         starImg.addEventListener('click', () => { // Add click events to all the stars, changing the poke image
           pokeImg.stars.forEach((thisStar) => thisStar.src = 'ui/shiny0.png');
           pokeImg.shinyOverride = (pokeImg.shinyOverride==i?0:i);
@@ -486,8 +486,8 @@ function makeMovesetHeader(specID) { // Create the moveset/info splash *********
 function createArrow(isRight) {
   const arrow = document.createElement('img');  arrow.src = 'ui/arrow.png';  arrow.className = 'moveset-arrow';
   if (isRight) arrow.style.transform = 'scaleX(-1)';
-  arrow.addEventListener('mouseover', () => arrow.src = 'ui/arrowh.png');
-  arrow.addEventListener('mouseout',  () => arrow.src = 'ui/arrow.png');
+  if (!isMobile) arrow.addEventListener('mouseover', () => arrow.src = 'ui/arrowh.png');
+  if (!isMobile) arrow.addEventListener('mouseout',  () => arrow.src = 'ui/arrow.png');
   arrow.addEventListener('click', () => changeMoveset(isRight ? 1 : -1));
   return arrow;
 }
@@ -523,8 +523,8 @@ function showInfoSplash(specID, forcePage=null, forceShiny=null, forceFem=null) 
       if (item.sh >= i) {
         const starImg = document.createElement('img'); starImg.className = 'zoom-star';
         starImg.src = `ui/shiny${(splashState.shiny==i?i:0)}.png`;
-        starImg.addEventListener('mouseover', () => starImg.src = `ui/shiny${i}.png`);
-        starImg.addEventListener('mouseout',  () => starImg.src = `ui/shiny${(splashState.shiny==i?i:0)}.png`);
+        if (!isMobile) starImg.addEventListener('mouseover', () => starImg.src = `ui/shiny${i}.png`);
+        if (!isMobile) starImg.addEventListener('mouseout',  () => starImg.src = `ui/shiny${(splashState.shiny==i?i:0)}.png`);
         starImg.addEventListener('click', () => { // Add click events to all the stars, changing the zoom image
           movesetScrollable.stars.forEach((thisStar) => thisStar.src = 'ui/shiny0.png');
           splashState.shiny = (splashState.shiny==i?0:i);
@@ -538,8 +538,8 @@ function showInfoSplash(specID, forcePage=null, forceShiny=null, forceFem=null) 
     if (item?.fe == 1) {
       const femImg = document.createElement('img'); femImg.className = 'zoom-star';
       femImg.src = `ui/fem${splashState.fem}.png`;
-      femImg.addEventListener('mouseover', () => femImg.src = `ui/fem1.png`);
-      femImg.addEventListener('mouseout',  () => femImg.src = `ui/fem${splashState.fem}.png`);
+      if (!isMobile) femImg.addEventListener('mouseover', () => femImg.src = `ui/fem1.png`);
+      if (!isMobile) femImg.addEventListener('mouseout',  () => femImg.src = `ui/fem${splashState.fem}.png`);
       femImg.addEventListener('click', () => {
         splashState.fem = 1-splashState.fem;
         zoomImg.src = `images/${item.img}_${splashState.shiny}${(splashState.fem ? 'f' : '')}.png`;

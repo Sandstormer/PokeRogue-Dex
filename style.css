@@ -127,11 +127,6 @@ h1 {
   margin-top: auto;
   margin-bottom: auto;
 }
-.filter-tag:hover {
-  background-color: #4e4e4e;
-  border: 2px solid #4e4e4e;
-  text-decoration: line-through;
-}
 .filter-tag img {
   margin-left: -3px;
   margin-right: 5px;
@@ -153,9 +148,6 @@ h1 {
   font-weight: bold;
   background-color: #0E0B11;
   border: 2px solid #29252D;
-}
-.suggestion:hover {
-  border: 2px solid rgb(140, 130, 240);
 }
 
 #itemList {
@@ -265,9 +257,23 @@ h1 {
   #movesetScrollable {
     max-height: 700px;
   }
+  .clickable-name:hover {
+    color: rgb(140, 130, 240) !important;
+  }
+  .splash-button:hover {
+    border: 2px solid rgb(140, 130, 240);
+  }
+  .filter-tag:hover {
+    background-color: #4e4e4e;
+    border: 2px solid #4e4e4e;
+    text-decoration: line-through;
+  }
+  .suggestion:hover {
+    border: 2px solid rgb(140, 130, 240);
+  }
 }
 
-/* My phone is 414px by 763px */
+/* My phone is 414px wide by 763px tall */
 @media (max-width: 768px) { /* Mobile View - Triple Row Layout */
   h1 {
     font-size: 20px;
@@ -383,8 +389,6 @@ h1 {
 .header-column {
   display: grid;
   align-items: center;
-  /* justify-content: center; */
-  /* white-space: normal; */
   text-align: center;
   word-wrap: break-word;
   padding: 0 0px;
@@ -403,9 +407,6 @@ h1 {
 .clickable-name {
   font-weight: bold;
   cursor: pointer;
-}
-.clickable-name:hover {
-  color: rgb(140, 130, 240) !important;
 }
 .star-header {
   margin: auto;
@@ -496,9 +497,6 @@ h1 {
   cursor: pointer;
   font-weight: bold;
 }
-.splash-button:hover {
-  border: 2px solid rgb(140, 130, 240);
-}
 .lang-head-img {
   width: 31px;
   height: 31px;
@@ -555,9 +553,7 @@ h1 {
   image-rendering: pixelated;
   image-rendering: crisp-edges;
   image-rendering: -moz-crisp-edges;
-  image-rendering: -webkit-optimize-contrast;
   -ms-interpolation-mode: nearest-neighbor;
-  /* outline: 1px solid red; */
 }
 .zoom-star {
   width: 44px;
