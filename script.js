@@ -557,22 +557,37 @@ function showInfoSplash(specID, forcePage=null, forceShiny=null, forceFem=null) 
       if (item.ee == 4) movesetScrollable.innerHTML += '<b>Only available via <span style="color:rgb(131, 182, 239);">Form Change</span>.</b><br>It does not appear in any biomes.';
       if (item.ee == 5) movesetScrollable.innerHTML += 'This Pokemon can only be caught after obtaining <b><span style="color:rgb(239, 131, 131);">All Other Pokemon</span></b>.<br>It does not appear in standard eggs.';
     }
-      possibleFID.slice(fidThreshold[8],fidThreshold[9]).forEach((fid) => {
-        if (fid in item) {
-          const biomeRow = document.createElement('div');  biomeRow.className = 'biome-row';
-          if (!movesetScrollable.innerHTML) biomeRow.style.marginTop = '4px';
-          biomeRow.innerHTML = `<b>${fidToName[fid]}:</b>`;
-          item[fid].forEach(src => {
-            biomeRow.innerHTML += `<br><span style="font-weight:bold; color:${makeBiomeDesc(~~(src/20))}</span>`;
-            if (src%20) { // If limited to time of day
-              let timeText = '';
-              [1,2,4,8].forEach((i,index) => timeText += ((src%20)%(2*i)>=i ? `${timeText?', ':''}${biomeText[11+index]}`:''));
-              biomeRow.innerHTML += `<span style="font-size:16px;"> (${timeText})</span>`;
-            }
-          });
-          movesetScrollable.appendChild(biomeRow);
+    possibleFID.slice(fidThreshold[8],fidThreshold[9]).forEach((fid) => {
+      if (fid in item) {
+        const biomeRow = document.createElement('div');  biomeRow.className = 'biome-row';
+        if (!movesetScrollable.innerHTML) biomeRow.style.marginTop = '4px'; // Add margin if empty
+        const biomeLink = document.createElement('a');
+        biomeLink.href = `https://wiki.pokerogue.net/biomes:biomes#interactive_map`;  biomeLink.target = '_blank'; // Open in new tab
+        const biomeImg = document.createElement('img');  biomeImg.src = `ui/biomes/${fid}.png`;  biomeImg.className = 'biome-img';
+        biomeLink.appendChild(biomeImg);
+        // biomeImg.https://wiki.pokerogue.net/biomes:town
+        const biomeDesc = document.createElement('div'); biomeDesc.innerHTML = `<b>${fidToName[fid]}:</b>`;
+        item[fid].forEach(src => {
+          biomeDesc.innerHTML += `<br><span style="font-weight:bold; color:${makeBiomeDesc(~~(src/20))}</span>`;
+          if (src%20) { // If limited to time of day
+            let timeText = '';
+            [1,2,4,8].forEach((i,index) => timeText += ((src%20)%(2*i)>=i ? `${timeText?', ':''}${biomeText[11+index]}`:''));
+            biomeDesc.innerHTML += `<span style="font-size:16px;"> (${timeText})</span>`;
+          }
+        });
+        if (!lockedFilters.includes(fid)) { // Button to add biome directly to filters
+          const splashButton = document.createElement('div'); splashButton.className = 'splash-button';
+          splashButton.innerHTML = altText[8];  
+          splashButton.addEventListener("click", () => { lockFilter(fid); 
+            splashScreen.classList.remove("show"); movesetScreen.classList.remove("show"); });
+          biomeDesc.appendChild(document.createElement('br'));
+          biomeDesc.appendChild(splashButton);
         }
-      });
+        biomeRow.appendChild(biomeLink);
+        biomeRow.appendChild(biomeDesc);
+        movesetScrollable.appendChild(biomeRow);
+      }
+    });
     movesetScrollable.appendChild(document.createElement('hr'));
     const splashCostInfo = document.createElement('div');  splashCostInfo.className = 'splash-move-tags';
     const HAtext = ('ha' in item ? `<br>${infoText[4]}: 1 in 8` : '');

@@ -260,16 +260,13 @@ h1 {
   .clickable-name:hover {
     color: rgb(140, 130, 240) !important;
   }
-  .splash-button:hover {
+  .splash-button:hover, .suggestion:hover, .biome-img:hover {
     border: 2px solid rgb(140, 130, 240);
   }
   .filter-tag:hover {
     background-color: #4e4e4e;
     border: 2px solid #4e4e4e;
     text-decoration: line-through;
-  }
-  .suggestion:hover {
-    border: 2px solid rgb(140, 130, 240);
   }
 }
 
@@ -518,6 +515,17 @@ h1 {
 }
 .biome-row {
   margin-top: 12px;
+  display: grid;
+  grid-template-columns: 136px 1fr;
+  align-items: center;
+  text-align: center;
+  justify-content: center;
+  margin-left: 6px;
+}
+.biome-img {
+  border-radius: 12px;
+  cursor: pointer;
+  border: 2px solid #29252D;
 }
 .moveset-row-header, .moveset-row {
   font-weight: bold;
