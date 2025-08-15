@@ -100,14 +100,20 @@ h1 {
   margin-bottom: 0px;
 }
 .filter-tag {
-  background-color: rgb(140, 130, 240);
   color: white;
   padding: 5px 10px;
   border-radius: 4px;
   cursor: pointer;
   font-weight: bold;
-  border: 2px solid rgb(140, 130, 240);
   animation: newfilteranim 1s ease-in-out;
+}
+.filter-tag-norm {
+  background-color: rgb(140, 130, 240);
+  border: 2px solid rgb(140, 130, 240);
+}
+.filter-tag-exc {
+  background-color: rgb(247, 82, 49);
+  border: 2px solid rgb(247, 82, 49);
 }
 @keyframes newfilteranim {
   0% { color: rgb(240, 230, 140); }
@@ -127,7 +133,7 @@ h1 {
   margin-top: auto;
   margin-bottom: auto;
 }
-.filter-tag img {
+.filter-tag img, .suggestion img {
   margin-left: -3px;
   margin-right: 5px;
 }

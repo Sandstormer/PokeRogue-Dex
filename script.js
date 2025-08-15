@@ -35,9 +35,9 @@ const REMchance = [24,12,6,6,3];
 let increment = 10;     // Number of items to load at a time
 let renderLimit = 0;    // Start with no items
 let showMoveLearn = []; // Filtered moves/biomes to show sources
-let filterToEnter = null;  // Filter to apply when hitting Enter
-let tabSelect = -1;        // Filter that is tab selected
-let lockedFilters = [];    // List of all locked filters
+let filterToEnter = null; // Filter to apply when hitting Enter
+let tabSelect = -1;       // Filter that is tab selected
+let lockedFilters = [];   // List of all locked filters
 let lockedMods = []; // List of filter mod objects
 let lockedFilterGroups = [[]]; // Grouped together for OR
 let pinnedRows = [];  // List of pinned row numbers
@@ -89,7 +89,7 @@ function loadAndApplyLanguage(lang) {
     
     // Initialize the searchable names
     fidToSearch = fidToName.map((thisName, fid) => makeSearchable( // Search via category for later categories
-      (fid >= fidThreshold[2] && fid < fidThreshold[8])||(fid >= fidThreshold[10]) ? `${fidToCategory(fid)}${thisName}` : thisName
+      (fid >= fidThreshold[2] && fid < fidThreshold[8])||(fid >= fidThreshold[10]) ? `${catToName[fidToCategory(fid)]}${thisName}` : thisName
     ));
     specToSearch = speciesNames.map(s => makeSearchable(s));
     searchBox.placeholder = `${altText[4]} ${headerNames[2]} / ${headerNames[3]} / ${headerNames[4]} / ${altText[0]} ...`;
@@ -167,12 +167,12 @@ function refreshAllItems() { // Display items based on query and locked filters 
             return TagToFID[fid].some(f => items[specID]?.[f] == 309+headerState.ability 
               || (headerState.ability == 1 && items[specID]?.[f] == 309));
           if (fid  <  fidThreshold[11]) return TagToFID[fid].some(f => f in items[specID]); // Other tag filters
-          console.warn('Filter error'); return fid in items[specID];
+          if (fid  >= fidThreshold[11]) return !(fid-fidThreshold[11] in items[specID]); // Exclusion filters
         }))) 
       }
   // Add moves to track in the move column  ==============
-  showMoveLearn = lockedFilters.filter(fid => isMoveOrBiome(fid));
-  lockedFilters.filter(f => f>fidThreshold[10]+1).forEach(f => // For the tag filters, add the associated FIDs
+  showMoveLearn = lockedFilters.filter(f => [2,9].includes(fidToCategory(f)));
+  lockedFilters.filter(f => f>fidThreshold[10]+1 && f<fidThreshold[11]).forEach(f => // For the move tag filters, add the associated FIDs
     showMoveLearn.push(...TagToFID[f].filter(fid => !showMoveLearn.some(ff => ff == fid))));
     
   // Remove the pinned items for now ==============
@@ -391,7 +391,7 @@ function renderMoreItems() { // Create each list item, with columns of info ****
       }
     });
     // Show biomes if toggled, and if column is empty or if peeking over a move
-    if (headerState.biome && (!numMovesShown || (showMoveLearn.every(fid => isMoveOrBiome(fid)==1) && numMovesShown < 4))) {
+    if (headerState.biome && (!numMovesShown || (showMoveLearn.every(fid => fidToCategory(f)==2) && numMovesShown < 4))) {
       if ([1,2].includes(item?.ee) && !numMovesShown) { // Show egg exclusives only if blank
         const clickableRow = document.createElement('div');  clickableRow.className = 'clickable-name';
         if (item.ee == 1) clickableRow.innerHTML += `<span style="color:rgb(143, 214, 154);">${infoText[5]}</span>`;
@@ -565,7 +565,6 @@ function showInfoSplash(specID, forcePage=null, forceShiny=null, forceFem=null) 
         biomeLink.href = `https://wiki.pokerogue.net/biomes:biomes#interactive_map`;  biomeLink.target = '_blank'; // Open in new tab
         const biomeImg = document.createElement('img');  biomeImg.src = `ui/biomes/${fid}.png`;  biomeImg.className = 'biome-img';
         biomeLink.appendChild(biomeImg);
-        // biomeImg.https://wiki.pokerogue.net/biomes:town
         const biomeDesc = document.createElement('div'); biomeDesc.innerHTML = `<b>${fidToName[fid]}:</b>`;
         item[fid].forEach(src => {
           biomeDesc.innerHTML += `<br><span style="font-weight:bold; color:${makeBiomeDesc(~~(src/20))}</span>`;
@@ -575,7 +574,7 @@ function showInfoSplash(specID, forcePage=null, forceShiny=null, forceFem=null) 
             biomeDesc.innerHTML += `<span style="font-size:16px;"> (${timeText})</span>`;
           }
         });
-        if (!lockedFilters.includes(fid)) { // Button to add biome directly to filters
+        if (!lockedFilters.some((f) => f%fidThreshold[11] == fid)) { // Button to add biome directly to filters
           const splashButton = document.createElement('div'); splashButton.className = 'splash-button';
           splashButton.innerHTML = altText[8];  
           splashButton.addEventListener("click", () => { lockFilter(fid); 
@@ -618,9 +617,9 @@ function showInfoSplash(specID, forcePage=null, forceShiny=null, forceFem=null) 
     }
     // Sort the moves
     moveList[0].sort((a, b) => item[a] > item[b] ? 1 : (item[a] < item[b]) ? -1 : 
-      (fidToName[a] > fidToName[b] ? 1 : (fidToName[a] < fidToName[b] ? -1 : 0 )));
+      (fidToName[a] > fidToName[b] ? 1 : (fidToName[a] < fidToName[b] ? -1 : 0 ))); // Level moves
     moveList[1].sort((a, b) => item[a]%4 > item[b]%4 ? 1 : (item[a]%4 < item[b]%4) ? -1 : 
-      (fidToName[a] > fidToName[b] ? 1 : (fidToName[a] < fidToName[b] ? -1 : 0 )));
+      (fidToName[a] > fidToName[b] ? 1 : (fidToName[a] < fidToName[b] ? -1 : 0 ))); // TM moves are mod 4
     [moveList[0],[item.e1,item.e2,item.e3,item.e4],moveList[1]].forEach((thisList, tableIndex) => {
       if (thisList != moveList[0]) movesetScrollable.appendChild(document.createElement('hr'));
       thisList.forEach(move => makeMovesetRow(move, item, tableIndex));
@@ -696,7 +695,7 @@ function showDescSplash(fid) { // Create the ability/move splash ***************
     });
     splashContent.appendChild(splashMoveTags);
   }
-  if (!lockedFilters.includes(fid)) { // Button to add ability/move directly to filters
+  if (!lockedFilters.some((f) => f%fidThreshold[11] == fid)) { // Button to add ability/move directly to filters
     const splashButton = document.createElement('div'); splashButton.className = 'splash-button'; 
     splashButton.innerHTML = altText[8];  
     splashButton.addEventListener("click", () => { lockFilter(fid); 
@@ -707,8 +706,8 @@ function showDescSplash(fid) { // Create the ability/move splash ***************
 }
 
 function fidToCategory(fid) {
-  for (let index = 0; index < catToName.length; index++) {
-    if (fid < fidThreshold[index]) return catToName[index]
+  for (let i = 0; i < catToName.length; i++) {
+    if (fid < fidThreshold[i]) return i;
   }
 }
 function fidToColor(fid) {
@@ -740,47 +739,36 @@ function eggTierColors(fid) {
   if (fid == 5) return col.ge;
   else { console.log('Invalid egg tier'); return null; }
 }
-function isMoveOrBiome(fid) {
-  return ((fid >= fidThreshold[1] && fid < fidThreshold[2]) ? 1 : ((fid >= fidThreshold[8] && fid < fidThreshold[9]) ? 2 : 0));
-}
 
 // Display the filter suggestions *************************
-function displaySuggestions() { // Get search query and clear the list
-  filterToEnter = null;   suggestions.innerHTML = '';
-  const query = makeSearchable(searchBox.value);
+function displaySuggestions() {
+  filterToEnter = null;   suggestions.innerHTML = ''; // Clear the list
+  const isExclusion = searchBox.value.startsWith('-');
+  const query = makeSearchable(searchBox.value); // Get search query
   if (query.length) {
     // Filter by species name, to suggest families
     let filteredSID = possibleSID.filter((ID) => items[ID].dex.toString().includes(query) || specToSearch[ID].includes(query));
     if (filteredSID.length > 20) filteredSID = [];
     let offerFamilies = [...new Set(filteredSID.map(ID => items[ID].fa))];
     if (offerFamilies.length > 4) offerFamilies = [];
-
-    let matchingFID = [];   
     // Filter suggestions based on query and exclude already locked filters
-    matchingFID = possibleFID.filter((fid) => {
-        if (lockedFilters.some((f) => f == fid)) return false; // Don't suggest if already locked
-        if (fid >= fidThreshold[9] && offerFamilies.includes(fid)) return true; // Suggest matching families
-        if (fid >= fidThreshold[10] && TagToFID[fid].some(f => fidToSearch[f].includes(query))) return true; // Suggest related tags
-        return fidToSearch[fid].includes(query); // Suggest if it contains the search query
+    let matchingFID = possibleFID.filter((fid) => {
+      if (isExclusion && ![0,1,2,9].includes(fidToCategory(fid))) return false; // Only exclusion filters of some categories
+      if (lockedFilters.some((f) => f%fidThreshold[11] == fid)) return false; // Don't suggest if already locked
+      if (fid >= fidThreshold[9] && offerFamilies.includes(fid)) return true; // Suggest matching families
+      if (fid >= fidThreshold[10] && TagToFID[fid].some(f => fidToSearch[f].includes(query))) return true; // Suggest related tags
+      return fidToSearch[fid].includes(query); // Suggest if it contains the search query
     });
-    if (matchingFID.length > 22) matchingFID = []; // Erase the list of suggestions if it is too large
-
-    if (lockedFilters.length) { // If there is at least one locked filter, re-sort the list
-      // (If there are no locked filters, the list is already presorted)
-      // Count how many hits each suggestion has
-
-      // Sort the list of suggestions based on hits in the item list (but still by type/ability/move)
-    }
-
+    // Erase the list of suggestions if it is too large
+    if (matchingFID.length > 22) matchingFID = [];
     // Highlight a suggestion if tab is hit
     if (matchingFID.length) {
-      if (tabSelect > matchingFID.length-1) tabSelect -= matchingFID.length;
+      tabSelect %= matchingFID.length
       filterToEnter = matchingFID[(tabSelect == -1 ? 0 : tabSelect)];
-    } 
+    }
     matchingFID.forEach((fid) => { // Create the suggestion tag elements
       let newSugg = document.createElement('div');  newSugg.className = 'suggestion';
-      newSugg.innerHTML = `<span style="color:${fidToColor(fid)[0]}; display:inline;">${fidToCategory(fid)}: 
-                           <span style="color:${fidToColor(fid)[1]}; display:inline;">${fidToName[fid]}</span></span>`;
+      newSugg.innerHTML = `${isExclusion?'<img src="ui/x.png">':''}<span style="color:${fidToColor(fid)[0]}; display:inline;">${catToName[fidToCategory(fid)]}: <span style="color:${fidToColor(fid)[1]}; display:inline;">${fidToName[fid]}</span></span>`;
       newSugg.addEventListener("click", () => lockFilter(fid));
       if (filterToEnter == fid && tabSelect != -1) newSugg.style.borderColor = col.pu;
       suggestions.appendChild(newSugg);
@@ -791,7 +779,8 @@ function displaySuggestions() { // Get search query and clear the list
 // Lock a filter *************************
 function lockFilter(newLockFID, clearQuery = true) {
   if (!lockedFilters.some((f) => f == newLockFID)) {
-    lockedFilters.push(newLockFID); // Add the filter to the locked filters container
+    const isExclusion = searchBox.value.startsWith('-');
+    lockedFilters.push(newLockFID+fidThreshold[11]*isExclusion); // Add the filter to the locked filters list
     let filterMod = null;
     if (lockedFilters.length > 1) {
       const defaultOR = (newLockFID >= fidThreshold[8] && lockedFilters[lockedFilters.length-2] >= fidThreshold[8]);
@@ -800,9 +789,9 @@ function lockFilter(newLockFID, clearQuery = true) {
       filterMod.addEventListener("click", () => toggleOR(filterMod));
       lockedMods.push(filterMod); filterContainer.appendChild(filterMod);
     }
-    const filterTag = document.createElement("span"); filterTag.className = "filter-tag";
-    filterTag.innerHTML = `<img src="ui/lock.png">${fidToCategory(newLockFID)}: ${fidToName[newLockFID]}`;
-    filterTag.addEventListener("click", () => removeFilter(newLockFID, filterTag, filterMod));
+    const filterTag = document.createElement("span"); filterTag.className = `filter-tag filter-tag-${isExclusion?"exc":"norm"}`;
+    filterTag.innerHTML = `<img src="ui/${isExclusion?"x":"lock"}.png">${catToName[fidToCategory(newLockFID)]}: ${fidToName[newLockFID]}`;
+    filterTag.addEventListener("click", () => removeFilter(newLockFID+fidThreshold[11]*isExclusion, filterTag, filterMod));
     filterContainer.appendChild(filterTag);
     // Clear the search bar after locking
     if (clearQuery) searchBox.value = ""; 
@@ -812,8 +801,8 @@ function lockFilter(newLockFID, clearQuery = true) {
       updateHeader(headerColumns[1]);
     } else if (newLockFID == fidThreshold[7]+2 && headerState.shiny > 1) { // No variants
       headerState.shiny = 0; updateHeader(headerColumns[1]);
-    } else if (sortState.column === 'row' && isMoveOrBiome(newLockFID)) { // Move/Biome
-      updateHeader(headerColumns[5]);
+    } else if (sortState.column === 'row' && [2,9].includes(fidToCategory(newLockFID+fidThreshold[11]*isExclusion))) {
+      updateHeader(headerColumns[5]); // Sort by Move/Biome for those new filters
     } else {
       updateHeader(null, true);
     }
@@ -833,12 +822,12 @@ function removeFilter(fidToRemove, tagToRemove, modToRemove) {
     headerState.shiny = 0;  headerColumns[1].innerHTML = headerNames[1]; 
   }
   // Reset the sorting if there aren't any more locked moves
-  if (sortState.column === 'moves' && !lockedFilters.some(f => (f >= isMoveOrBiome(f)))) { 
+  if (sortState.column === 'moves' && !lockedFilters.some(f => [2,9].includes(fidToCategory(f)))) { 
     updateHeader(headerColumns[0]); 
   } else { 
     updateHeader(null, true); // Update header, then refresh items and suggestions
   }
-  if (lockedFilters.length) { // Reset the animation of the page title
+  if (!lockedFilters.length) { // Reset the animation of the page title
     pageTitle.classList.remove('colorful-text');  void pageTitle.offsetWidth;
     pageTitle.classList.add('colorful-text');
   }
@@ -866,7 +855,7 @@ function toggleOR(filterMod) { // Click a filter to toggle it between AND and OR
 function updateHeader(clickTarget = null, ignoreFlip = false) {
   if (clickTarget == null) { clickTarget = sortState.target; ignoreFlip = true; }
   const sortAttribute = clickTarget?.sortattr;
-  const hasMovesBiomes = lockedFilters.some(f => isMoveOrBiome(f) || f > fidThreshold[10]+1);
+  const hasMovesBiomes = lockedFilters.some(f => [2,9].includes(fidToCategory(f)));
   // If clicking move column, with no moves/biomes filtered, toggle between egg moves and biomes
   if (sortAttribute == 'moves' && !hasMovesBiomes && !ignoreFlip) headerState.biome = !headerState.biome;
   // Set the text of the move column, depending on if a move is filtered
