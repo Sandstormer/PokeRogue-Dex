@@ -225,7 +225,7 @@ function refreshAllItems() { // Display items based on query and locked filters 
   if (!filteredItemIDs.length) { // No pokemon
     const helpMessage = document.createElement('div');  helpMessage.className = 'item-help-message';
     helpMessage.innerHTML = '<hr>';
-    if (headerState.shiny > 1) helpMessage.innerHTML += '<b><span style="color:rgb(140, 130, 240);">Restricted to Pokemon that have shiny variants.</b><br><br></span>';
+    if (lockedFilters.some(f => f == fidThreshold[7] || f == fidThreshold[7]+1)) helpMessage.innerHTML += '<b><span style="color:rgb(140, 130, 240);">Restricted to Pokemon that have shiny variants.</b><br><br></span>';
     if (headerState.ability) helpMessage.innerHTML += '<b><span style="color:rgb(140, 130, 240);">Abilities are restricted to only ' + (headerState.ability == 1 ? 'Main' : (headerState.ability == 2 ? 'Hidden' : 'Passive'))+ ' Abilities.</b><br><br></span>';
     if (suggestions.innerHTML === '') { // No suggestions
       if (!lockedFilters.length) { // No locked filters
@@ -863,7 +863,10 @@ function updateHeader(clickTarget = null, ignoreFlip = false) {
     (headerState.biome?`<span style="color:rgb(140, 130, 240);">${infoText[9]}</span>`:headerNames[5]));
   // Find the new sorting attribute, and update the headers
   if (sortAttribute == 'shiny') { // Toggle the global shiny state
-    headerState.shiny = (headerState.shiny+3)%(4-2*lockedFilters.some(f => f == fidThreshold[7]+2));
+    // Cap the selector to T1 if the "None" filter is selected or if the entire list only has T1
+    const shinyCap = lockedFilters.some(f => f == fidThreshold[7]+2) 
+      || (!filteredItemIDs.some(specID => items[specID].sh>1) && !!filteredItemIDs.length);
+    headerState.shiny += 3;  headerState.shiny %= (shinyCap?2:4);
     if (headerState.shiny) {
       headerColumns[1].innerHTML = `<span style="color:rgb(140, 130, 240);">${headerNames[1]}</span>`;
       const starImg = document.createElement('img');  starImg.className = 'star-header';
