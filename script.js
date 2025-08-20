@@ -568,9 +568,8 @@ function showInfoSplash(specID, forcePage=null, forceShiny=null, forceFem=null) 
         const biomeDesc = document.createElement('div'); biomeDesc.innerHTML = `<b>${fidToName[fid]}:</b>`;
         item[fid].forEach(src => {
           biomeDesc.innerHTML += `<br><span style="font-weight:bold; color:${makeBiomeDesc(~~(src/20))}</span>`;
-          if (src%20) { // If limited to time of day
-            let timeText = '';
-            [1,2,4,8].forEach((i,index) => timeText += ((src%20)%(2*i)>=i ? `${timeText?', ':''}${biomeText[11+index]}`:''));
+          if (src%20) { // If limited to time of day (bitmasked in the 4 lowest bits)
+            const timeText = [0,1,2,3].filter(i => 2**i&(src%20)).map(i => biomeText[11+i]).join(', ');
             biomeDesc.innerHTML += `<span style="font-size:16px;"> (${timeText})</span>`;
           }
         });
