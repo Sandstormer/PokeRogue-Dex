@@ -221,21 +221,21 @@ function refreshAllItems() { // Display items based on query and locked filters 
   displaySuggestions();
   renderLimit = 0;
   renderMoreItems();
+  
   // Show error messages if there are no results
   if (!filteredItemIDs.length) { // No pokemon
     const helpMessage = document.createElement('div');  helpMessage.className = 'item-help-message';
     helpMessage.innerHTML = '<hr>';
-    if (lockedFilters.some(f => f == fidThreshold[7] || f == fidThreshold[7]+1)) helpMessage.innerHTML += '<b><span style="color:rgb(140, 130, 240);">Restricted to Pokemon that have shiny variants.</b><br><br></span>';
-    if (headerState.ability) helpMessage.innerHTML += '<b><span style="color:rgb(140, 130, 240);">Abilities are restricted to only ' + (headerState.ability == 1 ? 'Main' : (headerState.ability == 2 ? 'Hidden' : 'Passive'))+ ' Abilities.</b><br><br></span>';
+    if (lockedFilters.some(f => f == fidThreshold[7] || f == fidThreshold[7]+1)) helpMessage.innerHTML += '<img src="ui/shiny2.png"> <img src="ui/shiny3.png"> <b><span style="color:rgb(140, 130, 240);">Restricted to Pokemon that have shiny variants.</b><br><br></span>';
+    if (headerState.ability) helpMessage.innerHTML += `<b><span style="color:rgb(140, 130, 240);">Abilities are restricted to only ${(headerState.ability == 1 ? "Main" : (headerState.ability == 2 ? "Hidden" : "Passive"))} Abilities.</b><br><br></span>`;
     if (suggestions.innerHTML === '') { // No suggestions
       if (!lockedFilters.length) { // No locked filters
-        helpMessage.innerHTML += '<b>There are no Pokemon or filters' + (isMobile ? '<br>' : ' ') + 'that match the search term' + (headerState.shiny > 1 ? ' and have shiny variants.</b>' : '.</b><br>Please check your spelling and try again.');
-        // Suggest language???
+        helpMessage.innerHTML += `<b>There are no Pokemon or filters${isMobile ? "<br>" : " "}that match the search term.</b><br>Please check your spelling and try again.`;
       } else {
         if (query === '') {
           helpMessage.innerHTML += '<b>There are no Pokemon that match the filters.</b><br>Remove filters, or change the connections to "OR".';
         } else {
-          helpMessage.innerHTML += '<b>There are no Pokemon that match' + (isMobile ? '<br>' : ' ') + 'the filters and the search term.</b><br>Try a different combination.';
+          helpMessage.innerHTML += `<b>There are no Pokemon that match${isMobile ? "<br>" : " "}the filters and the search term.</b><br>Try a different combination.`;
         }
       }
     } else {
