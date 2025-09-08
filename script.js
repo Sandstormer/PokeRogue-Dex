@@ -245,8 +245,13 @@ function refreshAllItems() { // Display items based on query and locked filters 
         helpMessage.innerHTML += '<b>There are no Pokemon that match the filters and the search term.</b><br>Adding another filter may change the results.';
       }
     }
-    // helpMessage.innerHTML += (suggestions.innerHTML ? (lockedFilters ? warningText[3] : warningText[4]) : (lockedFilters ? 
-    //   (query ? warningText[5] : warningText[6]) : warningText[7]));
+    // helpMessage.innerHTML = '<hr>';
+    // if (lockedFilters.some(f => f == fidThreshold[7] || f == fidThreshold[7]+1)) helpMessage.innerHTML += 
+    //   `<img src="ui/shiny2.png"> <img src="ui/shiny3.png"> <b><span style="color:rgb(140, 130, 240);">${warningText[0]}</b><br><br></span>`;
+    // if (headerState.ability) helpMessage.innerHTML += 
+    //   `<b><span style="color:rgb(140, 130, 240);">${warningText[headerState.ability]}</b><br><br></span>`;
+    // helpMessage.innerHTML += (suggestions.innerHTML ? (lockedFilters ? warningText[4] : warningText[5]) : (lockedFilters ? 
+    //   (query ? warningText[6] : warningText[7]) : warningText[8]));
   helpMessage.innerHTML += '<br><span style="color:rgb(145, 145, 145);">Click to see the instructions.</span><hr>'
   helpMessage.addEventListener('click', () => openHelpMenu());
   itemList.appendChild(helpMessage)
@@ -391,7 +396,7 @@ function renderMoreItems() { // Create each list item, with columns of info ****
       }
     });
     // Show biomes if toggled, and if column is empty or if peeking over a move
-    if (headerState.biome && (!numMovesShown || (showMoveLearn.every(fid => fidToCategory(f)==2) && numMovesShown < 4))) {
+    if (headerState.biome && (!numMovesShown || (showMoveLearn.every(f => fidToCategory(f)==2) && numMovesShown < 4))) {
       if ([1,2].includes(item?.ee) && !numMovesShown) { // Show egg exclusives only if blank
         const clickableRow = document.createElement('div');  clickableRow.className = 'clickable-name';
         if (item.ee == 1) clickableRow.innerHTML += `<span style="color:rgb(143, 214, 154);">${infoText[5]}</span>`;
