@@ -2,6 +2,7 @@ headerNames = ['No.','色違い','名前','タイプ','とくせい','タマゴ 
 altText = ['わざ','規格のみ','隠れのみ','消極的のみ','検索の','威力','命中','PP','フィルターに追加','きおくのキノコ','しんか','タマゴわざ','レアタマゴわざ','コモン','スーパー','ハイパー','わざマシン','Lv.','進化','卵'];
 catToName = ['タイプ','とくせい','わざ','世代','コスト','性','ゲームモード','タマゴ層','色違い','バイオーム','関連','タグ'];
 biomeText = ['コモン','アンコモン','レア','スーパーレア','ウルトラレア','ボス','コモン','UC','レア','SR','UR','暁','昼','黄昏','夜'];
+biomeLongText = ['<b>This Pokemon is <span style="color:rgb(143, 214, 154);">Egg Exclusive</span>.</b><br>It does not appear in any biomes, and can only be obtained from eggs.','<b>This is a <span style="color:rgb(216, 143, 205);">Baby Pokemon</span>.</b><br>It does not appear in any biomes, but can be unlocked by encountering its evolution.','<b>This <span style="color:rgb(239, 131, 131);">Paradox Pokemon</span> is <span style="color:rgb(143, 214, 154);">Egg Exclusive</span>.</b><br>It can only be obtained from eggs, but can afterward be caught in Classic mode.','<b>Only available via <span style="color:rgb(131, 182, 239);">Form Change</span>.</b><br>It does not appear in any biomes.','This Pokemon can only be caught after obtaining <b><span style="color:rgb(239, 131, 131);">All Other Pokemon</span></b>.<br>It does not appear in standard eggs.'];
 infoText = ['アメごとのなつき度','パッシブ','ポイント削減','タマゴを買う','隠れ特性','タマゴ 限定','ベイビィ限定','パラドックスポケモン','フォルムチェンジ','バイオーム'];
 procToDesc = [
 "User Atk",
@@ -96,6 +97,7 @@ tagToDesc = [
 "Makes Contact",
 "Partially Implemented",
 "Not Implemented"];
+warningText = ['Restricted to Pokemon that have shiny variants.','Abilities are restricted to only Main Abilities.','Abilities are restricted to only Hidden Abilities.','Abilities are restricted to only Passive Abilities.','<b>There are no Pokemon that match the filters and the search term.</b><br>Adding another filter may change the results.','<b>Click on a suggestion to filter it.</b><br>Filter preview is only for Species/Types/Abilities.','<b>There are no Pokemon that match the filters and the search term.</b><br>Try a different combination.','<b>There are no Pokemon that match the filters.</b><br>Remove filters, or change the connections to "OR".','<b>There are no Pokemon or filters that match the search term.</b><br>Please check your spelling and try again.','Click to see the instructions.'];
 fidToDesc = [
 'ＨＰが 減ったとき くさタイプの 技の 威力が 上がる。',
 '天気が 晴れのとき 素早さが 上がる。',

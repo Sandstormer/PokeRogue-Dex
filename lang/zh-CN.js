@@ -2,6 +2,7 @@ headerNames = ['编号','闪光','名称','属性','特性','蛋招式','费用'
 altText = ['招式','标准','梦特','被动','搜索','威力','命中','PP','添加到筛选','回忆蘑菇','进化','蛋招式','稀有 蛋招式','常见','超','高','学习器','等级','进化','蛋'];
 catToName = ['属性','特性','招式','世代','费用','性别','模式','蛋','变种闪光','环境','相关于','标签'];
 biomeText = ['普通','罕见','稀有','非常稀有','极其稀有','Boss','普通','罕见','稀有','非常','极其','黎明','白天','黄昏','夜晚'];
+biomeLongText = ['<b>This Pokemon is <span style="color:rgb(143, 214, 154);">Egg Exclusive</span>.</b><br>It does not appear in any biomes, and can only be obtained from eggs.','<b>This is a <span style="color:rgb(216, 143, 205);">Baby Pokemon</span>.</b><br>It does not appear in any biomes, but can be unlocked by encountering its evolution.','<b>This <span style="color:rgb(239, 131, 131);">Paradox Pokemon</span> is <span style="color:rgb(143, 214, 154);">Egg Exclusive</span>.</b><br>It can only be obtained from eggs, but can afterward be caught in Classic mode.','<b>Only available via <span style="color:rgb(131, 182, 239);">Form Change</span>.</b><br>It does not appear in any biomes.','This Pokemon can only be caught after obtaining <b><span style="color:rgb(239, 131, 131);">All Other Pokemon</span></b>.<br>It does not appear in standard eggs.'];
 infoText = ['每颗糖果的亲密度','被动','费用降低','兑换一颗蛋','梦特','蛋 限定','宝宝 限定','悖论宝可梦','形态变化','环境'];
 procToDesc = [
 "User Atk",
@@ -96,6 +97,7 @@ tagToDesc = [
 "Makes Contact",
 "Partially Implemented",
 "Not Implemented"];
+warningText = ['Restricted to Pokemon that have shiny variants.','Abilities are restricted to only Main Abilities.','Abilities are restricted to only Hidden Abilities.','Abilities are restricted to only Passive Abilities.','<b>There are no Pokemon that match the filters and the search term.</b><br>Adding another filter may change the results.','<b>Click on a suggestion to filter it.</b><br>Filter preview is only for Species/Types/Abilities.','<b>There are no Pokemon that match the filters and the search term.</b><br>Try a different combination.','<b>There are no Pokemon that match the filters.</b><br>Remove filters, or change the connections to "OR".','<b>There are no Pokemon or filters that match the search term.</b><br>Please check your spelling and try again.','Click to see the instructions.'];
 fidToDesc = [
 'ＨＰ减少的时候，草属性的招式威力会提高。',
 '晴朗天气时，速度会提高。',

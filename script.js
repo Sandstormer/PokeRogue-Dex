@@ -226,35 +226,16 @@ function refreshAllItems() { // Display items based on query and locked filters 
   if (!filteredItemIDs.length) { // No pokemon
     const helpMessage = document.createElement('div');  helpMessage.className = 'item-help-message';
     helpMessage.innerHTML = '<hr>';
-    if (lockedFilters.some(f => f == fidThreshold[7] || f == fidThreshold[7]+1)) helpMessage.innerHTML += '<img src="ui/shiny2.png"> <img src="ui/shiny3.png"> <b><span style="color:rgb(140, 130, 240);">Restricted to Pokemon that have shiny variants.</b><br><br></span>';
-    if (headerState.ability) helpMessage.innerHTML += `<b><span style="color:rgb(140, 130, 240);">Abilities are restricted to only ${(headerState.ability == 1 ? "Main" : (headerState.ability == 2 ? "Hidden" : "Passive"))} Abilities.</b><br><br></span>`;
-    if (suggestions.innerHTML === '') { // No suggestions
-      if (!lockedFilters.length) { // No locked filters
-        helpMessage.innerHTML += `<b>There are no Pokemon or filters${isMobile ? "<br>" : " "}that match the search term.</b><br>Please check your spelling and try again.`;
-      } else {
-        if (query === '') {
-          helpMessage.innerHTML += '<b>There are no Pokemon that match the filters.</b><br>Remove filters, or change the connections to "OR".';
-        } else {
-          helpMessage.innerHTML += `<b>There are no Pokemon that match${isMobile ? "<br>" : " "}the filters and the search term.</b><br>Try a different combination.`;
-        }
-      }
-    } else {
-      if (!lockedFilters.length) { // No locked filters
-        helpMessage.innerHTML += '<b>Click on a suggestion to filter it.</b><br>Filter preview is only for Species/Types/Abilities.';
-      } else {
-        helpMessage.innerHTML += '<b>There are no Pokemon that match the filters and the search term.</b><br>Adding another filter may change the results.';
-      }
-    }
-    // helpMessage.innerHTML = '<hr>';
-    // if (lockedFilters.some(f => f == fidThreshold[7] || f == fidThreshold[7]+1)) helpMessage.innerHTML += 
-    //   `<img src="ui/shiny2.png"> <img src="ui/shiny3.png"> <b><span style="color:rgb(140, 130, 240);">${warningText[0]}</b><br><br></span>`;
-    // if (headerState.ability) helpMessage.innerHTML += 
-    //   `<b><span style="color:rgb(140, 130, 240);">${warningText[headerState.ability]}</b><br><br></span>`;
-    // helpMessage.innerHTML += (suggestions.innerHTML ? (lockedFilters ? warningText[4] : warningText[5]) : (lockedFilters ? 
-    //   (query ? warningText[6] : warningText[7]) : warningText[8]));
-  helpMessage.innerHTML += '<br><span style="color:rgb(145, 145, 145);">Click to see the instructions.</span><hr>'
-  helpMessage.addEventListener('click', () => openHelpMenu());
-  itemList.appendChild(helpMessage)
+    if (lockedFilters.some(f => f == fidThreshold[7] || f == fidThreshold[7]+1)) helpMessage.innerHTML += 
+      `<img src="ui/shiny2.png"> <img src="ui/shiny3.png"> <b><span style="color:rgb(140, 130, 240);">${warningText[0]}</b><br><br></span>`;
+    if (headerState.ability) helpMessage.innerHTML += 
+      `<b><span style="color:rgb(140, 130, 240);">${warningText[headerState.ability]}</b><br><br></span>`;
+    helpMessage.innerHTML += (suggestions.innerHTML 
+      ? (lockedFilters.length ? warningText[4] : warningText[5]) 
+      : (lockedFilters.length ? (query ? warningText[6] : warningText[7]) : warningText[8]));
+    helpMessage.innerHTML += `<br><span style="color:rgb(145, 145, 145);">${warningText[9]}</span><hr>`;
+    helpMessage.addEventListener('click', () => openHelpMenu());
+    itemList.appendChild(helpMessage)
   }
 }
 
@@ -555,13 +536,7 @@ function showInfoSplash(specID, forcePage=null, forceShiny=null, forceFem=null) 
     movesetContent.style.width = (isMobile ? '351px':'auto');
   }
   else if (splashState.page == 1) { // Show biomes
-    if ('ee' in item) { // Description of pokemon with no biomes
-      if (item.ee == 1) movesetScrollable.innerHTML += '<b>This Pokemon is <span style="color:rgb(143, 214, 154);">Egg Exclusive</span>.</b><br>It does not appear in any biomes, and can only be obtained from eggs.';
-      if (item.ee == 2) movesetScrollable.innerHTML += '<b>This is a <span style="color:rgb(216, 143, 205);">Baby Pokemon</span>.</b><br>It does not appear in any biomes, but can be unlocked by encountering its evolution.';
-      if (item.ee == 3) movesetScrollable.innerHTML += '<b>This <span style="color:rgb(239, 131, 131);">Paradox Pokemon</span> is <span style="color:rgb(143, 214, 154);">Egg Exclusive</span>.</b><br>It can only be obtained from eggs, but can afterward be caught in Classic mode.';
-      if (item.ee == 4) movesetScrollable.innerHTML += '<b>Only available via <span style="color:rgb(131, 182, 239);">Form Change</span>.</b><br>It does not appear in any biomes.';
-      if (item.ee == 5) movesetScrollable.innerHTML += 'This Pokemon can only be caught after obtaining <b><span style="color:rgb(239, 131, 131);">All Other Pokemon</span></b>.<br>It does not appear in standard eggs.';
-    }
+    if ('ee' in item) movesetScrollable.innerHTML += biomeLongText[item.ee-1]; // Description of exclusivity
     possibleFID.slice(fidThreshold[8],fidThreshold[9]).forEach((fid) => {
       if (fid in item) {
         const biomeRow = document.createElement('div');  biomeRow.className = 'biome-row';
