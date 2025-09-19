@@ -1,6 +1,7 @@
 headerNames = ['Dex','Shiny','Species','Types','Abilities','Egg Moves','Cost','BST','HP','Atk','Def','SpA','SpD','Spe'];
 altText = ['Moves','Main Only','Hidden Only','Passive Only','Search','Pow','Acc','PP','Add to filters','Memory','Evolution','Egg Move','Rare Egg Move','Common','Great','Ultra','TM','Lv.','Evo','Egg'];
 catToName = ['Type','Ability','Move','Gen','Cost','Gender','Mode','Egg Tier','Shiny Variants','Biome','Related To','Tag'];
+infoText = ['Friendship per Candy','Passive','Cost Reduction','Species Egg','Hidden Ability','Egg Exclusive','Baby Exclusive','Paradox Pokemon','Form Change','Biomes','Filters'];
 biomeText = ['Common','Uncommon','Rare','Super Rare','Ultra Rare','Boss','Com.','Unc.','Rare','SR','UR','Dawn','Day','Dusk','Night'];
 biomeLongText = [
 '<b>This Pokemon is <span style="color:rgb(143, 214, 154);">Egg Exclusive</span>.</b><br>It does not appear in any biomes, and can only be obtained from eggs.',
@@ -8,7 +9,6 @@ biomeLongText = [
 '<b>This <span style="color:rgb(239, 131, 131);">Paradox Pokemon</span> is <span style="color:rgb(143, 214, 154);">Egg Exclusive</span>.</b><br>It can only be obtained from eggs, but can afterward be caught in Classic mode.',
 '<b>Only available via <span style="color:rgb(131, 182, 239);">Form Change</span>.</b><br>It does not appear in any biomes.',
 'This Pokemon can only be caught after obtaining <b><span style="color:rgb(239, 131, 131);">All Other Pokemon</span></b>.<br>It does not appear in standard eggs.'];
-infoText = ['Friendship per Candy','Passive','Cost Reduction','Species Egg','Hidden Ability','Egg Exclusive','Baby Exclusive','Paradox Pokemon','Form Change','Biomes'];
 procToDesc = [
 "User Atk",
 "User Def",

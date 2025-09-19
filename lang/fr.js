@@ -1,6 +1,7 @@
 headerNames = ['N°','Chrom.','Nom','Type','Talents','Capacités Œuf','Cout','Total','PV','Atq','Déf','ASp','DSp','Vit'];
 altText = ['Capacités','Principaux','Caché','Passif','Entrez','Puis.','Préc.','PP','Ajouter aux filtres','Champi Mémoriel','Évolutions','Capacités Œuf','Rare Capac. Œuf','Commun','Super','Hyper','CT','N.','Évo','Œuf'];
 catToName = ['Type','Talent','Capacité','Gen','Cout','Sexe','Mode','Œuf','Variantes Chromatique','Biome','Lié à','Étiquette'];
+infoText = ['Bonheur par Bonbon','Passif','Cout réduit','Acheter un Œuf','Talent Caché','Exclusif à l’Œuf','Exclusif aux Bébés','Pokémon Paradoxe','Changement de forme','Biomes','Filtres'];
 biomeText = ['Commun','Peu Commun','Rare','Super Rare','Hyper Rare','Boss','Com.','PC','Rare','SR','HR','Aube','Jour','Crépuscule','Nuit'];
 biomeLongText = [
 '<b>This Pokemon is <span style="color:rgb(143, 214, 154);">Egg Exclusive</span>.</b><br>It does not appear in any biomes, and can only be obtained from eggs.',
@@ -8,7 +9,6 @@ biomeLongText = [
 '<b>This <span style="color:rgb(239, 131, 131);">Paradox Pokemon</span> is <span style="color:rgb(143, 214, 154);">Egg Exclusive</span>.</b><br>It can only be obtained from eggs, but can afterward be caught in Classic mode.',
 '<b>Only available via <span style="color:rgb(131, 182, 239);">Form Change</span>.</b><br>It does not appear in any biomes.',
 'This Pokemon can only be caught after obtaining <b><span style="color:rgb(239, 131, 131);">All Other Pokemon</span></b>.<br>It does not appear in standard eggs.'];
-infoText = ['Bonheur par Bonbon','Passif','Cout réduit','Acheter un Œuf','Talent Caché','Exclusif à l’Œuf','Exclusif aux Bébés','Pokémon Paradoxe','Changement de forme','Biomes'];
 procToDesc = [
 "User Atk",
 "User Def",

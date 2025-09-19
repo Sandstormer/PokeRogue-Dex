@@ -1,6 +1,7 @@
 headerNames = ['Dex','Shiny','Especie','Tipos','Habilidades','Mov. Huevo','Coste','BST','PS','Atq','Def','AtE','DfE','Vel'];
 altText = ['Movimientos','Solo Principal','Solo Oculta','Solo Pasiva','Buscar','Pot.','Prec.','PP','Añadir a filtros','Recuerdo','Evolución','Mov. Huevo','Mov. Huevo Raro','Común','Súper','Ultra','MT','Nv.','Evo','Huevo'];
 catToName = ['Tipo','Habilidad','Movimiento','Gen','Coste','Género','Modo','Nivel de Huevo','Variantes Shiny','Bioma','Relacionado con','Etiqueta'];
+infoText = ['Amistad por Caramelo','Pasiva','Reducción de Coste','Huevo de Especie','Habilidad Oculta','Exclusivo de Huevo','Exclusivo de Cría','Pokémon Paradoja','Cambio de Forma','Biomas','Filtros'];
 biomeText = ['Común','Poco Común','Raro','Super Raro','Ultra Raro','Jefe','Com.','PCom.','Raro','SR','UR','Amanecer','Día','Atardecer','Noche'];
 biomeLongText = [
 '<b>This Pokemon is <span style="color:rgb(143, 214, 154);">Egg Exclusive</span>.</b><br>It does not appear in any biomes, and can only be obtained from eggs.',
@@ -8,7 +9,6 @@ biomeLongText = [
 '<b>This <span style="color:rgb(239, 131, 131);">Paradox Pokemon</span> is <span style="color:rgb(143, 214, 154);">Egg Exclusive</span>.</b><br>It can only be obtained from eggs, but can afterward be caught in Classic mode.',
 '<b>Only available via <span style="color:rgb(131, 182, 239);">Form Change</span>.</b><br>It does not appear in any biomes.',
 'This Pokemon can only be caught after obtaining <b><span style="color:rgb(239, 131, 131);">All Other Pokemon</span></b>.<br>It does not appear in standard eggs.'];
-infoText = ['Amistad por Caramelo','Pasiva','Reducción de Coste','Huevo de Especie','Habilidad Oculta','Exclusivo de Huevo','Exclusivo de Cría','Pokémon Paradoja','Cambio de Forma','Biomas'];
 procToDesc = [
 "User Atk",
 "User Def",

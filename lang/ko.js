@@ -1,6 +1,7 @@
 headerNames = ['번호','이로치','종','타입','특성','알기술','코스트','합계','HP','공격','방어','특공','특방','스핏'];
 altText = ['기술','일반특성','숨겨진 특성','패시브','검색','위력','명중률','PP','필터에 추가','기억버섯','진화계보','알 기술','레어 알 기술','일반','슈퍼','하이퍼','머신','레벨','진화','알'];
 catToName = ['타입','특성','기술','세대','코스트','성별','모드','알','색 다른 이로치','바이옴','진화계보','태그'];
+infoText = ['사탕당 친밀도','패시브','코스트 감소','알 구매하기','숨겨진 특성','알 한정','베이비 한정','패러독스 포켓몬','형태 변화','바이옴','선택 필터'];
 biomeText = ['보통','드묾','레어','슈퍼 레어','하이퍼 레어','보스','보통','드묾','레어','슈퍼','하이퍼','새벽','낮','황혼','밤'];
 biomeLongText = [
 '<b>This Pokemon is <span style="color:rgb(143, 214, 154);">Egg Exclusive</span>.</b><br>It does not appear in any biomes, and can only be obtained from eggs.',
@@ -8,7 +9,6 @@ biomeLongText = [
 '<b>This <span style="color:rgb(239, 131, 131);">Paradox Pokemon</span> is <span style="color:rgb(143, 214, 154);">Egg Exclusive</span>.</b><br>It can only be obtained from eggs, but can afterward be caught in Classic mode.',
 '<b>Only available via <span style="color:rgb(131, 182, 239);">Form Change</span>.</b><br>It does not appear in any biomes.',
 'This Pokemon can only be caught after obtaining <b><span style="color:rgb(239, 131, 131);">All Other Pokemon</span></b>.<br>It does not appear in standard eggs.'];
-infoText = ['사탕당 친밀도','패시브','코스트 감소','알 구매하기','숨겨진 특성','알 한정','베이비 한정','패러독스 포켓몬','형태 변화','바이옴'];
 procToDesc = [
 "사용자 공격",
 "사용자 방어",

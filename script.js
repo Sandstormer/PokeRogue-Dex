@@ -227,9 +227,9 @@ function refreshAllItems() { // Display items based on query and locked filters 
     const helpMessage = document.createElement('div');  helpMessage.className = 'item-help-message';
     helpMessage.innerHTML = '<hr>';
     if (lockedFilters.some(f => f == fidThreshold[7] || f == fidThreshold[7]+1)) helpMessage.innerHTML += 
-      `<img src="ui/shiny2.png"> <img src="ui/shiny3.png"> <b><span style="color:rgb(140, 130, 240);">${warningText[0]}</b><br><br></span>`;
+      `<img src="ui/shiny2.png"> <img src="ui/shiny3.png"> <b><span style="color:${col.pu};">${warningText[0]}</b><br><br></span>`;
     if (headerState.ability) helpMessage.innerHTML += 
-      `<b><span style="color:rgb(140, 130, 240);">${warningText[headerState.ability]}</b><br><br></span>`;
+      `<b><span style="color:${col.pu};">${warningText[headerState.ability]}</b><br><br></span>`;
     helpMessage.innerHTML += (suggestions.innerHTML 
       ? (lockedFilters.length ? warningText[4] : warningText[5]) 
       : (lockedFilters.length ? (query ? warningText[6] : warningText[7]) : warningText[8]));
@@ -838,8 +838,11 @@ function updateHeader(clickTarget = null, ignoreFlip = false) {
   // If clicking move column, with no moves/biomes filtered, toggle between egg moves and biomes
   if (sortAttribute == 'moves' && !hasMovesBiomes && !ignoreFlip) headerState.biome = !headerState.biome;
   // Set the text of the move column, depending on if a move is filtered
-  headerColumns[5].textDef = (hasMovesBiomes?`<span style="color:rgb(140, 130, 240);">${altText[0]}</span>`:
-    (headerState.biome?`<span style="color:rgb(140, 130, 240);">${infoText[9]}</span>`:headerNames[5]));
+  if (lockedFilters.some(f => [2,9].includes(fidToCategory(f)))) { // If filtered moves/biomes
+    headerColumns[5].textDef = `<span style="color:${col.pu};">${lockedFilters.some(f =>fidToCategory(f)==9) ? infoText[10] : altText[0]}</span>`;
+  } else {
+    headerColumns[5].textDef = headerState.biome ? `<span style="color:${col.pu};">${infoText[9]}</span>` : headerNames[5];
+  }
   // Find the new sorting attribute, and update the headers
   if (sortAttribute == 'shiny') { // Toggle the global shiny state
     // Cap the selector to T1 if the "None" filter is selected or if the entire list only has T1
@@ -847,7 +850,7 @@ function updateHeader(clickTarget = null, ignoreFlip = false) {
       || (!filteredItemIDs.some(specID => items[specID].sh>1) && !!filteredItemIDs.length);
     headerState.shiny += 3;  headerState.shiny %= (shinyCap?2:4);
     if (headerState.shiny) {
-      headerColumns[1].innerHTML = `<span style="color:rgb(140, 130, 240);">${headerNames[1]}</span>`;
+      headerColumns[1].innerHTML = `<span style="color:${col.pu};">${headerNames[1]}</span>`;
       const starImg = document.createElement('img');  starImg.className = 'star-header';
       starImg.src = `ui/shiny${headerState.shiny}.png`;
       headerColumns[1].appendChild(starImg);
@@ -860,15 +863,16 @@ function updateHeader(clickTarget = null, ignoreFlip = false) {
   } else if (sortAttribute == 'ab') { // Toggle the global ability state
     headerState.ability = (headerState.ability+1)%4;
     if (headerState.ability) {
-      headerColumns[4].innerHTML = `<span style="color:rgb(140, 130, 240);">${headerNames[4]}</span>`;
+      headerColumns[4].innerHTML = `<span style="color:${col.pu};">${headerNames[4]}</span>`;
       if      (headerState.ability == 1) headerColumns[4].innerHTML += `<span style="color:${col.wh}; font-size:12px;">(${altText[1]})</span>`;
       else if (headerState.ability == 2) headerColumns[4].innerHTML += `<span style="color:${col.ye}; font-size:12px;">(${altText[2]})</span>`;
       else if (headerState.ability == 3) headerColumns[4].innerHTML += `<span style="color:${col.pu}; font-size:12px;">(${altText[3]})</span>`;
     } else headerColumns[4].innerHTML = headerNames[4];
   } else {
     headerColumns[5].innerHTML = headerColumns[5].textDef;
+    // If clicked on a header that can actually be sorted
+    // (The "Moves" column can only be sorted if there is a filtered move/biome)
     if (sortAttribute && (sortAttribute != 'moves' || hasMovesBiomes)) { 
-      // Clicked on a header that can actually be sorted
       if (sortState.column === sortAttribute) {
         if (!ignoreFlip) {
           sortState.ascending = !sortState.ascending; // Toggle sort direction if sorting by the same column
@@ -998,7 +1002,7 @@ function openLangMenu() {
   splashContent.innerHTML = '<img src="ui/globe.png" class="lang-head-img">&nbsp<b>Change Language</b><hr style="margin-bottom: 0px;">';
   supportedLangs.forEach((thisLang, index) => {
     const thisLangRow = document.createElement('div'); thisLangRow.className = "splash-button";
-    if (pageLang == thisLang) thisLangRow.style.color = "rgb(140, 130, 240)";
+    if (pageLang == thisLang) thisLangRow.style.color = col.pu;
     thisLangRow.innerHTML = `${LanguageNames[index]}`;
     thisLangRow.addEventListener("click", () => {
       localStorage.setItem("preferredLang", thisLang);
