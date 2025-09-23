@@ -4,10 +4,10 @@ catToName = ['タイプ','とくせい','わざ','世代','コスト','性','ゲ
 infoText = ['アメごとのなつき度','パッシブ','ポイント削減','タマゴを買う','隠れ特性','タマゴ 限定','ベイビィ限定','パラドックスポケモン','フォルムチェンジ','バイオーム','選択フィルタ'];
 biomeText = ['コモン','アンコモン','レア','スーパーレア','ウルトラレア','ボス','コモン','UC','レア','SR','UR','暁','昼','黄昏','夜'];
 biomeLongText = [
+'<b>Only available via <span style="color:rgb(131, 182, 239);">Form Change</span>.</b><br>',
 '<b>This Pokemon is <span style="color:rgb(143, 214, 154);">Egg Exclusive</span>.</b><br>It does not appear in any biomes, and can only be obtained from eggs.',
 '<b>This is a <span style="color:rgb(216, 143, 205);">Baby Pokemon</span>.</b><br>It does not appear in any biomes, but can be unlocked by encountering its evolution.',
 '<b>This <span style="color:rgb(239, 131, 131);">Paradox Pokemon</span> is <span style="color:rgb(143, 214, 154);">Egg Exclusive</span>.</b><br>It can only be obtained from eggs, but can afterward be caught in Classic mode.',
-'<b>Only available via <span style="color:rgb(131, 182, 239);">Form Change</span>.</b><br>It does not appear in any biomes.',
 'This Pokemon can only be caught after obtaining <b><span style="color:rgb(239, 131, 131);">All Other Pokemon</span></b>.<br>It does not appear in standard eggs.'];
 procToDesc = [
 "User Atk",

@@ -4,10 +4,10 @@ catToName = ['属性','特性','招式','世代','费用','性别','模式','蛋
 infoText = ['每颗糖果的亲密度','被动','费用降低','兑换一颗蛋','梦特','蛋 限定','宝宝 限定','悖论宝可梦','形态变化','环境','已选筛选'];
 biomeText = ['普通','罕见','稀有','非常稀有','极其稀有','Boss','普通','罕见','稀有','非常','极其','黎明','白天','黄昏','夜晚'];
 biomeLongText = [
+'<b>Only available via <span style="color:rgb(131, 182, 239);">Form Change</span>.</b><br>',
 '<b>This Pokemon is <span style="color:rgb(143, 214, 154);">Egg Exclusive</span>.</b><br>It does not appear in any biomes, and can only be obtained from eggs.',
 '<b>This is a <span style="color:rgb(216, 143, 205);">Baby Pokemon</span>.</b><br>It does not appear in any biomes, but can be unlocked by encountering its evolution.',
 '<b>This <span style="color:rgb(239, 131, 131);">Paradox Pokemon</span> is <span style="color:rgb(143, 214, 154);">Egg Exclusive</span>.</b><br>It can only be obtained from eggs, but can afterward be caught in Classic mode.',
-'<b>Only available via <span style="color:rgb(131, 182, 239);">Form Change</span>.</b><br>It does not appear in any biomes.',
 'This Pokemon can only be caught after obtaining <b><span style="color:rgb(239, 131, 131);">All Other Pokemon</span></b>.<br>It does not appear in standard eggs.'];
 procToDesc = [
 "User Atk",

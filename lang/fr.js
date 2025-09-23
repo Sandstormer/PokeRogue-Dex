@@ -4,10 +4,10 @@ catToName = ['Type','Talent','Capacité','Gen','Cout','Sexe','Mode','Œuf','Vari
 infoText = ['Bonheur par Bonbon','Passif','Cout réduit','Acheter un Œuf','Talent Caché','Exclusif à l’Œuf','Exclusif aux Bébés','Pokémon Paradoxe','Changement de forme','Biomes','Filtres'];
 biomeText = ['Commun','Peu Commun','Rare','Super Rare','Hyper Rare','Boss','Com.','PC','Rare','SR','HR','Aube','Jour','Crépuscule','Nuit'];
 biomeLongText = [
+'<b>Only available via <span style="color:rgb(131, 182, 239);">Form Change</span>.</b><br>',
 '<b>This Pokemon is <span style="color:rgb(143, 214, 154);">Egg Exclusive</span>.</b><br>It does not appear in any biomes, and can only be obtained from eggs.',
 '<b>This is a <span style="color:rgb(216, 143, 205);">Baby Pokemon</span>.</b><br>It does not appear in any biomes, but can be unlocked by encountering its evolution.',
 '<b>This <span style="color:rgb(239, 131, 131);">Paradox Pokemon</span> is <span style="color:rgb(143, 214, 154);">Egg Exclusive</span>.</b><br>It can only be obtained from eggs, but can afterward be caught in Classic mode.',
-'<b>Only available via <span style="color:rgb(131, 182, 239);">Form Change</span>.</b><br>It does not appear in any biomes.',
 'This Pokemon can only be caught after obtaining <b><span style="color:rgb(239, 131, 131);">All Other Pokemon</span></b>.<br>It does not appear in standard eggs.'];
 procToDesc = [
 "User Atk",

@@ -22,8 +22,8 @@ const clearIcon = document.getElementById("clearIcon");
 const sortAttributes = ['row','shiny','sp','type','ab','moves','co','bst','hp','atk','def','spa','spd','spe'];
 const possibleFID = [...Array(fidThreshold[fidThreshold.length-1]-3).keys()]; // Remove -3 *********
 const possibleSID = [...Array(items.length).keys()];
-const supportedLangs = ["en","fr","es-ES","ko","zh-CN","ja"];//"it","es-ES","pt-BR","de"];
-const LanguageNames  = ["English","Français","Español (España)","한국어 (Hangugeo)","简体中文 (Jiǎntǐ Zhōngwén)","日本語 (Nihongo)"];//"Italiano","Português (Brasil)","Deutsch","繁體中文 (Fántǐ Zhōngwén)"];
+const supportedLangs = ["en","fr","es-ES","ko","zh-CN","ja"];//"it","pt-BR","de"];
+const LanguageNames  = ["English","Français","Español (España)","한국어 (Hangugeo)","简体中文 (Jiǎntǐ Zhōngwén)","日本語 (Nihongo)"];//"Italiano","Português (Brasil)","Deutsch"];
 const col = {pu:'rgb(140, 130, 240)', wh:'rgb(255, 255, 255)', ga:'rgb(145, 145, 145)', dg:'rgb(105, 105, 105)',
              bl:'rgb(131, 182, 239)', ye:'rgb(240, 230, 140)', re:'rgb(239, 131, 131)', pi:'rgb(216, 143, 205)',
              ge:'rgb(143, 214, 154)', or:'rgb(251, 173, 124)', cy:'rgb( 83, 237, 229)', dr:'rgb(247, 82,  49)'};
@@ -157,7 +157,7 @@ function refreshAllItems() { // Display items based on query and locked filters 
           if (fid === fidThreshold[5]+1) return 'fs' in items[specID]; // Fresh start filter
           if (fid === fidThreshold[5]+2) return true; // Flipped stats filter
           if (fid  <  fidThreshold[7]-1) return items[specID].et === fid - fidThreshold[6]; // Egg tier filter
-          if (fid === fidThreshold[7]-1) return [1,2,3].includes(items[specID]?.ee); // Egg exclusive
+          if (fid === fidThreshold[7]-1) return [1,2,3].includes(items[specID]?.ex); // Egg exclusive
           if (fid === fidThreshold[7]) return 'nv' in items[specID]; // New variants
           if (fid === fidThreshold[7]+1) return items[specID].sh == 3; // All variants
           if (fid === fidThreshold[7]+2) return items[specID].sh == 1; // No variants
@@ -378,10 +378,10 @@ function renderMoreItems() { // Create each list item, with columns of info ****
     });
     // Show biomes if toggled, and if column is empty or if peeking over a move
     if (headerState.biome && (!numMovesShown || (showMoveLearn.every(f => fidToCategory(f)==2) && numMovesShown < 4))) {
-      if ([1,2].includes(item?.ee) && !numMovesShown) { // Show egg exclusives only if blank
+      if ([1,2].includes(item?.ex) && !numMovesShown) { // Show egg exclusives only if blank
         const clickableRow = document.createElement('div');  clickableRow.className = 'clickable-name';
-        if (item.ee == 1) clickableRow.innerHTML += `<span style="color:rgb(143, 214, 154);">${infoText[5]}</span>`;
-        if (item.ee == 2) clickableRow.innerHTML += `<span style="color:rgb(216, 143, 205);">${infoText[6]}</span>`;
+        if (item.ex == 1) clickableRow.innerHTML += `<span style="color:rgb(143, 214, 154);">${infoText[5]}</span>`;
+        if (item.ex == 2) clickableRow.innerHTML += `<span style="color:rgb(216, 143, 205);">${infoText[6]}</span>`;
         clickableRow.addEventListener('click', () => showInfoSplash(thisID,1));
         moveColumn.appendChild(clickableRow);
       } else {
@@ -536,7 +536,8 @@ function showInfoSplash(specID, forcePage=null, forceShiny=null, forceFem=null) 
     movesetContent.style.width = (isMobile ? '351px':'auto');
   }
   else if (splashState.page == 1) { // Show biomes
-    if ('ee' in item) movesetScrollable.innerHTML += biomeLongText[item.ee-1]; // Description of exclusivity
+    if (item?.fx) movesetScrollable.innerHTML += biomeLongText[0]; // Description of form exclusivity
+    if (item?.ex) movesetScrollable.innerHTML += biomeLongText[item.ex]; // Description of exclusivity
     possibleFID.slice(fidThreshold[8],fidThreshold[9]).forEach((fid) => {
       if (fid in item) {
         const biomeRow = document.createElement('div');  biomeRow.className = 'biome-row';
