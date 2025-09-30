@@ -437,6 +437,7 @@ function renderMoreItems() { // Create each list item, with columns of info ****
     itemList.appendChild(li); // Append the current entry to the list of Pokemon
   });
 }
+
 function makeBiomeDesc(src, isSmall=0) {
   const offset = isSmall*6;
   if (src == 1) return `${col.wh};">${biomeText[0+offset]}`;
