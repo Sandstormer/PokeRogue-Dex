@@ -933,7 +933,7 @@ document.addEventListener('keydown', (event) => { // All key press events
   if (!ignoredKeys.includes(event.key)) { // Ignore certain key presses
     // Ignore all key presses if 'Ctrl' is held, except when pasting
     if (!event.ctrlKey || event.code == "KeyV") {
-      if (movesetScreen.classList.contains("show") && !splashScreen.classList.contains("show")) movesetScreen.classList.remove("show");
+      if (movesetScreen.classList.contains("show")) movesetScreen.classList.remove("show");
       if (splashScreen.classList.contains("show")) splashScreen.classList.remove("show");
       searchBox.focus(); // Focus the search box on any key press
     }
