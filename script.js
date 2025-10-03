@@ -50,11 +50,11 @@ let splashState = { speciesID: -1, page: 0, shiny: 0, fem: 0, zoomImgh: 300}
 const TagToFID = { // List of ability/move FIDs that match specific tag filters
   [fidThreshold[10]]: possibleFID.filter((fid) => fid >= fidThreshold[0] && fid < fidThreshold[1] && (fidToProc[fid-fidThreshold[0]][1].includes(59))), // Lure ability
   [fidThreshold[10]+1]: possibleFID.filter((fid) => fid >= fidThreshold[0] && fid < fidThreshold[1] && (fidToProc[fid-fidThreshold[0]][1].includes(37))), // Ignores abilities
-  [fidThreshold[10]+2]: possibleFID.filter((fid) => fid >= fidThreshold[1] && fid < fidThreshold[2] && (fidToProc[fid-fidThreshold[0]][7].includes(37))),
-  [fidThreshold[10]+3]: possibleFID.filter((fid) => fid >= fidThreshold[1] && fid < fidThreshold[2] && (fidToProc[fid-fidThreshold[0]][7].includes(40))),
+  [fidThreshold[10]+2]: possibleFID.filter((fid) => fid >= fidThreshold[1] && fid < fidThreshold[2] && (fidToProc[fid-fidThreshold[0]][1].includes(37))),
+  [fidThreshold[10]+3]: possibleFID.filter((fid) => fid >= fidThreshold[1] && fid < fidThreshold[2] && (fidToProc[fid-fidThreshold[0]][1].includes(40))),
   // [fidThreshold[10]+3]: possibleFID.filter((fid) => fid >= fidThreshold[1] && fid < fidThreshold[2] && fidToProc[fid-fidThreshold[0]][5]>0 && fidToProc[fid-fidThreshold[0]][1]<2),
   [fidThreshold[10]+4]: possibleFID.filter((fid) => fid >= fidThreshold[1] && fid < fidThreshold[2] && fidToProc[fid-fidThreshold[0]][1]<2
-    && (fidToProc[fid-fidThreshold[0]][7].includes(1) || fidToProc[fid-fidThreshold[0]][7].includes(2))),
+    && (fidToProc[fid-fidThreshold[0]][1].includes(1) || fidToProc[fid-fidThreshold[0]][1].includes(2))),
   // Switches out target
   // Spread moves
   // Healing
@@ -615,11 +615,11 @@ function makeMovesetRow(fid, item, table) {
   const moveRow = document.createElement('div');  moveRow.className = 'moveset-row';
   const procs = fidToProc[fid-fidThreshold[0]];
   moveRow.innerHTML = `<div style="color:${moveSrcText(item[fid],table)}</div>
-    <div style="color:${typeColors[procs[0]]};">${fidToName[fid]}</div>
-    <div style="color:${moveCatColor[procs[1]]}">${(procs[2]==-1?'-':procs[2])}</div>
-    <div style="color:${procs[7].includes(1)?col.re:(procs[7].includes(2)?col.dr:(procs[7].includes(0)?col.pi:col.wh))};">
-      ${(procs[3]==-1?'-':procs[3])}</div>
-    <div>${procs[4]}</div>`;
+    <div style="color:${typeColors[procs[2]]};">${fidToName[fid]}</div>
+    <div style="color:${moveCatColor[procs[3]]}">${(procs[4]==-1?'-':procs[4])}</div>
+    <div style="color:${procs[1].includes(1)?col.re:(procs[1].includes(2)?col.dr:(procs[1].includes(0)?col.pi:col.wh))};">
+      ${(procs[5]==-1?'-':procs[5])}</div>
+    <div>${procs[6]}</div>`;
   moveRow.addEventListener('click', () => showDescSplash(fid));
   movesetScrollable.appendChild(moveRow);
 }
@@ -650,24 +650,24 @@ function showDescSplash(fid) { // Create the ability/move splash ***************
     const splashMoveRow = document.createElement('div');  splashMoveRow.className = 'splash-move-row';
     altText.slice(4,8).forEach((attName,index) => { // Show type and damage category, then Power, Accuracy, PP
       const splashMoveCol = document.createElement('div');
-      if (!index) splashMoveCol.innerHTML = `<span style="color:${typeColors[thisProcs[0]]};">${fidToName[thisProcs[0]]}</span><br><img src="ui/cat${thisProcs[1]}.png">`;
-      else splashMoveCol.innerHTML = `${attName}<br>${(thisProcs[1+index]==-1 ? '-' : thisProcs[1+index])}`;
+      if (!index) splashMoveCol.innerHTML = `<span style="color:${typeColors[thisProcs[2]]};">${fidToName[thisProcs[2]]}</span><br><img src="ui/cat${thisProcs[3]}.png">`;
+      else splashMoveCol.innerHTML = `${attName}<br>${(thisProcs[3+index]==-1 ? '-' : thisProcs[3+index])}`;
       splashMoveRow.appendChild(splashMoveCol);
     });
     splashContent.appendChild(splashMoveRow);  splashContent.appendChild(document.createElement('hr'));
   }
   splashContent.innerHTML += fidToDesc[fid-fidThreshold[0]]; // Description of ability/move
-  if (fid>=fidThreshold[1] ? thisProcs[5]||thisProcs[6]||thisProcs[7] : thisProcs[0]||thisProcs[1]) {
+  if (fid>=fidThreshold[1] ? thisProcs[7]||thisProcs[0]||thisProcs[1] : thisProcs[0]||thisProcs[1]) {
     const splashMoveTags = document.createElement('div');  splashMoveTags.className = 'splash-move-tags';
-    if (fid>=fidThreshold[1] && thisProcs[5] != 0) { // If a non-zero priority move
-      splashMoveTags.innerHTML += `<p style="color:${thisProcs[5]>0?col.ge:col.re};">${procToDesc[27]}: ${thisProcs[5]>0?'+':''}${thisProcs[5]}</p>`;
+    if (fid>=fidThreshold[1] && thisProcs[7] != 0) { // If a non-zero priority move
+      splashMoveTags.innerHTML += `<p style="color:${thisProcs[7]>0?col.ge:col.re};">${procToDesc[27]}: ${thisProcs[7]>0?'+':''}${thisProcs[7]}</p>`;
     }
     tagToDesc.forEach((thisDesc,index) => { // Check all tags for a match
       const tagColor = (index in tagColors ? ` style="color:${tagColors[index]};"` : '');
       if (index == 44) thisDesc += `<br><span style="color:${col.ga}; font-size:12px;">35% / 35% / 15% / 15%</span>`;
-      if (thisProcs[7-6*(fid<fidThreshold[1])].includes(index)) splashMoveTags.innerHTML += `<p${tagColor}>${thisDesc}</p>`;
+      if (thisProcs[1].includes(index)) splashMoveTags.innerHTML += `<p${tagColor}>${thisDesc}</p>`;
       if (index == 2) { // Show procs after targets
-        thisProcs[6-6*(fid<fidThreshold[1])].forEach((thisProc) => { // Procs for stat boost, status, flinch, etc.
+        thisProcs[0].forEach((thisProc) => { // Procs for stat boost, status, flinch, etc.
           const procChance = ((thisProc[0]>0)?`${thisProc[0]}% `:'');
           const procStages = ((thisProc[2]=='0')?'':` ${(thisProc[0]==-2?'× ':(thisProc[2]>0?'+':''))}${thisProc[2]}${thisProc[0]==-3?'%':''}`);
           splashMoveTags.innerHTML += `<p>${procChance}${procToDesc[thisProc[1]]}${procStages}</p>`;
@@ -919,10 +919,10 @@ function adjustLayout(forceAdjust = false, headerClick = null) {
 }
 
 // All event listeners **************************
+window.addEventListener("resize", () => adjustLayout()); // Run on page load and when resizing the window
 window.addEventListener("scroll", () => { // Load more items on scroll
   if (window.scrollY + window.innerHeight >= document.body.scrollHeight * 0.8 - 1000) renderMoreItems();
 });
-window.addEventListener("resize", () => adjustLayout()); // Run on page load and when resizing the window
 searchBox.addEventListener('input', (event) => { // Typing in search box
   tabSelect = -1;
   refreshAllItems();
