@@ -596,11 +596,11 @@ function showInfoSplash(specID, forcePage=null, forceShiny=null, forceFem=null) 
         else if (value > 200 && value != 204 && value != 208) moveList[1].push(intKey);
       }
     }
-    // Sort the moves
+    // Sort the moves by rarity, then by name
     moveList[0].sort((a, b) => item[a] > item[b] ? 1 : (item[a] < item[b]) ? -1 : 
       (fidToName[a] > fidToName[b] ? 1 : (fidToName[a] < fidToName[b] ? -1 : 0 ))); // Level moves
     moveList[1].sort((a, b) => item[a]%4 > item[b]%4 ? 1 : (item[a]%4 < item[b]%4) ? -1 : 
-      (fidToName[a] > fidToName[b] ? 1 : (fidToName[a] < fidToName[b] ? -1 : 0 ))); // TM moves are mod 4
+      (fidToName[a] > fidToName[b] ? 1 : (fidToName[a] < fidToName[b] ? -1 : 0 ))); // TM rarity is mod 4
     [moveList[0],[item.e1,item.e2,item.e3,item.e4],moveList[1]].forEach((thisList, tableIndex) => {
       if (thisList != moveList[0]) movesetScrollable.appendChild(document.createElement('hr'));
       thisList.forEach(move => makeMovesetRow(move, item, tableIndex));
@@ -625,9 +625,10 @@ function makeMovesetRow(fid, item, table) {
 }
 function moveSrcText(src, table) {
   // src = -1:mushroom, 0:evo, 1-200:level, 201-203:egg/TM, 204:egg, 205-207:rare/TM, 208:rare, 209-211:TM
+  // table must be specified so moves can appear as both Egg & TM
   if (table == 0) { // Level moves
     if (src == -1) return `${col.or};"><img src="ui/mem.png">`;
-    if (src ==  0) return `${col.bl};">${altText[18]}`;
+    if (src ==  0) return `${col.wh};">${altText[18]}`;
     return `${col.wh};">${src}`;
   } else if (table == 1) { // Egg moves
     return `${src < 205 ? col.wh:col.ye};">${altText[19]}`
