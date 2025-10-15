@@ -4,7 +4,7 @@ catToName = ['Tipo','Habilidad','Movimiento','Gen','Coste','Género','Modo','Niv
 infoText = ['Amistad por Caramelo','Pasiva','Reducción de Coste','Huevo de Especie','Habilidad Oculta','Exclusivo de Huevo','Exclusivo de Cría','Pokémon Paradoja','Cambio de Forma','Biomas','Filtros'];
 biomeText = ['Común','Poco Común','Raro','Super Raro','Ultra Raro','Jefe','Com.','PCom.','Raro','SR','UR','Amanecer','Día','Atardecer','Noche'];
 biomeLongText = [
-'<b>Only available via <span style="color:rgb(131, 182, 239);">Form Change</span>.</b><br>',
+'<b>This form is only available via <span style="color:rgb(140, 130, 240);">Form Change</span>.</b> Other forms can be encountered in the biomes shown.<br>',
 '<b>This Pokemon is <span style="color:rgb(143, 214, 154);">Egg Exclusive</span>.</b><br>It does not appear in any biomes, and can only be obtained from eggs.',
 '<b>This is a <span style="color:rgb(216, 143, 205);">Baby Pokemon</span>.</b><br>It does not appear in any biomes, but can be unlocked by encountering its evolution.',
 '<b>This <span style="color:rgb(239, 131, 131);">Paradox Pokemon</span> is <span style="color:rgb(143, 214, 154);">Egg Exclusive</span>.</b><br>It can only be obtained from eggs, but can afterward be caught in Classic mode.',
@@ -69,7 +69,7 @@ tagToDesc = [
 "Heals 100% damage dealt",
 "Heals 75% damage dealt",
 "Heals 50% damage dealt",
-"Heals by target's Atk",
+"Heals based on target's Atk",
 "Heals Status Effects",
 "Heals Sleep",
 "Heals Freeze",

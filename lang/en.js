@@ -4,7 +4,7 @@ catToName = ['Type','Ability','Move','Gen','Cost','Gender','Mode','Egg Tier','Sh
 infoText = ['Friendship per Candy','Passive','Cost Reduction','Species Egg','Hidden Ability','Egg Exclusive','Baby Exclusive','Paradox Pokemon','Form Change','Biomes','Filters'];
 biomeText = ['Common','Uncommon','Rare','Super Rare','Ultra Rare','Boss','Com.','Unc.','Rare','SR','UR','Dawn','Day','Dusk','Night'];
 biomeLongText = [
-'<b>Only available via <span style="color:rgb(131, 182, 239);">Form Change</span>.</b><br>',
+'<b>This form is only available via <span style="color:rgb(140, 130, 240);">Form Change</span>.</b> Other forms can be encountered in the biomes shown.<br>',
 '<b>This Pokemon is <span style="color:rgb(143, 214, 154);">Egg Exclusive</span>.</b><br>It does not appear in any biomes, and can only be obtained from eggs.',
 '<b>This is a <span style="color:rgb(216, 143, 205);">Baby Pokemon</span>.</b><br>It does not appear in any biomes, but can be unlocked by encountering its evolution.',
 '<b>This <span style="color:rgb(239, 131, 131);">Paradox Pokemon</span> is <span style="color:rgb(143, 214, 154);">Egg Exclusive</span>.</b><br>It can only be obtained from eggs, but can afterward be caught in Classic mode.',
@@ -69,7 +69,7 @@ tagToDesc = [
 "Heals 100% damage dealt",
 "Heals 75% damage dealt",
 "Heals 50% damage dealt",
-"Heals by target's Atk",
+"Heals based on target's Atk",
 "Heals Status Effects",
 "Heals Sleep",
 "Heals Freeze",
@@ -4367,22 +4367,24 @@ helpMenuText = `
 Combine multiple filters to get what you want <br>
 <span style="color:rgb(145, 145, 145);">Click between filters to use the "OR" condition</span>
 <hr>
-<p style="margin: 10px; font-weight: bold;">Click the <span style="color:rgb(140, 130, 240);">Headers</span> to sort results</p>
-<b>${headerNames[1]}</b> column can restrict to shiny variants
-<p style="margin: 10px;"><b>${headerNames[4]}</b> column can restrict to one slot:<br>
+<p style="margin: 10px; font-weight: bold;">Click the <span style="color:rgb(140, 130, 240);">Headers</span> to sort results:</p>
+Click the <b>${headerNames[1]}</b> column to see only shiny variants
+<p style="margin: 10px;">Click the <b>${headerNames[4]}</b> column to restrict to one slot:<br>
 <b>Main Abilities</b>, 
 <span style="color:rgb(240, 230, 140); font-weight: bold;">Hidden Ability</span>, or 
 <span style="color:rgb(140, 130, 240); font-weight: bold;">Passive</span></p>
 <b>${headerNames[5]}</b> are shown as <b>${fidToName[fidThreshold[6]]}</b> and <span style="color:rgb(240, 230, 140); font-weight: bold;">${fidToName[fidThreshold[6]+1]}</span><br> 
-<span style="color:rgb(145, 145, 145);">Can also show biomes, or filtered moves/biomes</span>
-<p style="margin: 10px;"><b>${headerNames[6]}</b> column shows color of <b>${catToName[7]}</b>:<br> 
+<span style="color:rgb(145, 145, 145);">Click the header to switch to <b>${infoText[9]}</b> instead<br>
+This column will also show <b>filtered ${altText[0]}/${infoText[9]}</b></span>
+<p style="margin: 10px;"><b>${headerNames[6]}</b> column shows rarity color of <b>${catToName[7]}</b>:<br> 
 <b>${fidToName[fidThreshold[6]]}</b>, <span style="color:rgb(131, 182, 239);"><b>${fidToName[fidThreshold[6]+1]}</b></span>, <span style="color:rgb(240, 230, 140);"><b>${fidToName[fidThreshold[6]+2]}</b></span>, <span style="color:rgb(239, 131, 131);"><b>${fidToName[fidThreshold[6]+3]}</b></span>, <span style="color:rgb(216, 143, 205);"><b>${fidToName[fidThreshold[6]+4]}</b></span></p>
 <hr>
-<p style="margin: 10px;">Click to <span style="color:rgb(240, 230, 140); font-weight: bold;">Pin</span> a Pokemon, or see <a href="https://wiki.pokerogue.net/start" target="_blank"><b>Wiki</b></a> or <span style="color:${fidToColor(fidThreshold[7])[0]}; font-weight: bold;">Shiny</span></p>
-<p style="margin: 10px;">Click a 
-<span style="color:${col.wh}; font-weight: bold;">Name</span>, 
-<span style="color:${fidToColor(fidThreshold[3])[0]}; font-weight: bold;">${headerNames[6]}</span>, 
-<span style="color:${col.pu}; font-weight: bold;">${catToName[1]}</span> or 
-<span style="color:${col.pu}; font-weight: bold;">${catToName[2]}</span> to see details</p>
+<p style="margin: 10px; font-weight: bold;">Click on a <span style="color:rgb(140, 130, 240);">Pokemon</span> entry to see details:
+<span style="color:rgb(145, 145, 145);">Moves, Abilities, Cost, Image, Pin, Name</span></p>
+<p style="margin: 10px;">
+Click a Pokemon's <b>Name</b> to see their full moveset.<br>
+Color of <b>Pow</b> shows <span style="color:${col.or}; font-weight: bold;">Physical</span> or <span style="color:${col.bl}; font-weight: bold;">Special</span> damage<br>
+Color of <b>Acc</b> shows <span style="color:${col.re}; font-weight: bold;">Multi-target</span> moves
+</p>
 <hr style="margin-bottom: 10px;">
 <span style="color:rgb(145, 145, 145); font-size:11px">This site was created by Sandstorm, with a lot of hard work. I do not store any cookies or collect any personal data. Images and game data are from the PokeRogue GitHub. All asset rights are retained by their original creators.</span>`;

@@ -538,7 +538,7 @@ function showInfoSplash(specID, forcePage=null, forceShiny=null, forceFem=null) 
   }
   else if (splashState.page == 1) { // Show biomes
     if (item?.fx) movesetScrollable.innerHTML += biomeLongText[0]; // Description of form exclusivity
-    if (item?.ex) movesetScrollable.innerHTML += biomeLongText[item.ex]; // Description of exclusivity
+    if (item?.ex) movesetScrollable.innerHTML += biomeLongText[item.ex]; // Description of species exclusivity
     possibleFID.slice(fidThreshold[8],fidThreshold[9]).forEach((fid) => {
       if (fid in item) {
         const biomeRow = document.createElement('div');  biomeRow.className = 'biome-row';
