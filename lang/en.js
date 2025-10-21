@@ -4387,4 +4387,5 @@ Color of <b>Pow</b> shows <span style="color:${col.or}; font-weight: bold;">Phys
 Color of <b>Acc</b> shows <span style="color:${col.re}; font-weight: bold;">Multi-target</span> moves
 </p>
 <hr style="margin-bottom: 10px;">
-<span style="color:rgb(145, 145, 145); font-size:11px">This site was created by Sandstorm, with a lot of hard work. I do not store any cookies or collect any personal data. Images and game data are from the PokeRogue GitHub. All asset rights are retained by their original creators.</span>`;
+<span style="color:rgb(145, 145, 145); font-size:11px">This site was created by Sandstorm, with a lot of hard work. I do not store any cookies or collect any personal data. Images and game data are from the PokeRogue GitHub. All asset rights are retained by their original creators.
+<br>Game Version: ${gameVersion}&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbspDate: ${latestDate}</span>`;

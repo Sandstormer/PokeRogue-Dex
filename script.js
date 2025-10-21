@@ -33,20 +33,20 @@ const tmColors = [col.wh,col.bl,col.ye];
 const flipStats = {bst:'bst',hp:'spe',atk:'spd',def:'spa',spa:'def',spd:'atk',spe:'hp'};
 const REMchance = [16,12,6,6,3];
 let increment = 10;     // Number of items to load at a time
-let renderLimit = 0;    // Start with no items
+let renderLimit = 0;    // This value is updated when scrolling down (starts at 0)
 let showMoveLearn = []; // Filtered moves/biomes to show sources
 let filterToEnter = null; // Filter to apply when hitting Enter
 let tabSelect = -1;       // Filter that is tab selected
-let lockedFilters = [];   // List of all locked filters
+let lockedFilters = [];   // List of all locked filters IDs
 let lockedMods = []; // List of filter mod objects
-let lockedFilterGroups = [[]]; // Grouped together for OR
+let lockedFilterGroups = [[]]; // Filter IDs grouped together with "OR" condition
 let pinnedRows = [];  // List of pinned row numbers
 let isMobile = false; // Change display for mobile devices
 let filteredItemIDs = null; // List of all displayed row numbers
-let headerState = { shiny: 0, ability: 0, biome: 0 } // Global state of shiny(0,1,2,3), ability(0,1,2,3), biome(0,1)
-let sortState = { column: null, ascending: true, target: null }; // Track the current sort state
 // State of info screen: species shown, page(moveset,biome,family,zoom), shiny(0,1,2,3), fem(0,1), zoomImageHeight
 let splashState = { speciesID: -1, page: 0, shiny: 0, fem: 0, zoomImgh: 300}
+let headerState = { shiny: 0, ability: 0, biome: 0 } // Global state of shiny(0,1,2,3), ability(0,1,2,3), biome(0,1)
+let sortState = { column: null, ascending: true, target: null }; // Track the current sort state
 const TagToFID = { // List of ability/move FIDs that match specific tag filters
   [fidThreshold[10]]: possibleFID.filter((fid) => fid >= fidThreshold[0] && fid < fidThreshold[1] && (fidToProc[fid-fidThreshold[0]][1].includes(59))), // Lure ability
   [fidThreshold[10]+1]: possibleFID.filter((fid) => fid >= fidThreshold[0] && fid < fidThreshold[1] && (fidToProc[fid-fidThreshold[0]][1].includes(37))), // Ignores abilities
@@ -735,7 +735,7 @@ function displaySuggestions() {
     if (offerFamilies.length > 4) offerFamilies = [];
     // Filter suggestions based on query and exclude already locked filters
     let matchingFID = possibleFID.filter((fid) => {
-      if (isExclusion && ![0,1,2,9].includes(fidToCategory(fid))) return false; // Only exclusion filters of some categories
+      if (isExclusion && ![0,1,2,9].includes(fidToCategory(fid))) return false; // Only some categories can be exclusion filters
       if (lockedFilters.some((f) => f%fidThreshold[11] == fid)) return false; // Don't suggest if already locked
       if (fid >= fidThreshold[9] && offerFamilies.includes(fid)) return true; // Suggest matching families
       if (fid >= fidThreshold[10] && TagToFID[fid].some(f => fidToSearch[f].includes(query))) return true; // Suggest related tags
