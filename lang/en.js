@@ -2223,7 +2223,6 @@ speciesNames = [
 'Power Construct 50% Zygarde',
 'Power Construct 10% Zygarde',
 'Complete Zygarde',
-'Complete 10% Zygarde',
 'Diancie',
 'Mega Diancie',
 'Hoopa',

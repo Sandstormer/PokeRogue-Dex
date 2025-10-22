@@ -2223,7 +2223,6 @@ speciesNames = [
 '50% Sciamefusione Zygarde',
 '10% Sciamefusione Zygarde',
 'perfetta Zygarde',
-'perfetta Zygarde',
 'Diancie',
 'Mega Diancie',
 'Hoopa',
