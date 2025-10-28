@@ -4379,7 +4379,7 @@ This column will also show <b>filtered ${altText[0]}/${infoText[9]}</b></span>
 <b>${fidToName[fidThreshold[6]]}</b>, <span style="color:rgb(131, 182, 239);"><b>${fidToName[fidThreshold[6]+1]}</b></span>, <span style="color:rgb(240, 230, 140);"><b>${fidToName[fidThreshold[6]+2]}</b></span>, <span style="color:rgb(239, 131, 131);"><b>${fidToName[fidThreshold[6]+3]}</b></span>, <span style="color:rgb(216, 143, 205);"><b>${fidToName[fidThreshold[6]+4]}</b></span></p>
 <hr>
 <p style="margin: 10px; font-weight: bold;">Click on a <span style="color:rgb(140, 130, 240);">Pokemon</span> entry to see details:
-<span style="color:rgb(145, 145, 145);">Moves, Abilities, Cost, Image, Pin, Name</span></p>
+<span style="color:rgb(145, 145, 145);">${altText[0]}, ${headerNames[4]}, ${headerNames[6]}, Image, Pin, ${headerNames[2]}</span></p>
 <p style="margin: 10px;">
 Click a Pokemon's <b>Name</b> to see their full moveset.<br>
 Color of <b>Pow</b> shows <span style="color:${col.or}; font-weight: bold;">Physical</span> or <span style="color:${col.bl}; font-weight: bold;">Special</span> damage<br>

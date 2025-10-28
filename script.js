@@ -22,8 +22,8 @@ const clearIcon = document.getElementById("clearIcon");
 const sortAttributes = ['row','shiny','sp','type','ab','moves','co','bst','hp','atk','def','spa','spd','spe'];
 const possibleFID = [...Array(fidThreshold[fidThreshold.length-1]-3).keys()]; // Remove -3 *********
 const possibleSID = [...Array(items.length).keys()];
-const supportedLangs = ["en","fr","es-ES","ko","zh-Hans","ja"];//"it","pt-BR","de"];
-const LanguageNames  = ["English","Français","Español (España)","한국어 (Hangugeo)","简体中文 (Jiǎntǐ Zhōngwén)","日本語 (Nihongo)"];//"Italiano","Português (Brasil)","Deutsch"];
+const supportedLangs = ["en","fr","es-ES","it","ko","zh-Hans","ja"];//"pt-BR","de"];
+const LanguageNames  = ["English","Français","Español (España)","Italiano","한국어 (Hangugeo)","简体中文 (Jiǎntǐ Zhōngwén)","日本語 (Nihongo)"];//,"Português (Brasil)","Deutsch"];
 const col = {pu:'rgb(140, 130, 240)', wh:'rgb(255, 255, 255)', ga:'rgb(145, 145, 145)', dg:'rgb(105, 105, 105)',
              bl:'rgb(131, 182, 239)', ye:'rgb(240, 230, 140)', re:'rgb(239, 131, 131)', pi:'rgb(216, 143, 205)',
              ge:'rgb(143, 214, 154)', or:'rgb(251, 173, 124)', cy:'rgb( 83, 237, 229)', dr:'rgb(247, 82,  49)'};
