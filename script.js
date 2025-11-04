@@ -761,11 +761,13 @@ function displaySuggestions() {
 // Lock a filter *************************
 function lockFilter(newLockFID, clearQuery = true) {
   if (!lockedFilters.some((f) => f == newLockFID)) {
-    const isExclusion = searchBox.value.startsWith('-');
-    lockedFilters.push(newLockFID+fidThreshold[11]*isExclusion); // Add the filter to the locked filters list
+    const isExclusion = searchBox.value.startsWith('-')*fidThreshold[11];
+    lockedFilters.push(newLockFID+isExclusion); // Add the filter to the locked filters list
     let filterMod = null;
     if (lockedFilters.length > 1) {
-      const defaultOR = (newLockFID >= fidThreshold[8] && lockedFilters[lockedFilters.length-2] >= fidThreshold[8]);
+      // Default to "OR" for certain categories if matching previous filter
+      const defaultOR = ([3,4,8,9,10].includes(fidToCategory(newLockFID)) 
+        && fidToCategory(newLockFID) == fidToCategory(lockedFilters[lockedFilters.length-2]));
       filterMod = document.createElement("span"); filterMod.toggleOR = defaultOR;
       filterMod.className = "filter-mod";         filterMod.innerHTML = (defaultOR?'OR':'&');
       filterMod.addEventListener("click", () => toggleOR(filterMod));
@@ -773,7 +775,7 @@ function lockFilter(newLockFID, clearQuery = true) {
     }
     const filterTag = document.createElement("span"); filterTag.className = `filter-tag filter-tag-${isExclusion?"exc":"norm"}`;
     filterTag.innerHTML = `<img src="ui/${isExclusion?"x":"lock"}.png">${catToName[fidToCategory(newLockFID)]}: ${fidToName[newLockFID]}`;
-    filterTag.addEventListener("click", () => removeFilter(newLockFID+fidThreshold[11]*isExclusion, filterTag, filterMod));
+    filterTag.addEventListener("click", () => removeFilter(newLockFID+isExclusion, filterTag, filterMod));
     filterContainer.appendChild(filterTag);
     // Clear the search bar after locking
     if (clearQuery) searchBox.value = ""; 
@@ -783,7 +785,7 @@ function lockFilter(newLockFID, clearQuery = true) {
       updateHeader(headerColumns[1]);
     } else if (newLockFID == fidThreshold[7]+2 && headerState.shiny > 1) { // No variants
       headerState.shiny = 0; updateHeader(headerColumns[1]);
-    } else if (sortState.column === 'row' && [2,9].includes(fidToCategory(newLockFID+fidThreshold[11]*isExclusion))) {
+    } else if (sortState.column === 'row' && [2,9].includes(fidToCategory(newLockFID+isExclusion))) {
       updateHeader(headerColumns[5]); // Sort by Move/Biome for those new filters
     } else {
       updateHeader(null, true);
@@ -793,17 +795,31 @@ function lockFilter(newLockFID, clearQuery = true) {
 
 // Remove a filter **************************
 function removeFilter(fidToRemove, tagToRemove, modToRemove) {
-  // If removing first filter, also remove mod attached to second filter
-  if (lockedFilters.length > 1 && fidToRemove == lockedFilters[0]) modToRemove = lockedMods[0];
-  // Remove the fid from the filter list, the actual filter tag, the mod from the mod list, and the actual mod
+  if (!lockedMods.includes(modToRemove)) { // Try to find a mod to remove
+    // If removing first filter, target the mod to the right
+    if (lockedFilters.length > 1 && fidToRemove == lockedFilters[0]) modToRemove = lockedMods[0];
+    // For other filters, target the mod to the left
+    if (fidToRemove != lockedFilters[0]) modToRemove = lockedMods[lockedFilters.indexOf(fidToRemove)-1];
+  }
+  if (modToRemove) {
+    // Determine which mod is more intuitive to remove (left or right)
+    const modIndex = lockedMods.indexOf(modToRemove);
+    if (modIndex < lockedMods.length-1 && fidToRemove != lockedFilters[0]) { // If there is another mod to the right
+      if (!modToRemove.toggleOR && lockedMods[modIndex+1].toggleOR) { // If current mod is not "OR", but next mod is
+        modToRemove = lockedMods[modIndex+1];
+      }
+    }
+    // Remove the mod from the mod list, and remove the actual mod
+    lockedMods = lockedMods.filter((f) => f != modToRemove); 
+    modToRemove.remove();
+  }
+  // Remove the fid from the filter list, and remove the actual filter tag 
   lockedFilters = lockedFilters.filter((f) => f != fidToRemove);  tagToRemove.remove();
-  lockedMods = lockedMods.filter((f) => f != modToRemove); 
-  if (modToRemove) modToRemove.remove();
   updateFilterGroups();  
   if ((fidToRemove == fidThreshold[7] || fidToRemove == fidThreshold[7]+1) && headerState.shiny > 1) { 
-    headerState.shiny = 0;  headerColumns[1].innerHTML = headerNames[1]; 
+    headerState.shiny = 0;  headerColumns[1].innerHTML = headerNames[1]; // Update header if removing shiny filter
   }
-  // Reset the sorting if there aren't any more locked moves
+  // Reset the sorting if there aren't any more locked moves/biomes
   if (sortState.column === 'moves' && !lockedFilters.some(f => [2,9].includes(fidToCategory(f)))) { 
     updateHeader(headerColumns[0]); 
   } else { 
