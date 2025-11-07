@@ -2,12 +2,12 @@
   <img src="ui/bigbutton.png">
 </a>
 
-### This is the repository for Sandstorm's [PokeRogue SearchDex](https://sandstormer.github.io/PokeRogue-Dex/), a fast and powerful way to search all the data in PokeRogue, with intuitive UI and advanced filtering. 
-You can see which Pokémon learn a move and when they learn it, who has variant shinies, who has the highest stats, which biomes or eggs to find Pokémon, and much more. 
+## This is the repository for Sandstorm's [PokeRogue SearchDex](https://sandstormer.github.io/PokeRogue-Dex/), a fast and powerful way to search all the data in PokeRogue, with intuitive UI and advanced filtering. 
+You can see which Pokémon learn a move and when they learn it, who has variant shinies, who has the highest stats, which biomes or eggs to find Pokémon, and much more. I have also released the [updater scripts](https://github.com/Sandstormer/SearchDex-Updater), which I run offline to update the website, so that this project is fully open source.
 
 ❔ See the help screen for instructions and a list of available filters.
 
-🌐 All the main text and filters have been translated into 6 languages.
+🌐 The UI is available in 6 languages, with nearly complete translations.
 
 ⭐ If you enjoy my Pokedex, please share the link with other players, and leave me a star on Github!
 
