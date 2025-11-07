@@ -658,9 +658,9 @@ function showDescSplash(fid) { // Create the ability/move splash ***************
     splashContent.appendChild(splashMoveRow);  splashContent.appendChild(document.createElement('hr'));
   }
   splashContent.innerHTML += fidToDesc[fid-fidThreshold[0]]; // Description of ability/move
-  if (fid>=fidThreshold[1] ? thisProcs[7]||thisProcs[0]||thisProcs[1] : thisProcs[0]||thisProcs[1]) {
+  if (thisProcs[0] || thisProcs[1] || thisProcs[7]) {
     const splashMoveTags = document.createElement('div');  splashMoveTags.className = 'splash-move-tags';
-    if (fid>=fidThreshold[1] && thisProcs[7] != 0) { // If a non-zero priority move
+    if (thisProcs[7]) { // If a non-zero priority move
       splashMoveTags.innerHTML += `<p style="color:${thisProcs[7]>0?col.ge:col.re};">${procToDesc[27]}: ${thisProcs[7]>0?'+':''}${thisProcs[7]}</p>`;
     }
     tagToDesc.forEach((thisDesc,index) => { // Check all tags for a match
