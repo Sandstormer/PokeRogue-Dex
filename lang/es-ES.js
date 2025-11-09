@@ -3022,7 +3022,7 @@ fidToName = [
 'Carga Cuark',
 'Néctar Dulce',
 'Evocarrecuerdos Velocidad',
-'Evocarrecuerdos Def.&nbspEsp.',
+'Evocarrecuerdos Def. Esp.',
 'Evocarrecuerdos Ataque',
 'Evocarrecuerdos Defensa',
 'Teracambio',

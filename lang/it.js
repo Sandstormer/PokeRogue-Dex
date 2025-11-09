@@ -3022,7 +3022,7 @@ fidToName = [
 'Carica Quark',
 'Sciroppo Sublime',
 'Albergamemorie Velocità',
-'Albergamemorie Dif.&nbspSp.',
+'Albergamemorie Dif. Sp.',
 'Albergamemorie Attacco',
 'Albergamemorie Difesa',
 'Teramorfosi',
