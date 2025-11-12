@@ -151,7 +151,9 @@ function refreshAllItems() { // Display items based on query and locked filters 
             return items[specID]?.[fid] == 309+headerState.ability || (headerState.ability == 1 && items[specID]?.[fid] == 309)
           if (fid  <  fidThreshold[2]) return fid in items[specID]; // Type/Ability/Move filters
           if (fid  <  fidThreshold[3]) return items[specID].ge === fid - fidThreshold[2] + 1; // Gen filters
-          if (fid  <  fidThreshold[4]) return items[specID].co === fid - fidThreshold[3] + 1; // Cost filters
+          if (fid  <  fidThreshold[3]+10) return items[specID].co === fid - fidThreshold[3] + 1; // Cost equal filters
+          if (fid  <  fidThreshold[3]+18) return items[specID].co <= fid - fidThreshold[3] - 8; // Cost LEQ filters
+          if (fid  <  fidThreshold[4]) return items[specID].co >= fid - fidThreshold[3] - 16;   // Cost GEQ filters
           if (fid === fidThreshold[4]) return 'fe' in items[specID]; // Gender filter
           if (fid === fidThreshold[5]) return 'st' in items[specID]; // Starter select filter
           if (fid === fidThreshold[5]+1) return 'fs' in items[specID]; // Fresh start filter

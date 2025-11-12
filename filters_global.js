@@ -1,5 +1,5 @@
 const gameVersion = "1.11.3";
-const latestDate = "2025-11-08";
+const latestDate = "2025-11-11";
 const typeColors = [
 '#ADBD21',
 '#735A4A',
@@ -25,14 +25,14 @@ const fidThreshold = [
 328,
 1154,
 1163,
-1173,
-1174,
-1177,
-1183,
-1186,
-1221,
-1636,
-1641,
+1189,
+1190,
+1193,
+1199,
+1202,
+1237,
+1652,
+1657,
 ];
 const upgradeCosts = [
 [40,25,60,30,25],
