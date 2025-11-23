@@ -4,7 +4,7 @@ catToName = ['Type','Ability','Move','Gen','Cost','Gender','Mode','Egg Tier','Sh
 infoText = ['Friendship per Candy','Passive','Cost Reduction','Species Egg','Hidden Ability','Egg Exclusive','Baby Exclusive','Paradox Pokemon','Form Change','Biomes','Filters'];
 biomeText = ['Common','Uncommon','Rare','Super Rare','Ultra Rare','Boss','Com.','Unc.','Rare','SR','UR','Dawn','Day','Dusk','Night'];
 biomeLongText = [
-'<b>This form is only available via <span style="color:rgb(140, 130, 240);">Form Change</span>.</b> Other forms can be encountered in the biomes shown.<br>',
+'<b>This form is only available via <span style="color:rgb(140, 130, 240);">Form Change</span>.</b> Other forms can be encountered in the biomes shown.',
 '<b>This Pokemon is <span style="color:rgb(143, 214, 154);">Egg Exclusive</span>.</b><br>It does not appear in any biomes, and can only be obtained from eggs.',
 '<b>This is a <span style="color:rgb(216, 143, 205);">Baby Pokemon</span>.</b><br>It does not appear in any biomes, but can be unlocked by encountering its evolution.',
 '<b>This <span style="color:rgb(239, 131, 131);">Paradox Pokemon</span> is <span style="color:rgb(143, 214, 154);">Egg Exclusive</span>.</b><br>It can only be obtained from eggs, but can afterward be caught in Classic mode.',

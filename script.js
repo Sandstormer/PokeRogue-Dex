@@ -1,8 +1,9 @@
-// script.js
+// Main script for handling all functionality
+// Some variables are imported from other scripts
 // pokedex_data.js: items
 // filters_global.js: typeColors, fidThreshold, fidToProc
-// lang/en.js: headerNames, altText, catToName, fidToDesc, speciesNames, fidToName, helpMenuText, procTodesc, fidToDesc
-// TBD: warningText
+// lang/en.js: headerNames, altText, catToName, infoText, biomeText, biomeLongText,
+//             warningText, procTodesc, tagToDesc, fidToDesc, speciesNames, fidToName, helpMenuText
     
 const itemList = document.getElementById('itemList');
 const searchBox = document.getElementById('searchBox');
@@ -44,7 +45,7 @@ let pinnedRows = [];  // List of pinned row numbers
 let isMobile = false; // Change display for mobile devices
 let filteredItemIDs = null; // List of all displayed row numbers
 // State of info screen: species shown, page(moveset,biome,family,zoom), shiny(0,1,2,3), fem(0,1), zoomImageHeight
-let splashState = { speciesID: -1, page: 0, shiny: 0, fem: 0, zoomImgh: 300}
+let splashState = { speciesID: -1, page: 0, shiny: 0, fem: 0, zoomImgh: 300 }
 let headerState = { shiny: 0, ability: 0, biome: 0 } // Global state of shiny(0,1,2,3), ability(0,1,2,3), biome(0,1)
 let sortState = { column: null, ascending: true, target: null }; // Track the current sort state
 const TagToFID = { // List of ability/move FIDs that match specific tag filters
@@ -463,7 +464,7 @@ function makeMovesetHeader(specID) { // Create the moveset/info splash *********
   const nameAndType = document.createElement('div'); nameAndType.style.maxHeight = '46px';
   const secondTypeText = ('t2' in item ? ` / <span style="color:${typeColors[item.t2]}; display:inline">${fidToName[item.t2]}</span>` : '')
   nameAndType.innerHTML = `${speciesNames[specID]}<br><span style="color:${typeColors[item.t1]}; display:inline">${fidToName[item.t1]}</span>${secondTypeText}`;
-  [arrowL, msImg, nameAndType, arrowR].forEach(el => headerRow.appendChild(el));
+  [arrowL, msImg, nameAndType, arrowR].forEach(e => headerRow.appendChild(e));
   movesetHeader.append(headerRow, document.createElement('hr'));
   
   // const splashButton = document.createElement('div'); splashButton.className = 'splash-button'; 
@@ -540,6 +541,7 @@ function showInfoSplash(specID, forcePage=null, forceShiny=null, forceFem=null) 
   }
   else if (splashState.page == 1) { // Show biomes
     if (item?.fx) movesetScrollable.innerHTML += biomeLongText[0]; // Description of form exclusivity
+    if (item?.fx && item?.ex) movesetScrollable.innerHTML += '<br><br>';
     if (item?.ex) movesetScrollable.innerHTML += biomeLongText[item.ex]; // Description of species exclusivity
     possibleFID.slice(fidThreshold[8],fidThreshold[9]).forEach((fid) => {
       if (fid in item) {
