@@ -1,25 +1,25 @@
 headerNames = ['Dex','Shiny','Species','Types','Abilities','Egg Moves','Cost','BST','HP','Atk','Def','SpA','SpD','Spe'];
 altText = ['Moves','Main Only','Hidden Only','Passive Only','Search','Pow','Acc','PP','Add to filters','Memory','Evolution','Egg Move','Rare Egg Move','Common','Great','Ultra','TM','Lv.','Evo','Egg'];
 catToName = ['Type','Ability','Move','Gen','Cost','Gender','Mode','Egg Tier','Shiny Variants','Biome','Related To','Tag'];
-infoText = ['Friendship per Candy','Passive','Cost Reduction','Species Egg','Hidden Ability','Egg Exclusive','Baby Exclusive','Paradox Pokemon','Form Change','Biomes','Filters'];
+infoText = ['Friendship per Candy','Passive','Cost Reduction','Species Egg','Hidden Ability','Egg Exclusive','Baby Exclusive','Paradox Pokémon','Form Change','Biomes','Filters'];
 biomeText = ['Common','Uncommon','Rare','Super Rare','Ultra Rare','Boss','Com.','Unc.','Rare','SR','UR','Dawn','Day','Dusk','Night'];
 biomeLongText = [
 '<b>This form is only available via <span style="color:rgb(140, 130, 240);">Form Change</span>.</b> Other forms can be encountered in the biomes shown.',
-'<b>This Pokemon is <span style="color:rgb(143, 214, 154);">Egg Exclusive</span>.</b><br>It does not appear in any biomes, and can only be obtained from eggs.',
-'<b>This is a <span style="color:rgb(216, 143, 205);">Baby Pokemon</span>.</b><br>It does not appear in any biomes, but can be unlocked by encountering its evolution.',
-'<b>This <span style="color:rgb(239, 131, 131);">Paradox Pokemon</span> is <span style="color:rgb(143, 214, 154);">Egg Exclusive</span>.</b><br>It can only be obtained from eggs, but can afterward be caught in Classic mode.',
-'This Pokemon can only be caught after obtaining <b><span style="color:rgb(239, 131, 131);">All Other Pokemon</span></b>.<br>It does not appear in standard eggs.',
+'<b>This Pokémon is <span style="color:rgb(143, 214, 154);">Egg Exclusive</span>.</b><br>It does not appear in any biomes, and can only be obtained from eggs.',
+'<b>This is a <span style="color:rgb(216, 143, 205);">Baby Pokémon</span>.</b><br>It does not appear in any biomes, but can be unlocked by encountering its evolution.',
+'<b>This <span style="color:rgb(239, 131, 131);">Paradox Pokémon</span> is <span style="color:rgb(143, 214, 154);">Egg Exclusive</span>.</b><br>It can only be obtained from eggs, but can afterward be caught in Classic mode.',
+'This Pokémon can only be caught after obtaining <b><span style="color:rgb(239, 131, 131);">All Other Pokémon</span></b>.<br>It does not appear in standard eggs.',
 '<b>This form is unobtainable.</b>'];
 warningText = [
-'Restricted to Pokemon that have shiny variants.',
+'Restricted to Pokémon that have shiny variants.',
 'Abilities are restricted to only Main Abilities.',
 'Abilities are restricted to only Hidden Abilities.',
 'Abilities are restricted to only Passive Abilities.',
-'<b>There are no Pokemon that match the filters and the search term.</b><br>Adding another filter may change the results.',
+'<b>There are no Pokémon that match the filters and the search term.</b><br>Adding another filter may change the results.',
 '<b>Click on a suggestion to filter it.</b><br>Filter preview is only for Species/Types/Abilities.',
-'<b>There are no Pokemon that match the filters and the search term.</b><br>Try a different combination.',
-'<b>There are no Pokemon that match the filters.</b><br>Remove filters, or change the connections to "OR".',
-'<b>There are no Pokemon or filters that match the search term.</b><br>Please check your spelling and try again.',
+'<b>There are no Pokémon that match the filters and the search term.</b><br>Try a different combination.',
+'<b>There are no Pokémon that match the filters.</b><br>Remove filters, or change the connections to "OR".',
+'<b>There are no Pokémon or filters that match the search term.</b><br>Please check your spelling and try again.',
 'Click to see the instructions.'];
 procToDesc = [
 "User Atk",
@@ -4394,10 +4394,10 @@ This column will also show <b>filtered ${altText[0]}/${infoText[9]}</b></span>
 <p style="margin: 10px;"><b>${headerNames[6]}</b> column shows rarity color of <b>${catToName[7]}</b>:<br> 
 <b>${fidToName[fidThreshold[6]]}</b>, <span style="color:rgb(131, 182, 239);"><b>${fidToName[fidThreshold[6]+1]}</b></span>, <span style="color:rgb(240, 230, 140);"><b>${fidToName[fidThreshold[6]+2]}</b></span>, <span style="color:rgb(239, 131, 131);"><b>${fidToName[fidThreshold[6]+3]}</b></span>, <span style="color:rgb(216, 143, 205);"><b>${fidToName[fidThreshold[6]+4]}</b></span></p>
 <hr>
-<p style="margin: 10px; font-weight: bold;">Click on a <span style="color:rgb(140, 130, 240);">Pokemon</span> entry to see details:
+<p style="margin: 10px; font-weight: bold;">Click on a <span style="color:rgb(140, 130, 240);">Pokémon</span> entry to see details:
 <br><span style="color:rgb(145, 145, 145);">${altText[0]}, ${headerNames[4]}, ${headerNames[6]}, Image, Pin, ${headerNames[2]}</span></p>
 <p style="margin: 10px;">
-Click a Pokemon's <b>Name</b> to see their full moveset.<br>
+Click a Pokémon's <b>Name</b> to see their full moveset.<br>
 Color of <b>Pow</b> shows <span style="color:${col.or}; font-weight: bold;">Physical</span> or <span style="color:${col.bl}; font-weight: bold;">Special</span> damage<br>
 Color of <b>Acc</b> shows <span style="color:${col.re}; font-weight: bold;">Multi-target</span> moves
 </p>

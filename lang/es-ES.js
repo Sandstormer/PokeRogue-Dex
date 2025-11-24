@@ -5,21 +5,21 @@ infoText = ['Amistad por Caramelo','Pasiva','Reducción de Coste','Huevo de Espe
 biomeText = ['Común','Poco Común','Raro','Super Raro','Ultra Raro','Jefe','Com.','PCom.','Raro','SR','UR','Amanecer','Día','Atardecer','Noche'];
 biomeLongText = [
 '<b>This form is only available via <span style="color:rgb(140, 130, 240);">Form Change</span>.</b> Other forms can be encountered in the biomes shown.',
-'<b>This Pokemon is <span style="color:rgb(143, 214, 154);">Egg Exclusive</span>.</b><br>It does not appear in any biomes, and can only be obtained from eggs.',
-'<b>This is a <span style="color:rgb(216, 143, 205);">Baby Pokemon</span>.</b><br>It does not appear in any biomes, but can be unlocked by encountering its evolution.',
-'<b>This <span style="color:rgb(239, 131, 131);">Paradox Pokemon</span> is <span style="color:rgb(143, 214, 154);">Egg Exclusive</span>.</b><br>It can only be obtained from eggs, but can afterward be caught in Classic mode.',
-'This Pokemon can only be caught after obtaining <b><span style="color:rgb(239, 131, 131);">All Other Pokemon</span></b>.<br>It does not appear in standard eggs.',
+'<b>This Pokémon is <span style="color:rgb(143, 214, 154);">Egg Exclusive</span>.</b><br>It does not appear in any biomes, and can only be obtained from eggs.',
+'<b>This is a <span style="color:rgb(216, 143, 205);">Baby Pokémon</span>.</b><br>It does not appear in any biomes, but can be unlocked by encountering its evolution.',
+'<b>This <span style="color:rgb(239, 131, 131);">Paradox Pokémon</span> is <span style="color:rgb(143, 214, 154);">Egg Exclusive</span>.</b><br>It can only be obtained from eggs, but can afterward be caught in Classic mode.',
+'This Pokémon can only be caught after obtaining <b><span style="color:rgb(239, 131, 131);">All Other Pokémon</span></b>.<br>It does not appear in standard eggs.',
 '<b>This form is unobtainable.</b>'];
 warningText = [
-'Restricted to Pokemon that have shiny variants.',
+'Restricted to Pokémon that have shiny variants.',
 'Abilities are restricted to only Main Abilities.',
 'Abilities are restricted to only Hidden Abilities.',
 'Abilities are restricted to only Passive Abilities.',
-'<b>There are no Pokemon that match the filters and the search term.</b><br>Adding another filter may change the results.',
+'<b>There are no Pokémon that match the filters and the search term.</b><br>Adding another filter may change the results.',
 '<b>Click on a suggestion to filter it.</b><br>Filter preview is only for Species/Types/Abilities.',
-'<b>There are no Pokemon that match the filters and the search term.</b><br>Try a different combination.',
-'<b>There are no Pokemon that match the filters.</b><br>Remove filters, or change the connections to "OR".',
-'<b>There are no Pokemon or filters that match the search term.</b><br>Please check your spelling and try again.',
+'<b>There are no Pokémon that match the filters and the search term.</b><br>Try a different combination.',
+'<b>There are no Pokémon that match the filters.</b><br>Remove filters, or change the connections to "OR".',
+'<b>There are no Pokémon or filters that match the search term.</b><br>Please check your spelling and try again.',
 'Click to see the instructions.'];
 procToDesc = [
 "User Atk",
