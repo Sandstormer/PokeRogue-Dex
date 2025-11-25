@@ -114,7 +114,7 @@ function loadAndApplyLanguage(lang) {
   console.log(`Attempting to load: ${script.src}`);
 }
 function makeSearchable(input) { // Remove punctuation, accents, and compound characters
-  return input.normalize("NFD").replace(/[\u0300-\u036f\u2019.'\s-]/g,"").toLowerCase() // Dash must be at end of regex group
+  return input.normalize("NFD").replace(/[\u0300-\u036f\u2019.:'\s-]/g,"").toLowerCase() // Dash must be at end of regex group
     .replace(/ß/g,"ss").replace(/œ/g,"oe").replace(/æ/g,"ae");
 }
 
