@@ -1,3 +1,6 @@
+// Do not edit these files directly
+// They are changed automatically by the update script
+// Changes must be made through the updater repository
 headerNames = ['No.','色違い','名前','タイプ','とくせい','タマゴ わざ','コスト','合計','HP','攻撃','防御','特攻','特防','素早'];
 altText = ['わざ','規格のみ','隠れのみ','消極的のみ','検索の','威力','命中','PP','フィルターに追加','きおくのキノコ','しんか','タマゴわざ','レアタマゴわざ','コモン','スーパー','ハイパー','わざマシン','Lv.','進化','卵'];
 catToName = ['タイプ','とくせい','わざ','世代','コスト','性','ゲームモード','タマゴ層','色違い','バイオーム','関連','タグ'];

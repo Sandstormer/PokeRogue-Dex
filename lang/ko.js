@@ -1,3 +1,6 @@
+// Do not edit these files directly
+// They are changed automatically by the update script
+// Changes must be made through the updater repository
 headerNames = ['번호','이로치','종','타입','특성','알기술','코스트','합계','HP','공격','방어','특공','특방','스핏'];
 altText = ['기술','일반 특성','숨겨진 특성','패시브 특성','검색','위력','명중률','PP','필터에 추가','기억버섯','진화계보','알 기술','레어 알 기술','일반','슈퍼','하이퍼','머신','레벨','진화','알'];
 catToName = ['타입','특성','기술','세대','코스트','성별','모드','알','색 다른 이로치','바이옴','진화계보','태그'];

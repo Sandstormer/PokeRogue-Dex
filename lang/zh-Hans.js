@@ -1,3 +1,6 @@
+// Do not edit these files directly
+// They are changed automatically by the update script
+// Changes must be made through the updater repository
 headerNames = ['编号','闪光','名称','属性','特性','蛋招式','费用','全部','HP','攻击','防御','特攻','特防','速度'];
 altText = ['招式','标准','梦特','被动','搜索','威力','命中','PP','添加到筛选','回忆蘑菇','进化','蛋招式','稀有 蛋招式','常见','超','高','学习器','等级','进化','蛋'];
 catToName = ['属性','特性','招式','世代','费用','性别','模式','蛋','变种闪光','环境','相关于','标签'];

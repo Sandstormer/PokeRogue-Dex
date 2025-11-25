@@ -1,3 +1,6 @@
+// Do not edit these files directly
+// They are changed automatically by the update script
+// Changes must be made through the updater repository
 headerNames = ['N°','Crom.','Nome','Tipo','Abilità','Mosse Uovo','Costo','Tot','PS','Att','Dif','ASp','DSp','Vel'];
 altText = ['Mosse','Principale','Speciale','Passiva','Cerca','Pot','Prec','PP','Aggiungi ai filtri','Memoria','Evoluzione','Mossa Uovo','Mossa Uovo Rara','Comuni','Mega','Ultra','MT','L.','Evo','Uova'];
 catToName = ['Tipo','Abilità','Mossa','Gen','Costo','Genere','Modalità','Uova','Varianti Cromatiche','Bioma','Evoluzioni','Etichetta'];

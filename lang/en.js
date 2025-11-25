@@ -1,3 +1,6 @@
+// Do not edit these files directly
+// They are changed automatically by the update script
+// Changes must be made through the updater repository
 headerNames = ['Dex','Shiny','Species','Types','Abilities','Egg Moves','Cost','BST','HP','Atk','Def','SpA','SpD','Spe'];
 altText = ['Moves','Main Only','Hidden Only','Passive Only','Search','Pow','Acc','PP','Add to filters','Memory','Evolution','Egg Move','Rare Egg Move','Common','Great','Ultra','TM','Lv.','Evo','Egg'];
 catToName = ['Type','Ability','Move','Gen','Cost','Gender','Mode','Egg Tier','Shiny Variants','Biome','Related To','Tag'];

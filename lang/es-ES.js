@@ -1,3 +1,6 @@
+// Do not edit these files directly
+// They are changed automatically by the update script
+// Changes must be made through the updater repository
 headerNames = ['Dex','Shiny','Especie','Tipos','Habilidades','Mov. Huevo','Coste','BST','PS','Atq','Def','AtE','DfE','Vel'];
 altText = ['Movimientos','Solo Principal','Solo Oculta','Solo Pasiva','Buscar','Pot.','Prec.','PP','Añadir a filtros','Recuerdo','Evolución','Mov. Huevo','Mov. Huevo Raro','Común','Súper','Ultra','MT','Nv.','Evo','Huevo'];
 catToName = ['Tipo','Habilidad','Movimiento','Gen','Coste','Género','Modo','Nivel de Huevo','Variantes Shiny','Bioma','Relacionado con','Etiqueta'];
