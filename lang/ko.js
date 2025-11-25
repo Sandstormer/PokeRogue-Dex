@@ -4398,4 +4398,5 @@ helpMenuText = `
 <span style="color:rgb(140, 130, 240); font-weight: bold;">${catToName[1]}</span> 또는 
 <span style="color:rgb(140, 130, 240); font-weight: bold;">${catToName[2]}</span> 의 설명을 볼 수 있습니다.</p>
 <hr style="margin-bottom: 10px;">
-<span style="color:rgb(145, 145, 145); font-size:11px">이 사이트는 Sandstorm 이 만들었으며, Misdreavus 가 번역을 도왔습니다. 쿠키를 저장하거나 개인 데이터를 수집하지 않습니다. 이미지와 게임 데이터는 PokeRogue GitHub 에서 제공되며, 자산 권리는 원 제작자에게 있습니다.</span>`;
+<span style="color:rgb(145, 145, 145); font-size:11px">이 사이트는 Sandstorm 이 만들었으며, Misdreavus 가 번역을 도왔습니다. 쿠키를 저장하거나 개인 데이터를 수집하지 않습니다. 이미지와 게임 데이터는 PokeRogue GitHub 에서 제공되며, 자산 권리는 원 제작자에게 있습니다.</span>
+`;

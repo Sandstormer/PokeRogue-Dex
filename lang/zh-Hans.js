@@ -4399,4 +4399,5 @@ helpMenuText = `
 <span style="color:${col.pu}; font-weight: bold;">${catToName[1]}</span>, 
 <span style="color:${col.pu}; font-weight: bold;">${catToName[2]}</span> 查看详细信息</p>
 <hr style="margin-bottom: 10px;">
-<span style="color:rgb(145, 145, 145); font-size:11px">本网站由 Sandstorm 创建，倾注了大量心血。我不存储任何 cookie, 也不收集任何个人数据。图片和游戏数据来自 PokeRogue 的 GitHub。所有素材版权归原作者所有。</span>`;
+<span style="color:rgb(145, 145, 145); font-size:11px">本网站由 Sandstorm 创建，倾注了大量心血。我不存储任何 cookie, 也不收集任何个人数据。图片和游戏数据来自 PokeRogue 的 GitHub。所有素材版权归原作者所有。</span>
+`;

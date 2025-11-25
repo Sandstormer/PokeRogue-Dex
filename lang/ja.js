@@ -4399,4 +4399,5 @@ helpMenuText = `
 <span style="color:${col.pu}; font-weight: bold;">${catToName[1]}</span>, 
 <span style="color:${col.pu}; font-weight: bold;">${catToName[2]}</span></p>
 <hr style="margin-bottom: 10px;">
-<span style="color:rgb(145, 145, 145); font-size:11px">このサイトは Sandstorm によって多大な努力のもと作成されました。クッキーは保存しておらず, 個人データの収集も行っていません。画像とゲームデータは PokeRogue の GitHub から取得しています。すべてのアセットの著作権は元の制作者に帰属します。</span>`;
+<span style="color:rgb(145, 145, 145); font-size:11px">このサイトは Sandstorm によって多大な努力のもと作成されました。クッキーは保存しておらず, 個人データの収集も行っていません。画像とゲームデータは PokeRogue の GitHub から取得しています。すべてのアセットの著作権は元の制作者に帰属します。</span>
+`;
