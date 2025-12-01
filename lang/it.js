@@ -2666,7 +2666,7 @@ speciesNames = [
 'Muk di Alola',
 'Exeggutor di Alola',
 'Marowak di Alola',
-'Floette',
+'Floette Fiore Eterno',
 'Meowth di Galar',
 'Ponyta di Galar',
 'Rapidash di Galar',
@@ -2707,7 +2707,7 @@ speciesNames = [
 'Infuocata Tauros di Paldea',
 'Acquatica Tauros di Paldea',
 'Wooper di Paldea',
-'Ursaluna'
+'Ursaluna Luna Cremisi'
 ];
 fidToName = [
 'Coleottero',

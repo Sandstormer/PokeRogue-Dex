@@ -2666,7 +2666,7 @@ speciesNames = [
 'Grotadmorv d’Alola',
 'Noadkoko d’Alola',
 'Ossatueur d’Alola',
-'Floette',
+'Floette Fleur Éternelle',
 'Miaouss de Galar',
 'Ponyta de Galar',
 'Galopa de Galar',
@@ -2707,7 +2707,7 @@ speciesNames = [
 'Tauros de Paldea Flamboyant',
 'Tauros de Paldea Aquatique',
 'Axoloto de Paldea',
-'Ursaking'
+'Ursaking Lune Vermeille'
 ];
 fidToName = [
 'Insecte',
