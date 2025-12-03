@@ -47,7 +47,8 @@ let filteredItemIDs = null; // List of all displayed row numbers
 // State of info screen: species shown, page(moveset,biome,family,zoom), shiny(0,1,2,3), fem(0,1), zoomImageHeight
 let splashState = { speciesID: -1, page: 0, shiny: 0, fem: 0, zoomImgh: 300 }
 let headerState = { shiny: 0, ability: 0, biome: 0 } // Global state of shiny(0,1,2,3), ability(0,1,2,3), biome(0,1)
-let sortState = { column: null, ascending: true, target: null }; // Track the current sort state
+let sortState = { sortAttr: 'row', ascending: true, index: 0 }; // Track the current sort state
+let persistentState = false; // Whether filters are reloaded upon refresh
 const TagToFID = { // List of ability/move FIDs that match specific tag filters
   [fidThreshold[10]]: possibleFID.filter((fid) => fid >= fidThreshold[0] && fid < fidThreshold[1] && (fidToProc[fid-fidThreshold[0]][1].includes(59))), // Lure ability
   [fidThreshold[10]+1]: possibleFID.filter((fid) => fid >= fidThreshold[0] && fid < fidThreshold[1] && (fidToProc[fid-fidThreshold[0]][1].includes(37))), // Ignores abilities
@@ -99,19 +100,29 @@ function loadAndApplyLanguage(lang) {
     headerColumns = [];
     headerNames.forEach((thisHeaderName, index) => {
       const newColumn = document.createElement('div');
-      newColumn.innerHTML = thisHeaderName;  newColumn.textDef = thisHeaderName;
+      newColumn.innerHTML = thisHeaderName;  newColumn.textDef = thisHeaderName;  newColumn.index = index;
       newColumn.className = 'header-column'; newColumn.sortattr = sortAttributes[index];
       newColumn.addEventListener('click', () => updateHeader(newColumn));
       headerColumns.push(newColumn); // Push the column element into the array
     });      
     
-    // Display items, and initial sort by row number
-    headerState.shiny = 0; headerState.ability = 0;
-    adjustLayout(true, headerColumns[0]); 
+    // Load persistent settings if enabled
+    persistentState = JSON.parse(localStorage.getItem("persistentState"));
+    if (persistentState) { // If persistent filters are enabled
+      pinnedRows = loadFromStorage("pinnedRows") ?? [];
+      headerState = loadFromStorage("headerState") ?? headerState;
+      sortState = loadFromStorage("sortState") ?? sortState;
+      const loadedGroups = loadFromStorage("lockedFilterGroups") ?? [[]];
+      loadedGroups.forEach(group => group.forEach((fid,i) => lockFilter(fid, true, (i>0))));
+    }
+    adjustLayout(true, headerColumns[sortState.index ?? 0]); // Do initial display of pokemon
   }
   script.onerror = (e) => console.warn(`Failed to load ${lang}.js`, e);
   document.head.appendChild(script);
   console.log(`Attempting to load: ${script.src}`);
+}
+function loadFromStorage(key) {
+  if (localStorage.getItem(key) !== null) return JSON.parse(localStorage.getItem(key));
 }
 function makeSearchable(input) { // Remove punctuation, accents, and compound characters
   return input.normalize("NFD").replace(/[\u0300-\u036f\u2019.:'\s-]/g,"").toLowerCase() // Dash must be at end of regex group
@@ -182,30 +193,30 @@ function refreshAllItems() { // Display items based on query and locked filters 
   if (pinnedRows) filteredItemIDs = filteredItemIDs.filter((thisID) => !pinnedRows.includes(thisID));
 
   // Sort items if a column is specified ==============
-  if (sortState.column) {
-    let effectiveSort = sortState.column;
-    if (lockedFilters.some((f) => f == fidThreshold[5]+2) && sortState.column in flipStats) { // If flipped mode
-      effectiveSort = flipStats[sortState.column]
+  if (sortState.sortAttr) {
+    let effectiveSort = sortState.sortAttr;
+    if (lockedFilters.some((f) => f == fidThreshold[5]+2) && sortState.sortAttr in flipStats) { // If flipped mode
+      effectiveSort = flipStats[sortState.sortAttr]
     }
     filteredItemIDs.sort((a, b) => {
       let aValue = a; let bValue = b; // Set default attribute of row number
-      if (sortState.column == 'moves') { // Sort by source of moves
+      if (sortState.sortAttr == 'moves') { // Sort by source of moves
         const getLearnLevel = (ID) => 
           showMoveLearn.reduce((total, move) => total + (move in items[ID] ? 
             (move >= fidThreshold[8] ? (items[ID][move][1] ? ~~(items[ID][move][0]/20)*0.9+~~(items[ID][move][1]/20)/10 
               : ~~(items[ID][move][0]/20)) : items[ID][move]) : 500), 0);
         aValue = getLearnLevel(a);
         bValue = getLearnLevel(b);
-      } else if (sortState.column == 'type') { // Sort by type combinations
+      } else if (sortState.sortAttr == 'type') { // Sort by type combinations
         const typeMult = (lockedFilters.some((fid) => fid < fidThreshold[0]) ? 2 : 36 );
         const aEntry = items[a]; const bEntry = items[b];
         aValue = (aEntry.t1+1)*(typeMult*!lockedFilters.includes(aEntry.t1));
         bValue = (bEntry.t1+1)*(typeMult*!lockedFilters.includes(bEntry.t1));
         if ('t2' in aEntry) aValue += (aEntry.t2*2+1)*!lockedFilters.includes(aEntry.t2);
         if ('t2' in bEntry) bValue += (bEntry.t2*2+1)*!lockedFilters.includes(bEntry.t2);
-      } else if (sortState.column == 'sp') { // Sort by species names alphabetically
+      } else if (sortState.sortAttr == 'sp') { // Sort by species names alphabetically
         aValue = speciesNames[a]; bValue = speciesNames[b];
-      } else if (sortState.column != 'row') { // If anything OTHER than row number
+      } else if (sortState.sortAttr != 'row') { // If anything OTHER than row number
         aValue = items[a][effectiveSort]; bValue = items[b][effectiveSort];
       }
       if (aValue < bValue) return sortState.ascending ? -1 : 1;
@@ -275,6 +286,7 @@ function renderMoreItems() { // Create each list item, with columns of info ****
         pinnedRows.push(thisID);
         pinImg.src = 'ui/pin1.png';
       }
+      localStorage.setItem("pinnedRows",JSON.stringify(pinnedRows));
     });
     if (item?.fe == 1) {
       if (!isMobile) femImg.addEventListener('mouseover', () => femImg.src = `ui/fem1.png`);
@@ -763,7 +775,8 @@ function displaySuggestions() {
 }
 
 // Lock a filter *************************
-function lockFilter(newLockFID, clearQuery = true) {
+function lockFilter(newLockFID, clearQuery = true, forceOR = null) {
+  if (newLockFID == null) return;
   if (!lockedFilters.some((f) => f == newLockFID)) {
     const isExclusion = searchBox.value.startsWith('-')*fidThreshold[11];
     lockedFilters.push(newLockFID+isExclusion); // Add the filter to the locked filters list
@@ -772,8 +785,8 @@ function lockFilter(newLockFID, clearQuery = true) {
       // Default to "OR" for certain categories if matching previous filter
       const defaultOR = ([3,4,8,9,10].includes(fidToCategory(newLockFID)) 
         && fidToCategory(newLockFID) == fidToCategory(lockedFilters[lockedFilters.length-2]));
-      filterMod = document.createElement("span"); filterMod.toggleOR = defaultOR;
-      filterMod.className = "filter-mod";         filterMod.innerHTML = (defaultOR?'OR':'&');
+      filterMod = document.createElement("span"); filterMod.toggleOR = forceOR ?? defaultOR;
+      filterMod.className = "filter-mod";         filterMod.innerHTML = (filterMod.toggleOR?'OR':'&');
       filterMod.addEventListener("click", () => toggleOR(filterMod));
       lockedMods.push(filterMod); filterContainer.appendChild(filterMod);
     }
@@ -789,7 +802,7 @@ function lockFilter(newLockFID, clearQuery = true) {
       updateHeader(headerColumns[1]);
     } else if (newLockFID == fidThreshold[7]+2 && headerState.shiny > 1) { // No variants
       headerState.shiny = 0; updateHeader(headerColumns[1]);
-    } else if (sortState.column === 'row' && [2,9].includes(fidToCategory(newLockFID+isExclusion))) {
+    } else if (sortState.sortAttr === 'row' && [2,9].includes(fidToCategory(newLockFID+isExclusion))) {
       updateHeader(headerColumns[5]); // Sort by Move/Biome for those new filters
     } else {
       updateHeader(null, true);
@@ -824,7 +837,7 @@ function removeFilter(fidToRemove, tagToRemove, modToRemove) {
     headerState.shiny = 0;  headerColumns[1].innerHTML = headerNames[1]; // Update header if removing shiny filter
   }
   // Reset the sorting if there aren't any more locked moves/biomes
-  if (sortState.column === 'moves' && !lockedFilters.some(f => [2,9].includes(fidToCategory(f)))) { 
+  if (sortState.sortAttr === 'moves' && !lockedFilters.some(f => [2,9].includes(fidToCategory(f)))) { 
     updateHeader(headerColumns[0]); 
   } else { 
     updateHeader(null, true); // Update header, then refresh items and suggestions
@@ -844,10 +857,13 @@ function updateFilterGroups() { // Updates the grouping of filters based on AND/
     if (!lockedMods[i].toggleOR) { group += 1;  lockedFilterGroups.push([]); } 
     lockedFilterGroups[group].push(lockedFilters[i+1]);
   }
+  localStorage.setItem("lockedFilters",JSON.stringify(lockedFilters));
+  localStorage.setItem("lockedFilterGroups",JSON.stringify(lockedFilterGroups));
+  localStorage.setItem("lockedMods",JSON.stringify(lockedMods));
 }
 
 function toggleOR(filterMod) { // Click a filter to toggle it between AND and OR
-  filterMod.toggleOR = 1 - filterMod.toggleOR;
+  filterMod.toggleOR = !filterMod.toggleOR;
   filterMod.innerHTML = (filterMod.toggleOR ? 'OR' : '&');
   updateFilterGroups();
   refreshAllItems();
@@ -855,7 +871,7 @@ function toggleOR(filterMod) { // Click a filter to toggle it between AND and OR
 
 // Click on the header row to sort/filter by an attribute **************************
 function updateHeader(clickTarget = null, ignoreFlip = false) {
-  if (clickTarget == null) { clickTarget = sortState.target; ignoreFlip = true; }
+  if (clickTarget == null) { clickTarget = headerColumns[sortState.index]; ignoreFlip = true; }
   const sortAttribute = clickTarget?.sortattr;
   const hasMovesBiomes = lockedFilters.some(f => [2,9].includes(fidToCategory(f)));
   // If clicking move column, with no moves/biomes filtered, toggle between egg moves and biomes
@@ -871,47 +887,49 @@ function updateHeader(clickTarget = null, ignoreFlip = false) {
     // Cap the selector to T1 if the "None" filter is selected or if the entire list only has T1
     const shinyCap = lockedFilters.some(f => f == fidThreshold[7]+2) 
       || (!filteredItemIDs.some(specID => items[specID].sh>1) && !!filteredItemIDs.length);
-    headerState.shiny += 3;  headerState.shiny %= (shinyCap?2:4);
-    if (headerState.shiny) {
-      headerColumns[1].innerHTML = `<span style="color:${col.pu};">${headerNames[1]}</span>`;
-      const starImg = document.createElement('img');  starImg.className = 'star-header';
-      starImg.src = `ui/shiny${headerState.shiny}.png`;
-      headerColumns[1].appendChild(starImg);
-      if (headerState.shiny == 3 && !lockedFilters.some(f => f == fidThreshold[7] || f == fidThreshold[7]+1)) {
-        lockFilter(fidThreshold[7]+1,false);
-      }
-    } else {
-      headerColumns[1].innerHTML = headerNames[1];
-    }
+    headerState.shiny = (headerState.shiny+3)%(shinyCap?2:4);
   } else if (sortAttribute == 'ab') { // Toggle the global ability state
     headerState.ability = (headerState.ability+1)%4;
-    if (headerState.ability) {
-      headerColumns[4].innerHTML = `<span style="color:${col.pu};">${headerNames[4]}</span>`;
-      if      (headerState.ability == 1) headerColumns[4].innerHTML += `<span style="color:${col.wh}; font-size:12px;">(${altText[1]})</span>`;
-      else if (headerState.ability == 2) headerColumns[4].innerHTML += `<span style="color:${col.ye}; font-size:12px;">(${altText[2]})</span>`;
-      else if (headerState.ability == 3) headerColumns[4].innerHTML += `<span style="color:${col.pu}; font-size:12px;">(${altText[3]})</span>`;
-    } else headerColumns[4].innerHTML = headerNames[4];
   } else {
     headerColumns[5].innerHTML = headerColumns[5].textDef;
     // If clicked on a header that can actually be sorted
     // (The "Moves" column can only be sorted if there is a filtered move/biome)
     if (sortAttribute && (sortAttribute != 'moves' || hasMovesBiomes)) { 
-      if (sortState.column === sortAttribute) {
+      if (sortState.sortAttr === sortAttribute) {
         if (!ignoreFlip) {
           sortState.ascending = !sortState.ascending; // Toggle sort direction if sorting by the same column
         }
       } else {
-        sortState.column = sortAttribute;
+        sortState.sortAttr = sortAttribute;
         // Sort ascending on some columns, but descending on others
-        sortState.ascending = ['row','sp','type','moves'].includes(sortState.column);
-        if (sortState.target?.textDef) { // Clear arrow from previous target
-          sortState.target.innerHTML = sortState.target?.textDef;
+        sortState.ascending = ['row','sp','type','moves'].includes(sortState.sortAttr);
+        if (headerColumns[sortState.index]?.textDef) { // Clear arrow from previous target
+          headerColumns[sortState.index].innerHTML = headerColumns[sortState.index]?.textDef;
         }
       }
-      sortState.target = clickTarget; // Draw arrow on new target
+      sortState.index = clickTarget.index; // Draw arrow on new target
       clickTarget.innerHTML = `${clickTarget.textDef}<span style="color:${col.pu}; font-family: serif;">${(sortState.ascending?"&#9650;":"&#9660;")}</span>`;
     }
   }
+  if (headerState.shiny) {
+    headerColumns[1].innerHTML = `<span style="color:${col.pu};">${headerNames[1]}</span>`;
+    const starImg = document.createElement('img');  starImg.className = 'star-header';
+    starImg.src = `ui/shiny${headerState.shiny}.png`;
+    headerColumns[1].appendChild(starImg);
+    if (headerState.shiny == 3 && !lockedFilters.some(f => f == fidThreshold[7] || f == fidThreshold[7]+1)) {
+      lockFilter(fidThreshold[7]+1,false);
+    }
+  } else {
+    headerColumns[1].innerHTML = headerNames[1];
+  }
+  if (headerState.ability) {
+    headerColumns[4].innerHTML = `<span style="color:${col.pu};">${headerNames[4]}</span>`;
+    if      (headerState.ability == 1) headerColumns[4].innerHTML += `<span style="color:${col.wh}; font-size:12px;">(${altText[1]})</span>`;
+    else if (headerState.ability == 2) headerColumns[4].innerHTML += `<span style="color:${col.ye}; font-size:12px;">(${altText[2]})</span>`;
+    else if (headerState.ability == 3) headerColumns[4].innerHTML += `<span style="color:${col.pu}; font-size:12px;">(${altText[3]})</span>`;
+  } else headerColumns[4].innerHTML = headerNames[4];
+  localStorage.setItem("headerState",JSON.stringify(headerState));
+  localStorage.setItem("sortState",JSON.stringify(sortState));
   refreshAllItems(); // Update the display
 }
 
@@ -934,8 +952,8 @@ function adjustLayout(forceAdjust = false, headerClick = null) {
       for (const thisColumn of headerColumns) thisRow.appendChild(thisColumn);  
       headerContainer.appendChild(thisRow);
     }
-  increment = (isMobile ? 10 : 30);
-  updateHeader(headerClick, true);
+    increment = (isMobile ? 10 : 30);
+    updateHeader(headerClick, true);
   }
 }
 
@@ -1044,5 +1062,16 @@ openHelpButton.addEventListener("click",     () => openHelpMenu());
 function openHelpMenu() { // Show the instructions
   splashContent.style.width = '382px';
   splashContent.innerHTML = helpMenuText;
+  const persistentButton = document.createElement('div'); persistentButton.className = 'splash-button'; 
+  persistentButton.innerHTML = `Persistent Filters (Experimental) - ${persistentState?"ON":"OFF"}`;  
+  persistentButton.style.color = persistentState?col.pu:col.wh;
+  persistentButton.style.fontSize = "12px";
+  persistentButton.addEventListener("click", () => { 
+    persistentState = !persistentState;
+    localStorage.setItem("persistentState",persistentState);
+    persistentButton.innerHTML = `Persistent Filters (Experimental) - ${persistentState?"ON":"OFF"}`;  
+    persistentButton.style.color = persistentState?col.pu:col.wh;
+  });
+  splashContent.appendChild(persistentButton);
   splashScreen.classList.add("show"); // Make it visible
 }
