@@ -106,16 +106,27 @@ function loadAndApplyLanguage(lang) {
       headerColumns.push(newColumn); // Push the column element into the array
     });      
     
-    // Load persistent settings if enabled
-    persistentState = JSON.parse(localStorage.getItem("persistentState"));
-    if (persistentState) { // If persistent filters are enabled
-      pinnedRows = loadFromStorage("pinnedRows") ?? [];
-      headerState = loadFromStorage("headerState") ?? headerState;
-      sortState = loadFromStorage("sortState") ?? sortState;
-      const loadedGroups = loadFromStorage("lockedFilterGroups") ?? [[]];
-      loadedGroups.forEach(group => group.forEach((fid,i) => lockFilter(fid, true, (i>0))));
+    try { // Load persistent settings if enabled, and catch any corruption errors
+        persistentState = JSON.parse(localStorage.getItem("persistentState")) ?? false;
+        if (persistentState) { // If persistent filters are enabled
+          pinnedRows = loadFromStorage("pinnedRows") ?? [];
+          headerState = loadFromStorage("headerState") ?? headerState;
+          sortState = loadFromStorage("sortState") ?? sortState;
+          const loadedGroups = loadFromStorage("lockedFilterGroups") ?? [[]];
+          loadedGroups.forEach(group => group.forEach((fid,i) => lockFilter(fid, false, (i>0))));
+        }
+        adjustLayout(true, headerColumns[sortState.index ?? 0]); // Do initial display of pokemon
+      } catch (error) { // Catch any corruption of persistent filters
+        const alreadyTried = sessionStorage.getItem("recoveryAttempted");
+        if (!alreadyTried) {
+          localStorage.clear(); // Clear all local storage
+          localStorage.setItem("preferredLang", pageLang); // Keep the language setting
+          sessionStorage.setItem("recoveryAttempted", "true");
+          location.reload(); // Reload the page
+        } else {
+          console.error("Unrecoverable corruption in local storage", error);
+        }
     }
-    adjustLayout(true, headerColumns[sortState.index ?? 0]); // Do initial display of pokemon
   }
   script.onerror = (e) => console.warn(`Failed to load ${lang}.js`, e);
   document.head.appendChild(script);
@@ -761,7 +772,7 @@ function displaySuggestions() {
     if (matchingFID.length > 22) matchingFID = [];
     // Highlight a suggestion if tab is hit
     if (matchingFID.length) {
-      tabSelect %= matchingFID.length
+      tabSelect %= matchingFID.length;
       filterToEnter = matchingFID[(tabSelect == -1 ? 0 : tabSelect)];
     }
     matchingFID.forEach((fid) => { // Create the suggestion tag elements
@@ -776,7 +787,7 @@ function displaySuggestions() {
 
 // Lock a filter *************************
 function lockFilter(newLockFID, clearQuery = true, forceOR = null) {
-  if (newLockFID == null) return;
+  if (newLockFID == null || newLockFID < 0 || newLockFID > fidThreshold[fidThreshold.length-1]) return;
   if (!lockedFilters.some((f) => f == newLockFID)) {
     const isExclusion = searchBox.value.startsWith('-')*fidThreshold[11];
     lockedFilters.push(newLockFID+isExclusion); // Add the filter to the locked filters list
@@ -857,9 +868,7 @@ function updateFilterGroups() { // Updates the grouping of filters based on AND/
     if (!lockedMods[i].toggleOR) { group += 1;  lockedFilterGroups.push([]); } 
     lockedFilterGroups[group].push(lockedFilters[i+1]);
   }
-  localStorage.setItem("lockedFilters",JSON.stringify(lockedFilters));
   localStorage.setItem("lockedFilterGroups",JSON.stringify(lockedFilterGroups));
-  localStorage.setItem("lockedMods",JSON.stringify(lockedMods));
 }
 
 function toggleOR(filterMod) { // Click a filter to toggle it between AND and OR
@@ -911,7 +920,7 @@ function updateHeader(clickTarget = null, ignoreFlip = false) {
       clickTarget.innerHTML = `${clickTarget.textDef}<span style="color:${col.pu}; font-family: serif;">${(sortState.ascending?"&#9650;":"&#9660;")}</span>`;
     }
   }
-  if (headerState.shiny) {
+  if (headerState.shiny) { // Update the "Shiny" column text
     headerColumns[1].innerHTML = `<span style="color:${col.pu};">${headerNames[1]}</span>`;
     const starImg = document.createElement('img');  starImg.className = 'star-header';
     starImg.src = `ui/shiny${headerState.shiny}.png`;
@@ -922,15 +931,16 @@ function updateHeader(clickTarget = null, ignoreFlip = false) {
   } else {
     headerColumns[1].innerHTML = headerNames[1];
   }
-  if (headerState.ability) {
+  if (headerState.ability) { // Update the "Ability" column text
     headerColumns[4].innerHTML = `<span style="color:${col.pu};">${headerNames[4]}</span>`;
     if      (headerState.ability == 1) headerColumns[4].innerHTML += `<span style="color:${col.wh}; font-size:12px;">(${altText[1]})</span>`;
     else if (headerState.ability == 2) headerColumns[4].innerHTML += `<span style="color:${col.ye}; font-size:12px;">(${altText[2]})</span>`;
     else if (headerState.ability == 3) headerColumns[4].innerHTML += `<span style="color:${col.pu}; font-size:12px;">(${altText[3]})</span>`;
   } else headerColumns[4].innerHTML = headerNames[4];
+  // Save the filters to local storage, then update the display
   localStorage.setItem("headerState",JSON.stringify(headerState));
   localStorage.setItem("sortState",JSON.stringify(sortState));
-  refreshAllItems(); // Update the display
+  refreshAllItems(); 
 }
 
 function adjustLayout(forceAdjust = false, headerClick = null) {
