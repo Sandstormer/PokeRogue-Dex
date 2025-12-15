@@ -45,7 +45,22 @@ h1 {
   text-align: center;
   font-family: Verdana, sans-serif;
 }
-.colorful-text span {
+.colorful-text-holiday span {
+  display: inline-block;
+  animation: colorChangeHoliday 2s step-start infinite, forceWhite 0s linear forwards;
+  animation-delay: calc(var(--i) * -0.5s), 3.5s; /* Delay each letter, then become white */
+}
+@keyframes colorChangeHoliday {
+  0% { color: rgb(255, 255, 255); }
+  25% { color: rgb(239, 131, 131); }
+  50% { color: rgb(255, 255, 255); }
+  75% { color: rgb(143, 214, 154); }
+  100% { color: rgb(255, 255, 255); }
+}
+@keyframes forceWhite {
+  to { color: white; }
+}
+.colorful-text span, .colorful-text.colorful-text-holiday span {
   display: inline-block;
   animation: colorChange 2s ease-in-out;
   animation-delay: calc(var(--i) * 0.05s); /* Delay each letter */
