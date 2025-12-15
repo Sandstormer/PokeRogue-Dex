@@ -37,7 +37,7 @@ let increment = 10;     // Number of items to load at a time
 let renderLimit = 0;    // This value is updated when scrolling down (starts at 0)
 let showMoveLearn = []; // Filtered moves/biomes to show sources
 let filterToEnter = null; // Filter to apply when hitting Enter
-let tabSelect = -1;       // Filter that is tab selected
+let tabSelect = null;       // Filter that is tab selected
 let lockedFilters = [];   // List of all locked filters IDs
 let lockedMods = []; // List of filter mod objects
 let lockedFilterGroups = [[]]; // Filter IDs grouped together with "OR" condition
@@ -772,14 +772,15 @@ function displaySuggestions() {
     if (matchingFID.length > 22) matchingFID = [];
     // Highlight a suggestion if tab is hit
     if (matchingFID.length) {
+      if (tabSelect < 0) tabSelect += matchingFID.length;
       tabSelect %= matchingFID.length;
-      filterToEnter = matchingFID[(tabSelect == -1 ? 0 : tabSelect)];
+      filterToEnter = matchingFID[(tabSelect ?? 0)];
     }
     matchingFID.forEach((fid) => { // Create the suggestion tag elements
       let newSugg = document.createElement('div');  newSugg.className = 'suggestion';
       newSugg.innerHTML = `${isExclusion?'<img src="ui/x.png">':''}<span style="color:${fidToColor(fid)[0]}; display:inline;">${catToName[fidToCategory(fid)]}: <span style="color:${fidToColor(fid)[1]}; display:inline;">${fidToName[fid]}</span></span>`;
       newSugg.addEventListener("click", () => lockFilter(fid));
-      if (filterToEnter == fid && tabSelect != -1) newSugg.style.borderColor = col.pu;
+      if (filterToEnter == fid && tabSelect != null) newSugg.style.borderColor = col.pu;
       suggestions.appendChild(newSugg);
     });
   }
@@ -973,7 +974,7 @@ window.addEventListener("scroll", () => { // Load more items on scroll
   if (window.scrollY + window.innerHeight >= document.body.scrollHeight * 0.8 - 1000) renderMoreItems();
 });
 searchBox.addEventListener('input', (event) => { // Typing in search box
-  tabSelect = -1;
+  tabSelect = null;
   refreshAllItems();
 });
 document.addEventListener('keydown', (event) => { // All key press events
@@ -1026,7 +1027,7 @@ document.addEventListener('keydown', (event) => { // All key press events
     }
   }
   if (event.key == "Tab" && document.activeElement == searchBox) {
-    tabSelect += 1 + (tabSelect == -1);
+    tabSelect = (tabSelect ?? 0) + (event.shiftKey ? -1 : 1);
     displaySuggestions();
     event.preventDefault();
   }
