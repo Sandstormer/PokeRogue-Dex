@@ -604,8 +604,9 @@ function showInfoSplash(specID, forcePage=null, forceShiny=null, forceFem=null) 
       <p>${infoText[1]}: <span style="color:${col.pu}";>${upgradeCosts[item.co-1][0]}</span> <img src="ui/candy.png" style="margin-bottom:-2px;"></p>
       <p>${infoText[2]}: <span style="color:${col.bl}";>${upgradeCosts[item.co-1][1]}</span> &
         <span style="color:${col.ye}";> ${upgradeCosts[item.co-1][2]}<span> <img src="ui/candy.png" style="margin-bottom:-2px;"></p>
-      <p>${infoText[3]}: ${upgradeCosts[item.co-1][3]} <img src="ui/candy.png" style="margin-bottom:-2px;">
-      <span style="color:${col.ga}; font-size:12px;"><br>${altText[12]}: 1 in ${REMchance[item.et]}${HAtext}
+      <p>${infoText[3]}: ${upgradeCosts[item.co-1][3]}<img src="ui/candy.png" style="margin-bottom:-2px;">
+      <span style="color:${col.ga}; font-size:12px;"><br>Reduced after 20/40/60 eggs
+      <br>${altText[12]}: 1 in ${REMchance[item.et]}${HAtext}
       <br>${headerNames[1]}: 1 in 12</span></p>
       `;
     movesetScrollable.appendChild(splashCostInfo);
