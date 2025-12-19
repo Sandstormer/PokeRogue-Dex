@@ -4,7 +4,7 @@
 headerNames = ['N°','Chrom.','Nom','Type','Talents','Capacités Œuf','Cout','Total','PV','Atq','Déf','ASp','DSp','Vit'];
 altText = ['Capacités','Principaux','Caché','Passif','Chercher','Puis.','Préc.','PP','Ajouter aux filtres','Champi Mémoriel','Évolutions','Capacités Œuf','Rare Capac. Œuf','Commun','Super','Hyper','CT','N.','Évo','Œuf'];
 catToName = ['Type','Talent','Capacité','Gen','Cout','Sexe','Mode','Œuf','Variantes Chromatique','Biome','Lié à','Étiquette'];
-infoText = ['Bonheur par Bonbon','Passif','Cout réduit','Acheter un Œuf','Talent Caché','Exclusif aux Œufs','Exclusif aux Bébés','Pokémon Paradoxe','Changement de forme','Biomes','Filtres'];
+infoText = ['Bonheur par Bonbon','Passif','Cout réduit','Acheter un Œuf','Talent Caché','Exclusif aux Œufs','Exclusif aux Bébés','Pokémon Paradoxe','Changement de forme','Biomes','Filtres','Réduit après ## œufs'];
 biomeText = ['Commun','Peu Commun','Rare','Super Rare','Hyper Rare','Boss','Com.','PC','Rare','SR','HR','Aube','Jour','Crépuscule','Nuit'];
 biomeLongText = [
 '<b>Forme disponible uniquement par <span style="color:rgb(140, 130, 240);">changement de forme</span>.</b> Les autres formes peuvent être rencontrées dans les biomes affichés.',
@@ -304,12 +304,12 @@ fidToDesc = [
 'Diminue la puissance des attaques super efficaces subies.',
 'Permet d’ignorer l’effet des capacités ou des talents qui attirent les capacités.',
 'Le Pokémon prend le type de la capacité qu’il utilise.',
-'Quand le soleil brille ou que le Pokémon tient une capsule d’Énergie Booster, sa stat la plus élevée augmente.',
+'Quand le soleil brille, la stat la plus élevée du Pokémon augmente.',
 'Le Pokémon crée un champ psychique au moment où il entre au combat.',
 'Augmente la puissance des capacités basées sur le son. Le Pokémon ne subit que la moitié des dégâts quand il est touché par ce genre de capacités.',
 'Le Pokémon utilise sa maitrise du yoga pour doubler la puissance de ses attaques physiques.',
 'Le sel pur immunise le Pokémon contre les altérations de statut, et diminue de moitié les dégâts des capacités de type Spectre.',
-'Quand un champ électrifié est actif ou que le Pokémon tient une capsule d’Énergie Booster, sa stat la plus élevée augmente.',
+'Quand un champ électrifié est actif, la stat la plus élevée du Pokémon augmente.',
 'L’adversaire est impressionné par la majesté du Pokémon et ne peut pas le viser avec une capacité prioritaire.',
 'Permet parfois au Pokémon d’agir en premier.',
 'Augmente la Vitesse du Pokémon en cas d’altération de statut.',
@@ -717,9 +717,9 @@ fidToDesc = [
 'Le lanceur met tout son corps à contribution pour attaquer la cible avec un immense marteau. Cette capacité ne peut pas être utilisée deux fois d’affilée.',
 'Le lanceur attaque la cible avec une lance de glace entourée d’un blizzard.',
 'Un souffle de vent qui congèle tout sur son passage s’abat sur l’ennemi. Réduit aussi sa Vitesse.',
-'Le lanceur se jette dans une charge inconsciente sur la cible. Au tour suivant, l’attaque de la cible inflige le double de dégâts et n’échoue jamais.',
+'Le lanceur se jette dans une charge inconsciente sur la cible. Une fois cette capacité utilisée, toute attaque sur le lanceur inflige le double de dégâts et n’échoue jamais.',
 'Le lanceur intimide la cible grâce à son regard terrifiant pour la paralyser.',
-'Évoli submerge l’adversaire sous un flot d’ondes psychiques et crée un mur fabuleux qui réduit les dégâts causés par les attaques spéciales de l’ennemi',
+'Le lanceur submerge l’adversaire sous un flot d’ondes psychiques et crée un mur fabuleux qui réduit les dégâts causés par les attaques spéciales de l’ennemi.',
 'Le lanceur fait des nœuds dans l’herbe pour faire trébucher la cible. Plus la cible est lourde, plus la puissance de cette capacité augmente.',
 'Une masse végétale s’abat sur la cible. Si cette capacité est utilisée en même temps qu’Aire d’Eau, la puissance augmente et un marécage apparait.',
 'Le lanceur joue une douce mélodie qui plonge l’ennemi dans un profond sommeil.',
@@ -2799,7 +2799,7 @@ fidToName = [
 'Aura Féérique',
 'Filtre',
 'Corps Ardent',
-'Rage Brûlure',
+'Rage Brulure',
 'Torche',
 'Don Floral',
 'Flora Voile',
@@ -3008,7 +3008,7 @@ fidToName = [
 'Torrent',
 'Griffe Dure',
 'Rage Poison',
-'Chaîne Toxique',
+'Chaine Toxique',
 'Dépôt Toxique',
 'Calque',
 'Transistor',

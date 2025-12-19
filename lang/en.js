@@ -4,7 +4,7 @@
 headerNames = ['Dex','Shiny','Species','Types','Abilities','Egg Moves','Cost','BST','HP','Atk','Def','SpA','SpD','Spe'];
 altText = ['Moves','Main Only','Hidden Only','Passive Only','Search','Pow','Acc','PP','Add to filters','Memory','Evolution','Egg Move','Rare Egg Move','Common','Great','Ultra','TM','Lv.','Evo','Egg'];
 catToName = ['Type','Ability','Move','Gen','Cost','Gender','Mode','Egg Tier','Shiny Variants','Biome','Related To','Tag'];
-infoText = ['Friendship per Candy','Passive','Cost Reduction','Species Egg','Hidden Ability','Egg Exclusive','Baby Exclusive','Paradox Pokemon','Form Change','Biomes','Filters'];
+infoText = ['Friendship per Candy','Passive','Cost Reduction','Species Egg','Hidden Ability','Egg Exclusive','Baby Exclusive','Paradox Pokemon','Form Change','Biomes','Filters','Reduced after ## eggs'];
 biomeText = ['Common','Uncommon','Rare','Super Rare','Ultra Rare','Boss','Com.','Unc.','Rare','SR','UR','Dawn','Day','Dusk','Night'];
 biomeLongText = [
 '<b>This form is only available via <span style="color:rgb(140, 130, 240);">Form Change</span>.</b> Other forms can be encountered in the biomes shown.',
@@ -304,12 +304,12 @@ fidToDesc = [
 'Reduces the power of supereffective attacks taken.',
 'Ignores the effects of opposing Pokémon’s Abilities and moves that draw in moves.',
 'Changes the Pokémon’s type to the type of the move it’s about to use.',
-'Boosts the Pokémon’s most proficient stat in harsh sunlight or if the Pokémon is holding Booster Energy.',
+'Boosts the Pokémon’s most proficient stat in harsh sunlight.',
 'Turns the ground into Psychic Terrain when the Pokémon enters a battle.',
 'Boosts the power of sound-based moves. The Pokémon also takes half the damage from these kinds of moves.',
 'Using its pure power, the Pokémon doubles its Attack stat.',
 'The Pokémon’s pure salt protects it from status conditions and halves the damage taken from Ghost-type moves.',
-'Boosts the Pokémon’s most proficient stat on Electric Terrain or if the Pokémon is holding Booster Energy.',
+'Boosts the Pokémon’s most proficient stat on Electric Terrain.',
 'Its majesty pressures the opposing Pokémon, making it unable to attack using priority moves.',
 'Enables the Pokémon to move first occasionally.',
 'Boosts the Speed stat if the Pokémon has a status condition.',

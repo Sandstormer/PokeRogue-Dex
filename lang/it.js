@@ -4,7 +4,7 @@
 headerNames = ['N°','Crom.','Nome','Tipo','Abilità','Mosse Uovo','Costo','Tot','PS','Att','Dif','ASp','DSp','Vel'];
 altText = ['Mosse','Principale','Speciale','Passiva','Cerca','Pot','Prec','PP','Aggiungi ai filtri','Memoria','Evoluzione','Mossa Uovo','Mossa Uovo Rara','Comuni','Mega','Ultra','MT','L.','Evo','Uova'];
 catToName = ['Tipo','Abilità','Mossa','Gen','Costo','Genere','Modalità','Uova','Varianti Cromatiche','Bioma','Evoluzioni','Etichetta'];
-infoText = ['Amicizia per Caramella','Passiva','Riduzione di Costo','Costi di un Uovo','Abilità Nascosta','Solo da Uovo','Solo Baby','Pokémon Paradosso','Cambio Forma','Biomi','Filtri'];
+infoText = ['Amicizia per Caramella','Passiva','Riduzione di Costo','Costi di un Uovo','Abilità Nascosta','Solo da Uovo','Solo Baby','Pokémon Paradosso','Cambio Forma','Biomi','Filtri','Ridotto dopo ## uova'];
 biomeText = ['Comune','Non Comune','Raro','Super Raro','Ultra Raro','Boss','Com.','NC','Raro','SR','UR','Alba','Giorno','Tramonto','Notte'];
 biomeLongText = [
 '<b>Questa forma è disponibile solo tramite <span style="color:rgb(140, 130, 240);">Cambio di Forma</span>.</b> Altre forme possono essere incontrate nel bioma mostrato.<br>',
@@ -304,12 +304,12 @@ fidToDesc = [
 'Riduce i danni subiti dalle mosse superefficaci.',
 'Permette di ignorare gli effetti di mosse e abilità che attirano altre mosse.',
 'Cambia il tipo del Pokémon in quello della mossa che usa.',
-'Quando il Pokémon ha con sé una Capsula energetica o la luce solare è intensa, la sua statistica più alta aumenta.',
+'Quando la luce solare è intensa, la sua statistica più alta aumenta.',
 'Quando il Pokémon entra in campo, lo trasforma in un Campo Psichico.',
 'Aumenta la potenza delle mosse basate sul suono. Inoltre, dimezza i danni subiti dal Pokémon se viene colpito da tali mosse.',
 'L’Attacco del Pokémon raddoppia grazie alla sua padronanza delle tecniche yoga.',
 'Protegge il Pokémon dai problemi di stato e dimezza il danno causato dalle mosse di tipo Spettro.',
-'Quando il Pokémon ha con sé una Capsula energetica o è in presenza di un Campo Elettrico, la sua statistica più alta aumenta.',
+'Quando in presenza di un Campo Elettrico, la sua statistica più alta aumenta.',
 'L’aura di regalità del Pokémon impedisce al nemico di attaccarlo con mosse che hanno priorità alta.',
 'A volte permette al Pokémon di agire per primo.',
 'Se il Pokémon è affetto da un problema di stato, la Velocità aumenta.',

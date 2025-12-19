@@ -4,7 +4,7 @@
 headerNames = ['Dex','Shiny','Especie','Tipos','Habilidades','Mov. Huevo','Coste','BST','PS','Atq','Def','AtE','DfE','Vel'];
 altText = ['Movimientos','Solo Principal','Solo Oculta','Solo Pasiva','Buscar','Pot.','Prec.','PP','Añadir a filtros','Recuerdo','Evolución','Mov. Huevo','Mov. Huevo Raro','Común','Súper','Ultra','MT','Nv.','Evo','Huevo'];
 catToName = ['Tipo','Habilidad','Movimiento','Gen','Coste','Género','Modo','Nivel de Huevo','Variantes Shiny','Bioma','Relacionado con','Etiqueta'];
-infoText = ['Amistad por Caramelo','Pasiva','Reducción de Coste','Huevo de Especie','Habilidad Oculta','Exclusivo de Huevo','Exclusivo de Cría','Pokémon Paradoja','Cambio de Forma','Biomas','Filtros'];
+infoText = ['Amistad por Caramelo','Pasiva','Reducción de Coste','Huevo de Especie','Habilidad Oculta','Exclusivo de Huevo','Exclusivo de Cría','Pokémon Paradoja','Cambio de Forma','Biomas','Filtros','Reducido después de ## huevos'];
 biomeText = ['Común','Poco Común','Raro','Super Raro','Ultra Raro','Jefe','Com.','PCom.','Raro','SR','UR','Amanecer','Día','Atardecer','Noche'];
 biomeLongText = [
 '<b>This form is only available via <span style="color:rgb(140, 130, 240);">Form Change</span>.</b> Other forms can be encountered in the biomes shown.',
@@ -304,12 +304,12 @@ fidToDesc = [
 'Mitiga el daño que le infligen los movimientos supereficaces.',
 'Ignora los efectos de las habilidades o los movimientos que permiten a un Pokémon centrar la atención sobre sí.',
 'Al entrar en combate, cambia su tipo al del primer movimiento que va a usar.',
-'Si hace sol o lleva un tanque de Energía Potenciadora, aumenta su característica más alta.',
+'Si hace sol, aumenta su característica más alta.',
 'Crea un campo psíquico al entrar en combate.',
 'Potencia los movimientos que usan sonido y reduce a la mitad el daño que le infligen dichos movimientos.',
 'Duplica la potencia de sus ataques físicos gracias al yoga.',
 'Su sal pura lo protege de los problemas de estado y reduce a la mitad el daño que recibe de ataques de tipo Fantasma.',
-'Si hay un campo eléctrico en el terreno de combate o lleva un tanque de Energía Potenciadora, aumenta su característica más alta.',
+'Si hay un campo eléctrico en el terreno de combate, aumenta su característica más alta.',
 'Intimida al rival y le impide usar movimientos con prioridad contra él y sus aliados.',
 'A veces, puede atacar el primero.',
 'Aumenta su velocidad si sufre problemas de estado.',
@@ -2705,7 +2705,7 @@ speciesNames = [
 'Decidueye de Hisui',
 'Combatiente Tauros de Paldea',
 'Ardiente Tauros de Paldea',
-'Acuático Tauros de Paldea',
+'Acuática Tauros de Paldea',
 'Wooper de Paldea',
 'Ursaluna Luna Carmesí'
 ];
@@ -3254,7 +3254,7 @@ fidToName = [
 'Explosión',
 'Paranormal',
 'Veloc. Extrema',
-'Imagen',
+'Fachada',
 'Cerrojo Feérico',
 'Viento Feérico',
 'Sorpresa',
@@ -3752,7 +3752,7 @@ fidToName = [
 'Supersónico',
 'Surf',
 'Azote Torrencial',
-'Contoneo',
+'Fanfarronear',
 'Tragar',
 'Beso Dulce',
 'Dulce Aroma',

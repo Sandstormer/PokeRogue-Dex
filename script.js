@@ -602,10 +602,11 @@ function showInfoSplash(specID, forcePage=null, forceShiny=null, forceFem=null) 
     splashCostInfo.innerHTML = `
       <p>${infoText[0]}: <span style="color:${col.re}";>${upgradeCosts[item.co-1][4]}</span> <img src="ui/fren.png"></p>
       <p>${infoText[1]}: <span style="color:${col.pu}";>${upgradeCosts[item.co-1][0]}</span> <img src="ui/candy.png" style="margin-bottom:-2px;"></p>
-      <p>${infoText[2]}: <span style="color:${col.bl}";>${upgradeCosts[item.co-1][1]}</span> &
-        <span style="color:${col.ye}";> ${upgradeCosts[item.co-1][2]}<span> <img src="ui/candy.png" style="margin-bottom:-2px;"></p>
-      <p>${infoText[3]}: ${upgradeCosts[item.co-1][3]}<img src="ui/candy.png" style="margin-bottom:-2px;">
-      <span style="color:${col.ga}; font-size:12px;"><br>Reduced after 20/40/60 eggs
+      <p>${infoText[2]}: <span style="color:${col.bl}";>${upgradeCosts[item.co-1][1][0]}</span> &
+        <span style="color:${col.ye}";> ${upgradeCosts[item.co-1][1][1]}<span> <img src="ui/candy.png" style="margin-bottom:-2px;"></p>
+      <p>${infoText[3]}: ${upgradeCosts[item.co-1][2].join(' / ')} <img src="ui/candy.png" style="margin-bottom:-2px;">
+      <span style="color:${col.ga}; font-size:12px;">
+      <br>${infoText[11].replace('##',upgradeCosts[item.co-1][3].join(' / '))}
       <br>${altText[12]}: 1 in ${REMchance[item.et]}${HAtext}
       <br>${headerNames[1]}: 1 in 12</span></p>
       `;
