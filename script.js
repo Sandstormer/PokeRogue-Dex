@@ -37,7 +37,7 @@ let increment = 10;     // Number of items to load at a time
 let renderLimit = 0;    // This value is updated when scrolling down (starts at 0)
 let showMoveLearn = []; // Filtered moves/biomes to show sources
 let filterToEnter = null; // Filter to apply when hitting Enter
-let tabSelect = null;       // Filter that is tab selected
+let tabSelect = null;     // Filter that is tab selected
 let lockedFilters = [];   // List of all locked filters IDs
 let lockedMods = []; // List of filter mod objects
 let lockedFilterGroups = [[]]; // Filter IDs grouped together with "OR" condition
@@ -136,8 +136,8 @@ function loadFromStorage(key) {
   if (localStorage.getItem(key) !== null) return JSON.parse(localStorage.getItem(key));
 }
 function makeSearchable(input) { // Remove punctuation, accents, and compound characters
-  return input.normalize("NFD").replace(/[\u0300-\u036f\u2019.:'\s-]/g,"").toLowerCase() // Dash must be at end of regex group
-    .replace(/ß/g,"ss").replace(/œ/g,"oe").replace(/æ/g,"ae");
+  return input.normalize("NFD").replace(/[\u0300-\u036f\u2019.:'\s-]/g,"") // Dash must be at end of regex group
+    .toLowerCase().replace(/ß/g,"ss").replace(/œ/g,"oe").replace(/æ/g,"ae");
 }
 
 function refreshAllItems() { // Display items based on query and locked filters **************************
@@ -770,13 +770,12 @@ function displaySuggestions() {
       if (fid >= fidThreshold[10] && TagToFID[fid].some(f => fidToSearch[f].includes(query))) return true; // Suggest related tags
       return fidToSearch[fid].includes(query); // Suggest if it contains the search query
     });
-    // Erase the list of suggestions if it is too large
-    if (matchingFID.length > 22) matchingFID = [];
+    // Erase the list of suggestions if it is too large, and no exact matches
+    if (matchingFID.length > 25 + 2*query.length && !matchingFID.filter(f => fidToSearch[f]==query).length) matchingFID = [];
     // Highlight a suggestion if tab is hit
     if (matchingFID.length) {
-      if (tabSelect < 0) tabSelect += matchingFID.length;
-      tabSelect %= matchingFID.length;
-      filterToEnter = matchingFID[(tabSelect ?? 0)];
+      if (tabSelect) tabSelect = (tabSelect+matchingFID.length)%matchingFID.length;
+      filterToEnter = matchingFID[tabSelect ?? 0];
     }
     matchingFID.forEach((fid) => { // Create the suggestion tag elements
       let newSugg = document.createElement('div');  newSugg.className = 'suggestion';
