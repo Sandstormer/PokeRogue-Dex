@@ -35,7 +35,7 @@ const flipStats = {bst:'bst',hp:'spe',atk:'spd',def:'spa',spa:'def',spd:'atk',sp
 const REMchance = [16,12,6,6,3];
 let increment = 10;     // Number of items to load at a time
 let renderLimit = 0;    // This value is updated when scrolling down (starts at 0)
-let showMoveLearn = []; // Filtered moves/biomes to show sources
+let toShowMovesBiomes = []; // Filtered moves/biomes to show sources
 let filterToEnter = null; // Filter to apply when hitting Enter
 let tabSelect = null;     // Filter that is tab selected
 let lockedFilters = [];   // List of all locked filters IDs
@@ -46,7 +46,8 @@ let isMobile = false; // Change display for mobile devices
 let filteredItemIDs = null; // List of all displayed row numbers
 // State of info screen: species shown, page(moveset,biome,family,zoom), shiny(0,1,2,3), fem(0,1), zoomImageHeight
 let splashState = { speciesID: -1, page: 0, shiny: 0, fem: 0, zoomImgh: 300 }
-let headerState = { shiny: 0, ability: 0, biome: 0 } // Global state of shiny(0,1,2,3), ability(0,1,2,3), biome(0,1)
+// Global state of header toggles: shiny(0,1,2,3), ability(0,1,2,3), biome(0,1), move(0,1,2,3)
+let headerState = { shiny: 0, ability: 0, biome: 0, move: 0 } 
 let sortState = { sortAttr: 'row', ascending: true, index: 0 }; // Track the current sort state
 let persistentState = false; // Whether filters are reloaded upon refresh
 const TagToFID = { // List of ability/move FIDs that match specific tag filters
@@ -157,8 +158,7 @@ function refreshAllItems() { // Display items based on query and locked filters 
         specToSearch[specID].includes(query) ||
         fidToSearch[items[specID].t1]?.includes(query) ||
         fidToSearch[items[specID].t2]?.includes(query) ||
-        ([0,1].includes(headerState.ability)
-          && (fidToSearch[items[specID].a1]?.includes(query)||fidToSearch[items[specID].a2]?.includes(query))) ||
+        ([0,1].includes(headerState.ability) &&(fidToSearch[items[specID].a1]?.includes(query)||fidToSearch[items[specID].a2]?.includes(query))) ||
         ([0,2].includes(headerState.ability) && fidToSearch[items[specID].ha]?.includes(query)) ||
         ([0,3].includes(headerState.ability) && fidToSearch[items[specID].pa]?.includes(query)) );
     }
@@ -171,7 +171,12 @@ function refreshAllItems() { // Display items based on query and locked filters 
       lockedFilterGroups.every(thisGroup => // Match at least one filter from each group
         thisGroup.some(fid => {
           if (headerState.ability && fid >= fidThreshold[0] && fid < fidThreshold[1]) // Restricted ability filter
-            return items[specID]?.[fid] == 309+headerState.ability || (headerState.ability == 1 && items[specID]?.[fid] == 309)
+            return items[specID]?.[fid] == 309+headerState.ability || (headerState.ability == 1 && items[specID]?.[fid] == 309);
+          if (headerState.move && fid >= fidThreshold[1] && fid < fidThreshold[2]) { // Restricted move filter
+            if (headerState.move == 1) return items[specID]?.[fid] <= 200;
+            if (headerState.move == 2) return items[specID]?.[fid] > 200 && items[specID]?.[fid] < 209;
+            if (headerState.move == 3) return items[specID]?.[fid] > 200 && ![204,208].includes(items[specID]?.[fid]);
+          }
           if (fid  <  fidThreshold[2]) return fid in items[specID]; // Type/Ability/Move filters
           if (fid  <  fidThreshold[3]) return items[specID].ge === fid - fidThreshold[2] + 1; // Gen filters
           if (fid  <  fidThreshold[3]+10) return items[specID].co === fid - fidThreshold[3] + 1; // Cost equal filters
@@ -196,9 +201,9 @@ function refreshAllItems() { // Display items based on query and locked filters 
         }))) 
       }
   // Add moves to track in the move column  ==============
-  showMoveLearn = lockedFilters.filter(f => [2,9].includes(fidToCategory(f)));
+  toShowMovesBiomes = lockedFilters.filter(f => [2,9].includes(fidToCategory(f)));
   lockedFilters.filter(f => f>fidThreshold[10]+1 && f<fidThreshold[11]).forEach(f => // For the move tag filters, add the associated FIDs
-    showMoveLearn.push(...TagToFID[f].filter(fid => !showMoveLearn.some(ff => ff == fid))));
+    toShowMovesBiomes.push(...TagToFID[f].filter(fid => !toShowMovesBiomes.some(ff => ff == fid))));
     
   // Remove the pinned items for now ==============
   if (pinnedRows) filteredItemIDs = filteredItemIDs.filter((thisID) => !pinnedRows.includes(thisID));
@@ -211,15 +216,24 @@ function refreshAllItems() { // Display items based on query and locked filters 
     }
     filteredItemIDs.sort((a, b) => {
       let aValue = a; let bValue = b; // Set default attribute of row number
-      if (sortState.sortAttr == 'moves') { // Sort by source of moves
-        const getLearnLevel = (ID) => 
-          showMoveLearn.reduce((total, move) => total + (move in items[ID] ? 
-            (move >= fidThreshold[8] ? (items[ID][move][1] ? ~~(items[ID][move][0]/20)*0.9+~~(items[ID][move][1]/20)/10 
-              : ~~(items[ID][move][0]/20)) : items[ID][move]) : 500), 0);
-        aValue = getLearnLevel(a);
-        bValue = getLearnLevel(b);
+      if (sortState.sortAttr == 'moves') { // Sort by source of moves and biomes
+        const getLearnLevel = (ID) => toShowMovesBiomes.reduce((total, FID) => {
+          if (FID in items[ID]) { 
+            if (FID >= fidThreshold[8]) { // For biomes
+              return total + (items[ID][FID][1] ? ~~(items[ID][FID][0]/20)*0.9+~~(items[ID][FID][1]/20)/10 : ~~(items[ID][FID][0]/20));
+            } else { // For moves
+              if (headerState.move == 0) return total + items[ID][FID];
+              if (headerState.move == 1) return total + ( items[ID][FID] <= 200 ? items[ID][FID] : 500 );
+              if (headerState.move == 2) return total + ( items[ID][FID] > 200 && items[ID][FID] < 209 ? items[ID][FID] : 500 );
+              if (headerState.move == 3) return total + ( items[ID][FID] > 200 && ![204,208].includes(items[ID][FID]) ? items[ID][FID] : 500 );
+            }
+          } else {
+            return total + 500;
+          }
+        }, 0);
+        aValue = getLearnLevel(a); bValue = getLearnLevel(b);
       } else if (sortState.sortAttr == 'type') { // Sort by type combinations
-        const typeMult = (lockedFilters.some((fid) => fid < fidThreshold[0]) ? 2 : 36 );
+        const typeMult = (lockedFilters.some((f) => f < fidThreshold[0]) ? 2 : 36 );
         const aEntry = items[a]; const bEntry = items[b];
         aValue = (aEntry.t1+1)*(typeMult*!lockedFilters.includes(aEntry.t1));
         bValue = (bEntry.t1+1)*(typeMult*!lockedFilters.includes(bEntry.t1));
@@ -253,8 +267,10 @@ function refreshAllItems() { // Display items based on query and locked filters 
     helpMessage.innerHTML = '<hr>';
     if (lockedFilters.some(f => f == fidThreshold[7] || f == fidThreshold[7]+1)) helpMessage.innerHTML += 
       `<img src="ui/shiny2.png"> <img src="ui/shiny3.png"> <b><span style="color:${col.pu};">${warningText[0]}</b><br><br></span>`;
-    if (headerState.ability) helpMessage.innerHTML += 
-      `<b><span style="color:${col.pu};">${warningText[headerState.ability]}</b><br><br></span>`;
+    if (headerState.ability && (query.length || lockedFilters.some(f => fidToCategory(f)==1))) {
+      // Show ability warning if toggled, and an ability filter or search query
+      helpMessage.innerHTML += `<b><span style="color:${col.pu};">${warningText[headerState.ability]}</b><br><br></span>`;
+    }
     helpMessage.innerHTML += (suggestions.innerHTML 
       ? (lockedFilters.length ? warningText[4] : warningText[5]) 
       : (lockedFilters.length ? (query ? warningText[6] : warningText[7]) : warningText[8]));
@@ -366,8 +382,14 @@ function renderMoreItems() { // Create each list item, with columns of info ****
     // Show the column of egg moves, biomes, or filtered moves/biomes and their sources
     const moveColumn = document.createElement('div');  moveColumn.className = 'item-column';  moveColumn.innerHTML = '';
     let numMovesShown = 0;
-    showMoveLearn.forEach((thisFID) => { // Show filtered moves/biomes
-      if (thisFID in item && numMovesShown < 3) {
+    toShowMovesBiomes.forEach((thisFID) => { // Show filtered moves/biomes
+      let isShowing = ( thisFID in item );
+      if (thisFID < fidThreshold[2]) { // If moves are restricted, only show eligible moves
+        if (headerState.move == 1) isShowing = ( item[thisFID] <= 200 );
+        if (headerState.move == 2) isShowing = ( item[thisFID] > 200 && item[thisFID] < 209 );
+        if (headerState.move == 3) isShowing = ( item[thisFID] > 200 && ![204,208].includes(item[thisFID]) );
+      }
+      if (isShowing && numMovesShown < 3) {
         numMovesShown += 2;
         let src = item[thisFID];  let srcText = '<span style="color:';
         const clickableRow = document.createElement('div');  clickableRow.className = 'clickable-name';
@@ -402,20 +424,20 @@ function renderMoreItems() { // Create each list item, with columns of info ****
         moveColumn.appendChild(clickableRow);
       }
     });
-    // Show biomes if toggled, and if column is empty or if peeking over a move
-    if (headerState.biome && (!numMovesShown || (showMoveLearn.every(f => fidToCategory(f)==2) && numMovesShown < 4))) {
+    // Show egg moves or biomes, depending on header state
+    if (headerState.biome && (!numMovesShown || (toShowMovesBiomes.every(f => fidToCategory(f)==2) && numMovesShown < 4))) {
       if ([1,2].includes(item?.ex) && !numMovesShown) { // Show egg exclusives only if blank
         const clickableRow = document.createElement('div');  clickableRow.className = 'clickable-name';
         if (item.ex == 1) clickableRow.innerHTML += `<span style="color:rgb(143, 214, 154);">${infoText[5]}</span>`;
         if (item.ex == 2) clickableRow.innerHTML += `<span style="color:rgb(216, 143, 205);">${infoText[6]}</span>`;
         clickableRow.addEventListener('click', () => showInfoSplash(thisID,1));
         moveColumn.appendChild(clickableRow);
-      } else {
-        possibleFID.slice(fidThreshold[8],fidThreshold[9]).forEach((fid) => { // Show biomes, even if peeking
+      } else { // Show biomes if toggled, and if column is empty or if peeking over a move
+        possibleFID.slice(fidThreshold[8],fidThreshold[9]).forEach((fid) => {
           if (fid in item) {
             if (numMovesShown < 4) {
               const clickableRow = document.createElement('div');  clickableRow.className = 'clickable-name';
-              if (showMoveLearn.length) clickableRow.style.color = col.ga;
+              if (toShowMovesBiomes.length) clickableRow.style.color = col.ga; // Color gray if peeking
               clickableRow.innerHTML = fidToName[fid];
               clickableRow.addEventListener('click', () => showInfoSplash(thisID,1));
               moveColumn.appendChild(clickableRow);
@@ -426,9 +448,9 @@ function renderMoreItems() { // Create each list item, with columns of info ****
           }
         });
         // Vertically center if only one biome is peeking over a move
-        if (numMovesShown == 3 && showMoveLearn.length) moveColumn.lastChild.style.marginTop = '6px'; 
+        if (numMovesShown == 3 && toShowMovesBiomes.length) moveColumn.lastChild.style.marginTop = '6px'; 
       }
-    } else if (!showMoveLearn.length) { // Show egg moves if there are no filtered moves/biomes
+    } else if (!toShowMovesBiomes.length) { // Show egg moves if there are no filtered moves/biomes
       ['e1','e2','e3','e4'].forEach((name) => {
         const clickableRow = document.createElement('div');  clickableRow.className = 'clickable-name';
         if (name == 'e4') clickableRow.style.color = col.ye;
@@ -887,32 +909,27 @@ function updateHeader(clickTarget = null, ignoreFlip = false) {
   const hasMovesBiomes = lockedFilters.some(f => [2,9].includes(fidToCategory(f)));
   // If clicking move column, with no moves/biomes filtered, toggle between egg moves and biomes
   if (sortAttribute == 'moves' && !hasMovesBiomes && !ignoreFlip) headerState.biome = !headerState.biome;
-  // Set the text of the move column, depending on if a move is filtered
-  if (lockedFilters.some(f => [2,9].includes(fidToCategory(f)))) { // If filtered moves/biomes
-    headerColumns[5].textDef = `<span style="color:${col.pu};">${lockedFilters.some(f =>fidToCategory(f)==9) ? infoText[10] : altText[0]}</span>`;
-  } else {
-    headerColumns[5].textDef = headerState.biome ? `<span style="color:${col.pu};">${infoText[9]}</span>` : headerNames[5];
-  }
   // Find the new sorting attribute, and update the headers
   if (sortAttribute == 'shiny') { // Toggle the global shiny state
     // Cap the selector to T1 if the "None" filter is selected or if the entire list only has T1
     const shinyCap = lockedFilters.some(f => f == fidThreshold[7]+2) 
-      || (!filteredItemIDs.some(specID => items[specID].sh>1) && !!filteredItemIDs.length);
+    || (!filteredItemIDs.some(specID => items[specID].sh>1) && !!filteredItemIDs.length);
     headerState.shiny = (headerState.shiny+3)%(shinyCap?2:4);
   } else if (sortAttribute == 'ab') { // Toggle the global ability state
     headerState.ability = (headerState.ability+1)%4;
   } else {
-    headerColumns[5].innerHTML = headerColumns[5].textDef;
-    // If clicked on a header that can actually be sorted
+    // If the clicked header can actually be sorted
     // (The "Moves" column can only be sorted if there is a filtered move/biome)
     if (sortAttribute && (sortAttribute != 'moves' || hasMovesBiomes)) { 
       if (sortState.sortAttr === sortAttribute) {
-        if (!ignoreFlip) {
+        if (sortAttribute == 'moves' && lockedFilters.some(f => fidToCategory(f)==2) && !ignoreFlip) {
+          headerState.move = ( ( headerState.move ?? 0 ) + 1 ) % 4; // Cycle the move restrictions
+        } else if (!ignoreFlip) {
           sortState.ascending = !sortState.ascending; // Toggle sort direction if sorting by the same column
         }
       } else {
         sortState.sortAttr = sortAttribute;
-        // Sort ascending on some columns, but descending on others
+        // Sort ascending on some columns, but descending by default on others
         sortState.ascending = ['row','sp','type','moves'].includes(sortState.sortAttr);
         if (headerColumns[sortState.index]?.textDef) { // Clear arrow from previous target
           headerColumns[sortState.index].innerHTML = headerColumns[sortState.index]?.textDef;
@@ -921,6 +938,22 @@ function updateHeader(clickTarget = null, ignoreFlip = false) {
       sortState.index = clickTarget.index; // Draw arrow on new target
       clickTarget.innerHTML = `${clickTarget.textDef}<span style="color:${col.pu}; font-family: serif;">${(sortState.ascending?"&#9650;":"&#9660;")}</span>`;
     }
+  }
+  
+  // Set the text of all the columns, depending on the header state
+  if (hasMovesBiomes) { // Update the "Moves" column text
+    const sortArrow = ( sortState.sortAttr != 'moves' ? '' :
+      `<span style="color:${col.pu}; font-size:16px"> ${sortState.ascending?"&#9650;":"&#9660;"}</span>` );
+    if (lockedFilters.some(f =>fidToCategory(f)==2)) { // Show the title as "Moves" if there is at least one move
+      if      (headerState.move == 0) headerColumns[5].innerHTML = `${altText[0]}${sortArrow}`;
+      else if (headerState.move == 1) headerColumns[5].innerHTML = `<span style="color:${col.pu};">${altText[0]}</span><span style="color:${col.wh}; font-size:12px;">(${infoText[12]})${sortArrow}</span>`;
+      else if (headerState.move == 2) headerColumns[5].innerHTML = `<span style="color:${col.pu};">${altText[0]}</span><span style="color:${col.ye}; font-size:12px;">(${infoText[13]})${sortArrow}</span>`;
+      else if (headerState.move == 3) headerColumns[5].innerHTML = `<span style="color:${col.pu};">${altText[0]}</span><span style="color:${col.pu}; font-size:12px;">(${infoText[14]})${sortArrow}</span>`;
+    } else {
+      headerColumns[5].innerHTML = `${infoText[10]}${sortArrow}`;
+    }
+  } else {
+    headerColumns[5].innerHTML = headerState.biome ? `<span style="color:${col.pu};">${infoText[9]}</span>` : headerNames[5];
   }
   if (headerState.shiny) { // Update the "Shiny" column text
     headerColumns[1].innerHTML = `<span style="color:${col.pu};">${headerNames[1]}</span>`;
@@ -938,7 +971,9 @@ function updateHeader(clickTarget = null, ignoreFlip = false) {
     if      (headerState.ability == 1) headerColumns[4].innerHTML += `<span style="color:${col.wh}; font-size:12px;">(${altText[1]})</span>`;
     else if (headerState.ability == 2) headerColumns[4].innerHTML += `<span style="color:${col.ye}; font-size:12px;">(${altText[2]})</span>`;
     else if (headerState.ability == 3) headerColumns[4].innerHTML += `<span style="color:${col.pu}; font-size:12px;">(${altText[3]})</span>`;
-  } else headerColumns[4].innerHTML = headerNames[4];
+  } else {
+    headerColumns[4].innerHTML = headerNames[4];
+  }
   // Save the filters to local storage, then update the display
   localStorage.setItem("headerState",JSON.stringify(headerState));
   localStorage.setItem("sortState",JSON.stringify(sortState));

@@ -4,7 +4,7 @@
 headerNames = ['N°','Crom.','Nome','Tipo','Abilità','Mosse Uovo','Costo','Tot','PS','Att','Dif','ASp','DSp','Vel'];
 altText = ['Mosse','Principale','Speciale','Passiva','Cerca','Pot','Prec','PP','Aggiungi ai filtri','Memoria','Evoluzione','Mossa Uovo','Mossa Uovo Rara','Comuni','Mega','Ultra','MT','L.','Evo','Uova'];
 catToName = ['Tipo','Abilità','Mossa','Gen','Costo','Genere','Modalità','Uova','Varianti Cromatiche','Bioma','Evoluzioni','Etichetta'];
-infoText = ['Amicizia per Caramella','Passiva','Riduzione di Costo','Costi di un Uovo','Abilità Nascosta','Solo da Uovo','Solo Baby','Pokémon Paradosso','Cambio Forma','Biomi','Filtri','Ridotto dopo ## uova'];
+infoText = ['Amicizia per Caramella','Passiva','Riduzione di Costo','Costi di un Uovo','Abilità Nascosta','Solo da Uovo','Solo Baby','Pokémon Paradosso','Cambio Forma','Biomi','Filtri','Ridotto dopo ## uova','per Livello','da Uovo','per MT'];
 biomeText = ['Comune','Non Comune','Raro','Super Raro','Ultra Raro','Boss','Com.','NC','Raro','SR','UR','Alba','Giorno','Tramonto','Notte'];
 biomeLongText = [
 '<b>Questa forma è disponibile solo tramite <span style="color:rgb(140, 130, 240);">Cambio di Forma</span>.</b> Altre forme possono essere incontrate nel bioma mostrato.<br>',

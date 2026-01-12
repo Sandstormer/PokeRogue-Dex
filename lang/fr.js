@@ -4,7 +4,7 @@
 headerNames = ['N°','Chrom.','Nom','Type','Talents','Capacités Œuf','Cout','Total','PV','Atq','Déf','ASp','DSp','Vit'];
 altText = ['Capacités','Principaux','Caché','Passif','Chercher','Puis.','Préc.','PP','Ajouter aux filtres','Champi Mémoriel','Évolutions','Capacités Œuf','Rare Capac. Œuf','Commun','Super','Hyper','CT','N.','Évo','Œuf'];
 catToName = ['Type','Talent','Capacité','Gen','Cout','Sexe','Mode','Œuf','Variantes Chromatique','Biome','Lié à','Étiquette'];
-infoText = ['Bonheur par Bonbon','Passif','Cout réduit','Acheter un Œuf','Talent Caché','Exclusif aux Œufs','Exclusif aux Bébés','Pokémon Paradoxe','Changement de forme','Biomes','Filtres','Réduit après ## œufs'];
+infoText = ['Bonheur par Bonbon','Passif','Cout réduit','Acheter un Œuf','Talent Caché','Exclusif aux Œufs','Exclusif aux Bébés','Pokémon Paradoxe','Changement de forme','Biomes','Filtres','Réduit après ## œufs','par Niveau','par Œuf','par CT'];
 biomeText = ['Commun','Peu Commun','Rare','Super Rare','Hyper Rare','Boss','Com.','PC','Rare','SR','HR','Aube','Jour','Crépuscule','Nuit'];
 biomeLongText = [
 '<b>Forme disponible uniquement par <span style="color:rgb(140, 130, 240);">changement de forme</span>.</b> Les autres formes peuvent être rencontrées dans les biomes affichés.',
@@ -107,12 +107,12 @@ tagToDesc = [
 "Ne peut pas être ignorée",
 "Ne peut pas être redirigée",
 "Ne peut pas être renvoyée",
-"Frappe toujous s'il pleut",
+"Frappe toujours s'il pleut",
 "Le lanceur ne peut pas être remplacé",
-"La ciblé ne peut pas être remplacée",
+"La cible ne peut pas être remplacée",
 "K.-O. en 1 coup",
 "Altérée contre les Boss",
-"Sucun effet sur les Boss",
+"Aucun effet sur les Boss",
 "Trompe le talent",
 "Contact",
 "Partiellement implémenté",
@@ -1949,7 +1949,7 @@ speciesNames = [
 'Crocorible',
 'Darumarond',
 'Darumacho',
-'Darumacho Mode Transe',
+'Darumacho Transe',
 'Maracachi',
 'Crabicoque',
 'Crabaraque',
@@ -2684,7 +2684,7 @@ speciesNames = [
 'Linéon de Galar',
 'Darumarond de Galar',
 'Darumacho de Galar',
-'Darumacho de Galar Mode Transe',
+'Darumacho de Galar Transe',
 'Tutafeh de Galar',
 'Limonde de Galar',
 'Caninos de Hisui',
