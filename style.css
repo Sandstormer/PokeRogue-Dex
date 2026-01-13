@@ -442,7 +442,7 @@ h1 {
   image-rendering: crisp-edges;
 }
 
-#splashScreen, #movesetScreen {
+#splashScreen, #movesetScreen, #helpScreen {
   display: none;
   position: fixed;
   top: -10%;
@@ -455,14 +455,14 @@ h1 {
   align-items: center;
   z-index: 999;
 }
-#movesetScreen {
+#movesetScreen, #helpScreen {
   z-index: 990;
 }
 .show {
   display: flex !important;
   flex-direction: column;
 }
-#splashContent, #movesetContent {
+#splashContent, #movesetContent, #helpContent {
   text-align: center;
   padding: 15px 10px;
   border: 1px solid #ffffff;
@@ -474,22 +474,21 @@ h1 {
   -ms-overflow-style: none;
 }
 #movesetScrollable {
-  margin-top: -5px;
   overflow: scroll;
   -ms-overflow-style: none;
 }
-#splashContent {
+#splashContent, #helpContent {
   max-height: calc(100vh - 100px);
 }
 
-#splashContent::-webkit-scrollbar, #movesetContent::-webkit-scrollbar, #movesetScrollable::-webkit-scrollbar {
+.scrollable::-webkit-scrollbar {
   width: 5px;
   height: 0px;
 }
-#splashContent::-webkit-scrollbar-track, #movesetContent::-webkit-scrollbar-track, #movesetScrollable::-webkit-scrollbar-track {
+.scrollable::-webkit-scrollbar-track {
   background: transparent;
 }  
-#splashContent::-webkit-scrollbar-thumb, #movesetContent::-webkit-scrollbar-thumb, #movesetScrollable::-webkit-scrollbar-thumb {
+.scrollable::-webkit-scrollbar-thumb {
   background-color: rgba(145, 145, 145, 0.5);
   border-radius: 3px;
 }
@@ -526,6 +525,7 @@ h1 {
   display: flex;
   flex-direction: column;
   align-items: center;
+  margin-bottom: -5px;
 }
 .moveset-banner {
   display: grid;

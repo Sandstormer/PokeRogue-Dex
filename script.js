@@ -17,6 +17,8 @@ const movesetScreen = document.getElementById("movesetScreen");
 const movesetHeader = document.getElementById("movesetHeader");
 const movesetContent = document.getElementById("movesetContent");
 const movesetScrollable = document.getElementById("movesetScrollable");
+const helpScreen = document.getElementById("helpScreen");
+const helpContent = document.getElementById("helpContent");
 const openHelpButton = document.getElementById("help-img");
 const openLangButton = document.getElementById("lang-img");
 const clearIcon = document.getElementById("clearIcon");
@@ -694,7 +696,7 @@ function changeMoveset(indexChange) {
     }
 }
 
-function showDescSplash(fid) { // Create the ability/move splash **************************
+function showDescSplash(fid) { // Create the ability/move details splash **************************
   splashContent.style.width = '300px';
   splashContent.innerHTML = `<b>${fidToName[fid]}</b><hr>`; // Name header
   const thisProcs = fidToProc[fid-fidThreshold[0]]; // List of atts, procs, tags
@@ -1029,6 +1031,7 @@ document.addEventListener('keydown', (event) => { // All key press events
     if (event.key == "ArrowLeft") changeMoveset(-1);
     if (event.key == "ArrowRight") changeMoveset(1);
   }
+  // Hit up/down to scroll main table or splash screen
   if (event.key == "ArrowUp" || event.key == "ArrowDown") {
     event.preventDefault();
     if (movesetScreen.classList.contains('show') && !splashScreen.classList.contains("show")) {
@@ -1039,7 +1042,7 @@ document.addEventListener('keydown', (event) => { // All key press events
   }
   // Hit 'Enter' to lock first filter
   if (event.key == "Enter" && filterToEnter != null) lockFilter(filterToEnter);
-  // Allow PageUp and PageDown even when in search box
+  // Hit PageUp and PageDown to scroll, even when in search box
   if (event.key == "PageDown" || event.key == "PageUp") searchBox.blur();
   // Hit escape to clear search box, text, last filter, or headers
   if (event.key == "Escape") {
@@ -1074,12 +1077,15 @@ clearIcon.addEventListener("click", () => {
   searchBox.value = '';
   refreshAllItems();
 });
-// Close splash screen when clicking outside the content box
+// Close splash screens when clicking outside the content box
 splashScreen.addEventListener("click", (event) => {
   if (event.target === splashScreen) splashScreen.classList.remove("show");
 });
 movesetScreen.addEventListener("click", (event) => {
   if (event.target === movesetScreen) movesetScreen.classList.remove("show");
+});
+helpScreen.addEventListener("click", (event) => {
+  if (event.target === helpScreen) helpScreen.classList.remove("show");
 });
 // Open the language selector splash
 openLangButton.addEventListener('mouseover', () => openLangButton.src = `ui/globeh.png`);
@@ -1100,15 +1106,16 @@ function openLangMenu() {
     if (thisLang != 'en') splashContent.appendChild(document.createElement('br'));
     splashContent.appendChild(thisLangRow);
   });
-  splashScreen.classList.add("show"); // Make it visible
+  splashScreen.classList.add("show"); // Make the language screen visible
 }
 // Open the help menu splash
 openHelpButton.addEventListener('mouseover', () => openHelpButton.src = `ui/helph.png`);
 openHelpButton.addEventListener('mouseout',  () => openHelpButton.src = `ui/help.png` ); 
 openHelpButton.addEventListener("click",     () => openHelpMenu());
 function openHelpMenu() { // Show the instructions
-  splashContent.style.width = '382px';
-  splashContent.innerHTML = helpMenuText;
+  helpContent.style.width = '382px';
+  helpContent.innerHTML = helpMenuText;
+  // Create the button that toggles persistent filters
   const persistentButton = document.createElement('div'); persistentButton.className = 'splash-button'; 
   persistentButton.innerHTML = `Persistent Filters (Experimental) - ${persistentState?"ON":"OFF"}`;  
   persistentButton.style.color = persistentState?col.pu:col.wh;
@@ -1119,6 +1126,6 @@ function openHelpMenu() { // Show the instructions
     persistentButton.innerHTML = `Persistent Filters (Experimental) - ${persistentState?"ON":"OFF"}`;  
     persistentButton.style.color = persistentState?col.pu:col.wh;
   });
-  splashContent.appendChild(persistentButton);
-  splashScreen.classList.add("show"); // Make it visible
+  helpContent.appendChild(persistentButton);
+  helpScreen.classList.add("show"); // Make the help screen visible
 }
