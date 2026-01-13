@@ -170,8 +170,8 @@ function refreshAllItems() { // Display items based on query and locked filters 
   // Filter from locked filters ==============
   if (lockedFilters.length) {
     filteredItemIDs = filteredItemIDs.filter(specID => // Search for filters with their fid as key
-      lockedFilterGroups.every(thisGroup => // Match at least one filter from each group
-        thisGroup.some(fid => {
+      lockedFilterGroups.every(thisGroup => // Match something from every group
+        thisGroup.some(fid => { // Match anything from within a filter group
           if (headerState.ability && fid >= fidThreshold[0] && fid < fidThreshold[1]) // Restricted ability filter
             return items[specID]?.[fid] == 309+headerState.ability || (headerState.ability == 1 && items[specID]?.[fid] == 309);
           if (headerState.move && fid >= fidThreshold[1] && fid < fidThreshold[2]) { // Restricted move filter
@@ -179,28 +179,38 @@ function refreshAllItems() { // Display items based on query and locked filters 
             if (headerState.move == 2) return items[specID]?.[fid] > 200 && items[specID]?.[fid] < 209;
             if (headerState.move == 3) return items[specID]?.[fid] > 200 && ![204,208].includes(items[specID]?.[fid]);
           }
-          if (fid  <  fidThreshold[2]) return fid in items[specID]; // Type/Ability/Move filters
-          if (fid  <  fidThreshold[3]) return items[specID].ge === fid - fidThreshold[2] + 1; // Gen filters
+          if (fid  <  fidThreshold[2])   return fid in items[specID]; // Type/Ability/Move filters
+          if (fid  <  fidThreshold[3])   return items[specID].ge === fid - fidThreshold[2] + 1; // Gen filters
           if (fid  <  fidThreshold[3]+10) return items[specID].co === fid - fidThreshold[3] + 1; // Cost equal filters
           if (fid  <  fidThreshold[3]+18) return items[specID].co <= fid - fidThreshold[3] - 8; // Cost LEQ filters
-          if (fid  <  fidThreshold[4]) return items[specID].co >= fid - fidThreshold[3] - 16;   // Cost GEQ filters
-          if (fid === fidThreshold[4]) return 'fe' in items[specID]; // Gender filter
-          if (fid === fidThreshold[5]) return 'st' in items[specID]; // Starter select filter
+          if (fid  <  fidThreshold[4])   return items[specID].co >= fid - fidThreshold[3] - 16;   // Cost GEQ filters
+          if (fid === fidThreshold[4])   return 'fe' in items[specID]; // Gender filter
+          if (fid === fidThreshold[5])   return 'st' in items[specID]; // Starter select filter
           if (fid === fidThreshold[5]+1) return 'fs' in items[specID]; // Fresh start filter
           if (fid === fidThreshold[5]+2) return true; // Flipped stats filter
           if (fid  <  fidThreshold[7]-1) return items[specID].et === fid - fidThreshold[6]; // Egg tier filter
           if (fid === fidThreshold[7]-1) return [1,2,3].includes(items[specID]?.ex); // Egg exclusive
-          if (fid === fidThreshold[7]) return 'nv' in items[specID]; // New variants
+          if (fid === fidThreshold[7])   return 'nv' in items[specID]; // New variants
           if (fid === fidThreshold[7]+1) return items[specID].sh == 3; // All variants
           if (fid === fidThreshold[7]+2) return items[specID].sh == 1; // No variants
-          if (fid  <  fidThreshold[9]) return fid in items[specID]; // Biome filter
-          if (fid  <  fidThreshold[10]) return items[specID]?.fa === fid; // Family filter
+          if (fid  <  fidThreshold[9])   return fid in items[specID]; // Biome filter
+          if (fid  <  fidThreshold[10])  return items[specID]?.fa === fid; // Family filter
           if (fid < fidThreshold[10]+2 && headerState.ability) // Restricted ability tag filter
             return TagToFID[fid].some(f => items[specID]?.[f] == 309+headerState.ability 
               || (headerState.ability == 1 && items[specID]?.[f] == 309));
           if (fid  <  fidThreshold[11]) return TagToFID[fid].some(f => f in items[specID]); // Other tag filters
-          if (fid  >= fidThreshold[11]) return !(fid-fidThreshold[11] in items[specID]); // Exclusion filters
-        }))) 
+          if (fid  >= fidThreshold[11]) { // Exclusion filters
+            const excFID = fid-fidThreshold[11];
+            if (excFID  <  fidThreshold[2])    return !(excFID in items[specID]); // Type/Ability/Move exclusions
+            if (excFID  <  fidThreshold[3])    return items[specID].ge !== excFID - fidThreshold[2] + 1; // Gen exclusions
+            if (excFID  <  fidThreshold[3]+10) return items[specID].co !== excFID - fidThreshold[3] + 1; // Cost equal exclusions
+            if (excFID  <  fidThreshold[6])    return true; // Invalid exclusion filters
+            if (excFID  <  fidThreshold[7]-1)  return items[specID].et !== excFID - fidThreshold[6]; // Egg tier exclusions
+            if (excFID === fidThreshold[7]-1)  return ![1,2,3].includes(items[specID]?.ex); // Egg exclusive exclusion
+            if (excFID  <  fidThreshold[8])    return true; // Invalid exclusion filters
+            if (excFID  <  fidThreshold[9])    return !(excFID in items[specID]); // Biome exclusions
+          }
+        })));
       }
   // Add moves to track in the move column  ==============
   toShowMovesBiomes = lockedFilters.filter(f => [2,9].includes(fidToCategory(f)));
@@ -516,7 +526,7 @@ function makeMovesetHeader(specID) { // Create the moveset/info splash *********
   
   // const splashButton = document.createElement('div'); splashButton.className = 'splash-button'; 
   // splashButton.innerHTML = 'eeeeeeee'; splashButton.style.margin = '-10px auto -10px auto';
-  // splashButton.addEventListener("click", () => mode = 3 );
+  // splashButton.addEventListener('click', () => mode = 3 );
   // movesetHeader.appendChild(splashButton);
   // movesetHeader.appendChild(document.createElement('hr'));
 }
@@ -609,7 +619,7 @@ function showInfoSplash(specID, forcePage=null, forceShiny=null, forceFem=null) 
         if (!lockedFilters.some((f) => f%fidThreshold[11] == fid)) { // Button to add biome directly to filters
           const splashButton = document.createElement('div'); splashButton.className = 'splash-button';
           splashButton.innerHTML = altText[8];  
-          splashButton.addEventListener("click", () => { lockFilter(fid); 
+          splashButton.addEventListener('click', () => { lockFilter(fid); 
             splashScreen.classList.remove("show"); movesetScreen.classList.remove("show"); });
           biomeDesc.appendChild(document.createElement('br'));
           biomeDesc.appendChild(splashButton);
@@ -733,7 +743,7 @@ function showDescSplash(fid) { // Create the ability/move details splash *******
   if (!lockedFilters.some((f) => f%fidThreshold[11] == fid)) { // Button to add ability/move directly to filters
     const splashButton = document.createElement('div'); splashButton.className = 'splash-button'; 
     splashButton.innerHTML = altText[8];  
-    splashButton.addEventListener("click", () => { lockFilter(fid); 
+    splashButton.addEventListener('click', () => { lockFilter(fid); 
       splashScreen.classList.remove("show"); movesetScreen.classList.remove("show"); });
     splashContent.appendChild(splashButton);
   }
@@ -750,7 +760,9 @@ function fidToColor(fid) {
   if (fid < fidThreshold[1]) return [col.pu, col.wh];
   if (fid < fidThreshold[2]) return [col.ga, col.wh];
   if (fid < fidThreshold[3]) return [col.bl, col.wh];
-  if (fid < fidThreshold[4]) return [col.ye, col.wh];
+  if (fid < fidThreshold[3]+10) return [col.ye, col.wh];
+  if (fid < fidThreshold[3]+18) return [col.ye, col.re];
+  if (fid < fidThreshold[4]) return [col.ye, col.ge];
   if (fid < fidThreshold[5]) return [col.pi, col.wh];
   if (fid < fidThreshold[6]) return [col.wh, col.re];
   if (fid < fidThreshold[7]) return [col.wh, eggTierColors(fid)]
@@ -788,7 +800,8 @@ function displaySuggestions() {
     if (offerFamilies.length > 4) offerFamilies = [];
     // Filter suggestions based on query and exclude already locked filters
     let matchingFID = possibleFID.filter((fid) => {
-      if (isExclusion && ![0,1,2,9].includes(fidToCategory(fid))) return false; // Only some categories can be exclusion filters
+      if (isExclusion && ![0,1,2,3,4,7,9].includes(fidToCategory(fid))) return false; // Only some categories can be exclusion filters
+      if (isExclusion && fidToCategory(fid)==4 && fid>=fidThreshold[3]+10) return false; // Disallow relative cost exclusions
       if (lockedFilters.some((f) => f%fidThreshold[11] == fid)) return false; // Don't suggest if already locked
       if (fid >= fidThreshold[9] && offerFamilies.includes(fid)) return true; // Suggest matching families
       if (fid >= fidThreshold[10] && TagToFID[fid].some(f => fidToSearch[f].includes(query))) return true; // Suggest related tags
@@ -804,7 +817,7 @@ function displaySuggestions() {
     matchingFID.forEach((fid) => { // Create the suggestion tag elements
       let newSugg = document.createElement('div');  newSugg.className = 'suggestion';
       newSugg.innerHTML = `${isExclusion?'<img src="ui/x.png">':''}<span style="color:${fidToColor(fid)[0]}; display:inline;">${catToName[fidToCategory(fid)]}: <span style="color:${fidToColor(fid)[1]}; display:inline;">${fidToName[fid]}</span></span>`;
-      newSugg.addEventListener("click", () => lockFilter(fid));
+      newSugg.addEventListener('click', () => lockFilter(fid));
       if (filterToEnter == fid && tabSelect != null) newSugg.style.borderColor = col.pu;
       suggestions.appendChild(newSugg);
     });
@@ -824,12 +837,12 @@ function lockFilter(newLockFID, clearQuery = true, forceOR = null) {
         && fidToCategory(newLockFID) == fidToCategory(lockedFilters[lockedFilters.length-2]));
       filterMod = document.createElement("span"); filterMod.toggleOR = forceOR ?? defaultOR;
       filterMod.className = "filter-mod";         filterMod.innerHTML = (filterMod.toggleOR?'OR':'&');
-      filterMod.addEventListener("click", () => toggleOR(filterMod));
+      filterMod.addEventListener('click', () => toggleOR(filterMod));
       lockedMods.push(filterMod); filterContainer.appendChild(filterMod);
     }
     const filterTag = document.createElement("span"); filterTag.className = `filter-tag filter-tag-${isExclusion?"exc":"norm"}`;
     filterTag.innerHTML = `<img src="ui/${isExclusion?"x":"lock"}.png">${catToName[fidToCategory(newLockFID)]}: ${fidToName[newLockFID]}`;
-    filterTag.addEventListener("click", () => removeFilter(newLockFID+isExclusion, filterTag, filterMod));
+    filterTag.addEventListener('click', () => removeFilter(newLockFID+isExclusion, filterTag, filterMod));
     filterContainer.appendChild(filterTag);
     // Clear the search bar after locking
     if (clearQuery) searchBox.value = ""; 
@@ -1072,25 +1085,25 @@ document.addEventListener('keydown', (event) => { // All key press events
   }
 });
 // Clear search box button on mobile
-clearIcon.addEventListener("click", () => {
+clearIcon.addEventListener('click', () => {
   searchBox.focus();
   searchBox.value = '';
   refreshAllItems();
 });
 // Close splash screens when clicking outside the content box
-splashScreen.addEventListener("click", (event) => {
+splashScreen.addEventListener('click', (event) => {
   if (event.target === splashScreen) splashScreen.classList.remove("show");
 });
-movesetScreen.addEventListener("click", (event) => {
+movesetScreen.addEventListener('click', (event) => {
   if (event.target === movesetScreen) movesetScreen.classList.remove("show");
 });
-helpScreen.addEventListener("click", (event) => {
+helpScreen.addEventListener('click', (event) => {
   if (event.target === helpScreen) helpScreen.classList.remove("show");
 });
 // Open the language selector splash
 openLangButton.addEventListener('mouseover', () => openLangButton.src = `ui/globeh.png`);
 openLangButton.addEventListener('mouseout',  () => openLangButton.src = `ui/globe.png` ); 
-openLangButton.addEventListener("click",     () => openLangMenu());
+openLangButton.addEventListener('click',     () => openLangMenu());
 function openLangMenu() {
   splashContent.style.width = '270px';
   splashContent.innerHTML = '<img src="ui/globe.png" class="lang-head-img">&nbsp<b>Change Language</b><hr style="margin-bottom: 0px;">';
@@ -1098,7 +1111,7 @@ function openLangMenu() {
     const thisLangRow = document.createElement('div'); thisLangRow.className = "splash-button";
     if (pageLang == thisLang) thisLangRow.style.color = col.pu;
     thisLangRow.innerHTML = `${LanguageNames[index]}`;
-    thisLangRow.addEventListener("click", () => {
+    thisLangRow.addEventListener('click', () => {
       localStorage.setItem("preferredLang", thisLang);
       loadAndApplyLanguage(thisLang);
       splashScreen.classList.remove("show");
@@ -1111,7 +1124,7 @@ function openLangMenu() {
 // Open the help menu splash
 openHelpButton.addEventListener('mouseover', () => openHelpButton.src = `ui/helph.png`);
 openHelpButton.addEventListener('mouseout',  () => openHelpButton.src = `ui/help.png` ); 
-openHelpButton.addEventListener("click",     () => openHelpMenu());
+openHelpButton.addEventListener('click',     () => openHelpMenu());
 function openHelpMenu() { // Show the instructions
   helpContent.style.width = '382px';
   helpContent.innerHTML = helpMenuText;
@@ -1120,7 +1133,7 @@ function openHelpMenu() { // Show the instructions
   persistentButton.innerHTML = `Persistent Filters (Experimental) - ${persistentState?"ON":"OFF"}`;  
   persistentButton.style.color = persistentState?col.pu:col.wh;
   persistentButton.style.fontSize = "12px";
-  persistentButton.addEventListener("click", () => { 
+  persistentButton.addEventListener('click', () => { 
     persistentState = !persistentState;
     localStorage.setItem("persistentState",persistentState);
     persistentButton.innerHTML = `Persistent Filters (Experimental) - ${persistentState?"ON":"OFF"}`;  
