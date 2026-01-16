@@ -24,6 +24,13 @@ body {
 }
 div {
   line-height: 1.125;
+  /* outline: 1px solid red; */
+}
+img {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  image-rendering: -moz-crisp-edges;
+  -ms-interpolation-mode: nearest-neighbor;
 }
 .container {
   display: flex;
@@ -95,7 +102,6 @@ h1 {
   padding: 11px 8px 11px 6px;
   cursor: pointer;
   object-fit: scale-down;
-  /* outline: 1px solid red; */
 }
 
 /* Filters and Suggestions */
@@ -255,14 +261,12 @@ h1 {
     /* cursor: pointer; */
   }
   .pin-img {
-    margin: 0px;
     width: 13px;
     height: 13px;
     padding: 3px 0 2px;
-    margin-bottom: 4px;
+    margin: 0px 0px 4px;
     object-fit: scale-down;
     cursor: pointer;
-    /* outline: 1px solid red; */
   }
   .star-img {
     width: 11px;
@@ -273,7 +277,6 @@ h1 {
     margin-bottom: -4px;
     object-fit: none;
     cursor: pointer;
-    /* outline: 1px solid red; */
   }
   #movesetScrollable {
     max-height: 700px;
@@ -336,7 +339,6 @@ h1 {
     width: 100%;
     height: 36px;
     cursor: pointer;
-    /* outline: 1px solid red; */
   }
   .header-row:first-child {
     grid-template-columns: 50px 60px 1.18fr 1.1fr 1.4fr;
@@ -379,7 +381,7 @@ h1 {
   .item-image {
     margin-left: -10px;
     margin-right: -15px;
-    /* cursor: pointer; */
+    cursor: pointer;
   }
   .pin-img {
     width: 13px;
@@ -388,16 +390,15 @@ h1 {
     margin: -3px -8px -4px 0px;
     object-fit: scale-down;
     cursor: pointer;
-    /* outline: 1px solid red; */
+    image-rendering: auto;
   }
   .star-img {
     width: 13px;
     height: 13px;
     padding: 5px 1px 5px 1px;
     margin: -2px 0px -3px 0px;
-    object-fit:none;
+    object-fit: none;
     cursor: pointer;
-    /* outline: 1px solid red; */
   }
   #movesetScrollable {
     max-height: calc(100vh - 300px);
@@ -438,8 +439,6 @@ h1 {
   margin-top: -5px;
   margin-bottom: -5px;
   object-fit: none;
-  image-rendering: pixelated;
-  image-rendering: crisp-edges;
 }
 
 #splashScreen, #movesetScreen, #helpScreen {
@@ -565,8 +564,6 @@ h1 {
   width: 117px; 
   height: 76px; 
   object-fit: none;
-  image-rendering: pixelated;
-  image-rendering: crisp-edges;
 }
 .moveset-arrow {
   margin-top: -15px;
@@ -576,13 +573,6 @@ h1 {
   height: 76px; 
   object-fit: contain;
   cursor: pointer;
-}
-
-.zoom-img, .zoom-star {
-  image-rendering: pixelated;
-  image-rendering: crisp-edges;
-  image-rendering: -moz-crisp-edges;
-  -ms-interpolation-mode: nearest-neighbor;
 }
 .zoom-star {
   width: 44px;

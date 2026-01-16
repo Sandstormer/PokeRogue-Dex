@@ -48,23 +48,22 @@ let isMobile = false; // Change display for mobile devices
 let filteredItemIDs = null; // List of all displayed row numbers
 // State of info screen: species shown, page(moveset,biome,family,zoom), shiny(0,1,2,3), fem(0,1), zoomImageHeight
 let splashState = { speciesID: -1, page: 0, shiny: 0, fem: 0, zoomImgh: 300 }
-// Global state of header toggles: shiny(0,1,2,3), ability(0,1,2,3), biome(0,1), move(0,1,2,3)
+// State of header toggles: shiny(0,1,2,3), ability(0,1,2,3), biome(0,1), move(0,1,2,3)
 let headerState = { shiny: 0, ability: 0, biome: 0, move: 0 } 
-let sortState = { sortAttr: 'row', ascending: true, index: 0 }; // Track the current sort state
+let sortState = { sortAttr: 'row', ascending: true, index: 0 }; // State of sorting order
 let persistentState = false; // Whether filters are reloaded upon refresh
 const TagToFID = { // List of ability/move FIDs that match specific tag filters
   [fidThreshold[10]]: possibleFID.filter((fid) => fid >= fidThreshold[0] && fid < fidThreshold[1] && (fidToProc[fid-fidThreshold[0]][1].includes(59))), // Lure ability
   [fidThreshold[10]+1]: possibleFID.filter((fid) => fid >= fidThreshold[0] && fid < fidThreshold[1] && (fidToProc[fid-fidThreshold[0]][1].includes(37))), // Ignores abilities
   [fidThreshold[10]+2]: possibleFID.filter((fid) => fid >= fidThreshold[1] && fid < fidThreshold[2] && (fidToProc[fid-fidThreshold[0]][1].includes(37))),
   [fidThreshold[10]+3]: possibleFID.filter((fid) => fid >= fidThreshold[1] && fid < fidThreshold[2] && (fidToProc[fid-fidThreshold[0]][1].includes(40))),
-  // [fidThreshold[10]+3]: possibleFID.filter((fid) => fid >= fidThreshold[1] && fid < fidThreshold[2] && fidToProc[fid-fidThreshold[0]][5]>0 && fidToProc[fid-fidThreshold[0]][1]<2),
   [fidThreshold[10]+4]: possibleFID.filter((fid) => fid >= fidThreshold[1] && fid < fidThreshold[2] && fidToProc[fid-fidThreshold[0]][1]<2
     && (fidToProc[fid-fidThreshold[0]][1].includes(1) || fidToProc[fid-fidThreshold[0]][1].includes(2))),
   // Switches out target
   // Spread moves
   // Healing
   // Setup
-  // Priority
+  // Priority [fidThreshold[10]+3]: possibleFID.filter((fid) => fid >= fidThreshold[1] && fid < fidThreshold[2] && fidToProc[fid-fidThreshold[0]][5]>0 && fidToProc[fid-fidThreshold[0]][1]<2),
 }
   
 // Perform initial display with detected language
@@ -212,9 +211,10 @@ function refreshAllItems() { // Display items based on query and locked filters 
           }
         })));
       }
-  // Add moves to track in the move column  ==============
+  // Add moves/biomes to track in the move column  ==============
   toShowMovesBiomes = lockedFilters.filter(f => [2,9].includes(fidToCategory(f)));
-  lockedFilters.filter(f => f>fidThreshold[10]+1 && f<fidThreshold[11]).forEach(f => // For the move tag filters, add the associated FIDs
+  // For the move tag filters, add the associated FIDs to that shown list
+  lockedFilters.filter(f => f>fidThreshold[10]+1 && f<fidThreshold[11]).forEach(f => 
     toShowMovesBiomes.push(...TagToFID[f].filter(fid => !toShowMovesBiomes.some(ff => ff == fid))));
     
   // Remove the pinned items for now ==============
@@ -279,7 +279,7 @@ function refreshAllItems() { // Display items based on query and locked filters 
     helpMessage.innerHTML = '<hr>';
     if (lockedFilters.some(f => f == fidThreshold[7] || f == fidThreshold[7]+1)) helpMessage.innerHTML += 
       `<img src="ui/shiny2.png"> <img src="ui/shiny3.png"> <b><span style="color:${col.pu};">${warningText[0]}</b><br><br></span>`;
-    if (headerState.ability && (query.length || lockedFilters.some(f => fidToCategory(f)==1))) {
+    if (headerState.ability && (query.length || lockedFilters.some(f => fidToCategory(f)==1) || headerState.ability==2)) {
       // Show ability warning if toggled, and an ability filter or search query
       helpMessage.innerHTML += `<b><span style="color:${col.pu};">${warningText[headerState.ability]}</b><br><br></span>`;
     }
