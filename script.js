@@ -23,10 +23,10 @@ const openHelpButton = document.getElementById("help-img");
 const openLangButton = document.getElementById("lang-img");
 const clearIcon = document.getElementById("clearIcon");
 const sortAttributes = ['row','shiny','sp','type','ab','moves','co','bst','hp','atk','def','spa','spd','spe'];
-const possibleFID = [...Array(fidThreshold[fidThreshold.length-1]-3).keys()]; // Remove -3 *********
+const possibleFID = [...Array(fidThreshold[fidThreshold.length-1]).keys()];
 const possibleSID = [...Array(items.length).keys()];
 const supportedLangs = ["en","fr","es-ES","it","ko","zh-Hans","ja"];//"pt-BR","de"];
-const LanguageNames  = ["English","Français","Español (España)","Italiano","한국어 (Hangugeo)","简体中文 (Jiǎntǐ Zhōngwén)","日本語 (Nihongo)"];//,"Português (Brasil)","Deutsch"];
+const languageNames  = ["English","Français","Español (España)","Italiano","한국어 (Hangugeo)","简体中文 (Jiǎntǐ Zhōngwén)","日本語 (Nihongo)"];//,"Português (Brasil)","Deutsch"];
 const col = {pu:'rgb(140, 130, 240)', wh:'rgb(255, 255, 255)', ga:'rgb(145, 145, 145)', dg:'rgb(105, 105, 105)',
              bl:'rgb(131, 182, 239)', ye:'rgb(240, 230, 140)', re:'rgb(239, 131, 131)', pi:'rgb(216, 143, 205)',
              ge:'rgb(143, 214, 154)', or:'rgb(251, 173, 124)', cy:'rgb( 83, 237, 229)', dr:'rgb(247, 82,  49)'};
@@ -52,19 +52,6 @@ let splashState = { speciesID: -1, page: 0, shiny: 0, fem: 0, zoomImgh: 300 }
 let headerState = { shiny: 0, ability: 0, biome: 0, move: 0 } 
 let sortState = { sortAttr: 'row', ascending: true, index: 0 }; // State of sorting order
 let persistentState = false; // Whether filters are reloaded upon refresh
-const TagToFID = { // List of ability/move FIDs that match specific tag filters
-  [fidThreshold[10]]: possibleFID.filter((fid) => fid >= fidThreshold[0] && fid < fidThreshold[1] && (fidToProc[fid-fidThreshold[0]][1].includes(59))), // Lure ability
-  [fidThreshold[10]+1]: possibleFID.filter((fid) => fid >= fidThreshold[0] && fid < fidThreshold[1] && (fidToProc[fid-fidThreshold[0]][1].includes(37))), // Ignores abilities
-  [fidThreshold[10]+2]: possibleFID.filter((fid) => fid >= fidThreshold[1] && fid < fidThreshold[2] && (fidToProc[fid-fidThreshold[0]][1].includes(37))),
-  [fidThreshold[10]+3]: possibleFID.filter((fid) => fid >= fidThreshold[1] && fid < fidThreshold[2] && (fidToProc[fid-fidThreshold[0]][1].includes(40))),
-  [fidThreshold[10]+4]: possibleFID.filter((fid) => fid >= fidThreshold[1] && fid < fidThreshold[2] && fidToProc[fid-fidThreshold[0]][1]<2
-    && (fidToProc[fid-fidThreshold[0]][1].includes(1) || fidToProc[fid-fidThreshold[0]][1].includes(2))),
-  // Switches out target
-  // Spread moves
-  // Healing
-  // Setup
-  // Priority [fidThreshold[10]+3]: possibleFID.filter((fid) => fid >= fidThreshold[1] && fid < fidThreshold[2] && fidToProc[fid-fidThreshold[0]][5]>0 && fidToProc[fid-fidThreshold[0]][1]<2),
-}
   
 // Perform initial display with detected language
 let pageLang = detectLanguage();
@@ -195,9 +182,9 @@ function refreshAllItems() { // Display items based on query and locked filters 
           if (fid  <  fidThreshold[9])   return fid in items[specID]; // Biome filter
           if (fid  <  fidThreshold[10])  return items[specID]?.fa === fid; // Family filter
           if (fid < fidThreshold[10]+2 && headerState.ability) // Restricted ability tag filter
-            return TagToFID[fid].some(f => items[specID]?.[f] == 309+headerState.ability 
+            return tagToFID[fid].some(f => items[specID]?.[f] == 309+headerState.ability 
               || (headerState.ability == 1 && items[specID]?.[f] == 309));
-          if (fid  <  fidThreshold[11]) return TagToFID[fid].some(f => f in items[specID]); // Other tag filters
+          if (fid  <  fidThreshold[11]) return tagToFID[fid].some(f => f in items[specID]); // Other tag filters
           if (fid  >= fidThreshold[11]) { // Exclusion filters
             const excFID = fid-fidThreshold[11];
             if (excFID  <  fidThreshold[2])    return !(excFID in items[specID]); // Type/Ability/Move exclusions
@@ -215,7 +202,7 @@ function refreshAllItems() { // Display items based on query and locked filters 
   toShowMovesBiomes = lockedFilters.filter(f => [2,9].includes(fidToCategory(f)));
   // For the move tag filters, add the associated FIDs to that shown list
   lockedFilters.filter(f => f>fidThreshold[10]+1 && f<fidThreshold[11]).forEach(f => 
-    toShowMovesBiomes.push(...TagToFID[f].filter(fid => !toShowMovesBiomes.some(ff => ff == fid))));
+    toShowMovesBiomes.push(...tagToFID[f].filter(fid => !toShowMovesBiomes.some(ff => ff == fid))));
     
   // Remove the pinned items for now ==============
   if (pinnedRows) filteredItemIDs = filteredItemIDs.filter((thisID) => !pinnedRows.includes(thisID));
@@ -804,7 +791,7 @@ function displaySuggestions() {
       if (isExclusion && fidToCategory(fid)==4 && fid>=fidThreshold[3]+10) return false; // Disallow relative cost exclusions
       if (lockedFilters.some((f) => f%fidThreshold[11] == fid)) return false; // Don't suggest if already locked
       if (fid >= fidThreshold[9] && offerFamilies.includes(fid)) return true; // Suggest matching families
-      if (fid >= fidThreshold[10] && TagToFID[fid].some(f => fidToSearch[f].includes(query))) return true; // Suggest related tags
+      if (fid >= fidThreshold[10] && tagToFID[fid].some(f => fidToSearch[f].includes(query))) return true; // Suggest related tags
       return fidToSearch[fid].includes(query); // Suggest if it contains the search query
     });
     // Erase the list of suggestions if it is too large, and no exact matches
@@ -1110,7 +1097,7 @@ function openLangMenu() {
   supportedLangs.forEach((thisLang, index) => {
     const thisLangRow = document.createElement('div'); thisLangRow.className = "splash-button";
     if (pageLang == thisLang) thisLangRow.style.color = col.pu;
-    thisLangRow.innerHTML = `${LanguageNames[index]}`;
+    thisLangRow.innerHTML = `${languageNames[index]}`;
     thisLangRow.addEventListener('click', () => {
       localStorage.setItem("preferredLang", thisLang);
       loadAndApplyLanguage(thisLang);
