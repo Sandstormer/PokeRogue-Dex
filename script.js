@@ -155,49 +155,57 @@ function refreshAllItems() { // Display items based on query and locked filters 
   if (headerState.ability == 2) filteredItemIDs = filteredItemIDs.filter(fid => 'ha' in items[fid]);
   // Filter from locked filters ==============
   if (lockedFilters.length) {
-    filteredItemIDs = filteredItemIDs.filter(specID => // Search for filters with their fid as key
-      lockedFilterGroups.every(thisGroup => // Match something from every group
+    filteredItemIDs = filteredItemIDs.filter(specID => { // Search for filters with their fid as key
+      const item = items[specID];
+      return lockedFilterGroups.every(thisGroup => // Match something from every group
         thisGroup.some(fid => { // Match anything from within a filter group
-          if (headerState.ability && fid >= fidThreshold[0] && fid < fidThreshold[1]) // Restricted ability filter
-            return items[specID]?.[fid] == 309+headerState.ability || (headerState.ability == 1 && items[specID]?.[fid] == 309);
-          if (headerState.move && fid >= fidThreshold[1] && fid < fidThreshold[2]) { // Restricted move filter
-            if (headerState.move == 1) return items[specID]?.[fid] <= 200;
-            if (headerState.move == 2) return items[specID]?.[fid] > 200 && items[specID]?.[fid] < 209;
-            if (headerState.move == 3) return items[specID]?.[fid] > 200 && ![204,208].includes(items[specID]?.[fid]);
-          }
-          if (fid  <  fidThreshold[2])   return fid in items[specID]; // Type/Ability/Move filters
-          if (fid  <  fidThreshold[3])   return items[specID].ge === fid - fidThreshold[2] + 1; // Gen filters
-          if (fid  <  fidThreshold[3]+10) return items[specID].co === fid - fidThreshold[3] + 1; // Cost equal filters
-          if (fid  <  fidThreshold[3]+18) return items[specID].co <= fid - fidThreshold[3] - 8; // Cost LEQ filters
-          if (fid  <  fidThreshold[4])   return items[specID].co >= fid - fidThreshold[3] - 16;   // Cost GEQ filters
-          if (fid === fidThreshold[4])   return 'fe' in items[specID]; // Gender filter
-          if (fid === fidThreshold[5])   return 'st' in items[specID]; // Starter select filter
-          if (fid === fidThreshold[5]+1) return 'fs' in items[specID]; // Fresh start filter
-          if (fid === fidThreshold[5]+2) return true; // Flipped stats filter
-          if (fid  <  fidThreshold[7]-1) return items[specID].et === fid - fidThreshold[6]; // Egg tier filter
-          if (fid === fidThreshold[7]-1) return [1,2,3].includes(items[specID]?.ex); // Egg exclusive
-          if (fid === fidThreshold[7])   return 'nv' in items[specID]; // New variants
-          if (fid === fidThreshold[7]+1) return items[specID].sh == 3; // All variants
-          if (fid === fidThreshold[7]+2) return items[specID].sh == 1; // No variants
-          if (fid  <  fidThreshold[9])   return fid in items[specID]; // Biome filter
-          if (fid  <  fidThreshold[10])  return items[specID]?.fa === fid; // Family filter
-          if (fid < fidThreshold[10]+2 && headerState.ability) // Restricted ability tag filter
-            return tagToFID[fid].some(f => items[specID]?.[f] == 309+headerState.ability 
-              || (headerState.ability == 1 && items[specID]?.[f] == 309));
-          if (fid  <  fidThreshold[11]) return tagToFID[fid].some(f => f in items[specID]); // Other tag filters
-          if (fid  >= fidThreshold[11]) { // Exclusion filters
+          if (fid < fidThreshold[2]) { // Type[0], Ability[1], Move[2]
+            if (headerState.ability && fid >= fidThreshold[0] && fid < fidThreshold[1]) // Restricted ability filter
+              return item?.[fid] == 309+headerState.ability || (headerState.ability == 1 && item?.[fid] == 309);
+            if (headerState.move && fid >= fidThreshold[1] && fid < fidThreshold[2]) { // Restricted move filter
+              if (headerState.move == 1) return item?.[fid] <= 200;
+              if (headerState.move == 2) return item?.[fid] > 200 && item?.[fid] < 209;
+              if (headerState.move == 3) return item?.[fid] > 200 && ![204,208].includes(item?.[fid]);
+            }
+            return fid in item; // Unrestricted Type/Ability/Move filters
+          } else if (fid < fidThreshold[4]) { // Gen[3], Cost[4]
+            if (fid < fidThreshold[3])    return item.ge == fid - fidThreshold[2] + 1; // Gen filters
+            if (fid < fidThreshold[3]+10) return item.co == fid - fidThreshold[3] + 1; // Cost equal filters
+            if (fid < fidThreshold[3]+18) return item.co <= fid - fidThreshold[3] - 8; // Cost LEQ filters
+            return item.co >= fid - fidThreshold[3] - 16; // Cost GEQ filters
+          } else if (fid < fidThreshold[7]) { // Gender[5], Mode[6], EggTier[7]
+            if (fid === fidThreshold[4])   return 'fe' in item; // Gender filter
+            if (fid === fidThreshold[5])   return 'st' in item; // Starter select filter
+            if (fid === fidThreshold[5]+1) return 'fs' in item; // Fresh start filter
+            if (fid === fidThreshold[5]+2) return true; // Flipped stats filter
+            if (fid  <  fidThreshold[7]-1) return item.et === fid - fidThreshold[6]; // Egg tier filter
+            return [1,2,3].includes(item?.ex); // Egg exclusive
+          } else if (fid  <  fidThreshold[10]) { // ShinyVariants[8], Biomes[9], Family[10]
+            if (fid === fidThreshold[7])   return 'nv' in item; // New variants
+            if (fid === fidThreshold[7]+1) return item.sh == 3; // All variants
+            if (fid === fidThreshold[7]+2) return item.sh == 1; // No variants
+            if (fid  <  fidThreshold[9])   return fid in item; // Biome filter
+            return item?.fa === fid; // Family filter
+          } else if (fid  <  fidThreshold[11]) { // Tags[11]
+            if (fid < fidThreshold[11] && headerState.ability) // Restricted ability tag filter
+              return tagToFID[fid].some(f => item?.[f] == 309+headerState.ability 
+                || (headerState.ability == 1 && item?.[f] == 309));
+            return tagToFID[fid].some(f => f in item); // Regular tag filter
+          } else if (fid  >= fidThreshold[11]) { // Exclusion filters
             const excFID = fid-fidThreshold[11];
-            if (excFID  <  fidThreshold[2])    return !(excFID in items[specID]); // Type/Ability/Move exclusions
-            if (excFID  <  fidThreshold[3])    return items[specID].ge !== excFID - fidThreshold[2] + 1; // Gen exclusions
-            if (excFID  <  fidThreshold[3]+10) return items[specID].co !== excFID - fidThreshold[3] + 1; // Cost equal exclusions
-            if (excFID  <  fidThreshold[6])    return true; // Invalid exclusion filters
-            if (excFID  <  fidThreshold[7]-1)  return items[specID].et !== excFID - fidThreshold[6]; // Egg tier exclusions
-            if (excFID === fidThreshold[7]-1)  return ![1,2,3].includes(items[specID]?.ex); // Egg exclusive exclusion
-            if (excFID  <  fidThreshold[8])    return true; // Invalid exclusion filters
-            if (excFID  <  fidThreshold[9])    return !(excFID in items[specID]); // Biome exclusions
+            if (excFID < fidThreshold[2])    return !(excFID in item); // Type/Ability/Move exclusions
+            if (excFID < fidThreshold[3])    return item.ge !== excFID - fidThreshold[2] + 1; // Gen exclusions
+            if (excFID < fidThreshold[3]+10) return item.co !== excFID - fidThreshold[3] + 1; // Cost equal exclusions
+            if (excFID < fidThreshold[6])    return true; // Invalid exclusion filters
+            if (excFID < fidThreshold[7]-1)  return item.et !== excFID - fidThreshold[6]; // Egg tier exclusions
+            if (excFID < fidThreshold[7])    return ![1,2,3].includes(item?.ex); // Egg exclusive exclusion
+            if (excFID < fidThreshold[8])    return true; // Invalid exclusion filters
+            if (excFID < fidThreshold[9])    return !(excFID in item); // Biome exclusions
           }
-        })));
-      }
+        })
+      );
+    });
+  }
   // Add moves/biomes to track in the move column  ==============
   toShowMovesBiomes = lockedFilters.filter(f => [2,9].includes(fidToCategory(f)));
   // For the move tag filters, add the associated FIDs to that shown list
