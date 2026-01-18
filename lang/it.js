@@ -3919,7 +3919,7 @@ fidToName = [
 'Cantiere',
 'Deserto',
 'Dojo',
-'???',
+'La Fine',
 'Fabbrica',
 'Caverna Fatata',
 'Foresta',
@@ -4517,10 +4517,7 @@ fidToName = [
 'Tauros di Paldea',
 'Ursaluna',
 'Abilità Esca',
-'Ignora Abilità',
-'Ignora Abilità',
-'Forza il Cambio',
-'Mosse ad Area'
+'Ignora Abilità'
 ];
 helpMenuText = `
 <b>Un <span style="color:rgb(140, 130, 240);">potente strumento di ricerca</span> per PokéRogue</b>

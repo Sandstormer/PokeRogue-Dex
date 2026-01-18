@@ -3919,7 +3919,7 @@ fidToName = [
 'Chantier',
 'Désert',
 'Dojo',
-'???',
+'La Fin',
 'Usine',
 'Grotte Féérique',
 'Forêt',
@@ -4517,10 +4517,7 @@ fidToName = [
 'Tauros de Paldea',
 'Ursaking',
 'Talent d’Appât',
-'Ignore les Talents',
-'Ignore les Talents',
-'Force le Changement',
-'Attaques de Zone'
+'Ignore les Talents'
 ];
 helpMenuText = `
 <b><span style="color:rgb(140, 130, 240);">Recherche rapide et puissante</span> pour PokeRogue</b>
