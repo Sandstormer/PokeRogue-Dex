@@ -4517,7 +4517,14 @@ fidToName = [
 'Tauros de Paldea',
 'Ursaking',
 'Talent d’Appât',
-'Ignore les Talents'
+'Ignore les Talents',
+'Immunité Électrik',
+'Immunité Feu',
+'Immunité Eau',
+'Talent Pluie',
+'Talent Tempête de Sable',
+'Talent Neige',
+'Talent Soleil'
 ];
 helpMenuText = `
 <b><span style="color:rgb(140, 130, 240);">Recherche rapide et puissante</span> pour PokeRogue</b>

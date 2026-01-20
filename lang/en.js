@@ -4517,7 +4517,14 @@ fidToName = [
 'Paldea Tauros',
 'Bloodmoon Ursaluna',
 'Lure Ability',
-'Ignores Abilities'
+'Ignores Abilities',
+'Electric Immunity',
+'Fire Immunity',
+'Water Immunity',
+'Rain Ability',
+'Sand Ability',
+'Snow Ability',
+'Sun Ability'
 ];
 helpMenuText = `
 <b>This is a <span style="color:rgb(140, 130, 240);">fast and powerful search</span> for PokeRogue</b>

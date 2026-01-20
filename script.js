@@ -209,8 +209,8 @@ function refreshAllItems() { // Display items based on query and locked filters 
   // Add moves/biomes to track in the move column  ==============
   toShowMovesBiomes = lockedFilters.filter(f => [2,9].includes(fidToCategory(f)));
   // For the move tag filters, add the associated FIDs to that shown list
-  lockedFilters.filter(f => f>fidThreshold[10]+1 && f<fidThreshold[11]).forEach(f => 
-    toShowMovesBiomes.push(...tagToFID[f].filter(fid => !toShowMovesBiomes.some(ff => ff == fid))));
+  // lockedFilters.filter(f => f>fidThreshold[10]+x && f<fidThreshold[11]).forEach(f => 
+  //   toShowMovesBiomes.push(...tagToFID[f].filter(fid => !toShowMovesBiomes.some(ff => ff == fid))));
     
   // Remove the pinned items for now ==============
   if (pinnedRows) filteredItemIDs = filteredItemIDs.filter((thisID) => !pinnedRows.includes(thisID));

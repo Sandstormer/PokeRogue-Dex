@@ -4517,7 +4517,14 @@ fidToName = [
 'Tauros di Paldea',
 'Ursaluna',
 'Abilità Esca',
-'Ignora Abilità'
+'Ignora Abilità',
+'Immunità Elettro',
+'Immunità Fuoco',
+'Immunità Acqua',
+'Abilità Pioggia',
+'Abilità Tempesta di Sabbia',
+'Abilità Neve',
+'Abilità Sole'
 ];
 helpMenuText = `
 <b>Un <span style="color:rgb(140, 130, 240);">potente strumento di ricerca</span> per PokéRogue</b>

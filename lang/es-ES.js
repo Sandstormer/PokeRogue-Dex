@@ -4517,7 +4517,14 @@ fidToName = [
 'Tauros de Paldea',
 'Ursaluna',
 'Habilidad de Colonia',
-'Ignora Habilidades'
+'Ignora Habilidades',
+'Inmunidad Eléctrica',
+'Inmunidad Fuego',
+'Inmunidad Agua',
+'Habilidad de Lluvia',
+'Habilidad de Tormenta de Arena',
+'Habilidad de Nieve',
+'Habilidad de Sol'
 ];
 helpMenuText = `
 <b><span style="color:rgb(140, 130, 240);">Búsqueda rápida y potente</span> para PokeRogue</b>
