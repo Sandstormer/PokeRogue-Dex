@@ -1,5 +1,5 @@
 const gameVersion = "1.11.6";
-const latestDate = "2026-01-19";
+const latestDate = "2026-01-26";
 const typeColors = [
 '#ADBD21',
 '#735A4A',

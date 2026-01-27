@@ -380,7 +380,7 @@ function renderMoreItems() { // Create each list item, with columns of info ****
       if (name in item) {
         const clickableRow = document.createElement('div');  clickableRow.className = 'clickable-name';
         clickableRow.style.color = abToColor(name);
-        clickableRow.innerHTML = `<p style="margin: 0;">${fidToName[item[name]]}</p>`;
+        clickableRow.innerHTML = fidToName[item[name]];
         clickableRow.addEventListener('click', () => showDescSplash(item[name]));
         abilityColumn.appendChild(clickableRow); 
       }
@@ -427,7 +427,7 @@ function renderMoreItems() { // Create each list item, with columns of info ****
           clickableRow.addEventListener('click', () => showDescSplash(thisFID));
         };
         // Show the move name, with click event for splash screen
-        clickableRow.innerHTML = `<p style="color:${col.pu}; margin: 0;">${fidToName[thisFID]}:<br>${srcText}</span></p>`;
+        clickableRow.innerHTML = `<span style="color:${col.pu};">${fidToName[thisFID]}:<br>${srcText}</span></span>`;
         moveColumn.appendChild(clickableRow);
       }
     });
