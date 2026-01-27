@@ -175,7 +175,7 @@ function refreshAllItems() { // Display items based on query and locked filters 
             return item.co >= fid - fidThreshold[3] - 16; // Cost GEQ filters
           } else if (fid < fidThreshold[7]) { // Gender[5], Mode[6], EggTier[7]
             if (fid === fidThreshold[4])   return 'fe' in item; // Gender filter
-            if (fid === fidThreshold[5])   return 'st' in item; // Starter select filter
+            if (fid === fidThreshold[5])   return 'st' in item && !('fx' in item); // Starter select filter
             if (fid === fidThreshold[5]+1) return 'fs' in item; // Fresh start filter
             if (fid === fidThreshold[5]+2) return true; // Flipped stats filter
             if (fid  <  fidThreshold[7]-1) return item.et === fid - fidThreshold[6]; // Egg tier filter
