@@ -3913,7 +3913,7 @@ fidToName = [
 'Base',
 'Mega',
 'Nuovo Mega',
-'Giga',
+'Gigamax',
 'Trasformato',
 'Femmina',
 'Abisso',
