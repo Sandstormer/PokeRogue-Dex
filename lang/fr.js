@@ -2,8 +2,8 @@
 // They are changed automatically by the update script
 // Changes must be made through the updater repository
 headerNames = ['N°','Chrom.','Nom','Type','Talents','Capacités Œuf','Cout','Total','PV','Atq','Déf','ASp','DSp','Vit'];
-altText = ['Capacités','Principaux','Caché','Passif','Chercher','Puis.','Préc.','PP','Ajouter aux filtres','Champi Mémoriel','Évolutions','Capacités Œuf','Rare Capac. Œuf','Commun','Super','Hyper','CT','N.','Évo','Œuf'];
-catToName = ['Type','Talent','Capacité','Gen','Cout','Sexe','Mode','Œuf','Variantes Chromatique','Biome','Lié à','Étiquette'];
+altText = ['Capacités','Principaux','Caché','Passif','Chercher','Puis.','Préc.','PP','Ajouter aux filtres','Champi Mémoriel','Évolution','Capacités Œuf','Rare Capac. Œuf','Commun','Super','Hyper','CT','N.','Évo','Œuf'];
+catToName = ['Type','Talent','Capacité','Gen','Cout','Œuf','Mode','Évolution','Forme','Biome','Lié à','Variantes Chromatique','Étiquette'];
 infoText = ['Bonheur par Bonbon','Passif','Cout réduit','Acheter un Œuf','Talent Caché','Exclusif aux Œufs','Exclusif aux Bébés','Pokémon Paradoxe','Changement de forme','Biomes','Filtres','Réduit après ## œufs','par Niveau','par Œuf','par CT'];
 biomeText = ['Commun','Peu Commun','Rare','Super Rare','Hyper Rare','Boss','Com.','PC','Rare','SR','HR','Aube','Jour','Crépuscule','Nuit'];
 biomeLongText = [
@@ -3899,19 +3899,23 @@ fidToName = [
 '≥ 7',
 '≥ 8',
 '≥ 9',
-'Femelle',
-'Starter',
-'Nouveau Départ',
-'Stats Inversées',
 'Commun',
 'Rare',
 'Épique',
 'Manaphy',
 'Légendaire',
 'Exclusif',
-'Nouvelle',
-'Oui',
-'Non',
+'Starter',
+'Nouveau Départ',
+'Stats Inversées',
+'Starter',
+'Entièrement évolué',
+'Base',
+'Méga',
+'Nouveau Méga',
+'Giga',
+'Transformé',
+'Femelle',
 'Gouffre',
 'Terres Sauvages',
 'Plage',
@@ -4516,6 +4520,9 @@ fidToName = [
 'Tauros de Paldea',
 'Axoloto de Paldea',
 'Ursaking',
+'Nouvelle',
+'Oui',
+'Non',
 'Talent d’Appât',
 'Ignore les Talents',
 'Immunité Électrik',
