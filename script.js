@@ -80,7 +80,7 @@ function loadAndApplyLanguage(lang) {
     
     // Initialize the searchable names
     fidToSearch = fidToName.map((thisName, fid) => makeSearchable( // Search via category for later categories
-      (fid >= fidThreshold[2] && fid < fidThreshold[8])||(fid >= fidThreshold[10]) ? `${catToName[fidToCategory(fid)]}${thisName}` : thisName
+      (fid >= fidThreshold[2] && fid < fidThreshold[11])||(fid >= fidThreshold[10]) ? `${catToName[fidToCategory(fid)]}${thisName}` : thisName
     ));
     specToSearch = speciesNames.map(s => makeSearchable(s));
     searchBox.placeholder = `${altText[4]} ${headerNames[2]} / ${headerNames[3]} / ${headerNames[4]} / ${altText[0]} ...`;
@@ -168,40 +168,55 @@ function refreshAllItems() { // Display items based on query and locked filters 
               if (headerState.move == 3) return item?.[fid] > 200 && ![204,208].includes(item?.[fid]);
             }
             return fid in item; // Unrestricted Type/Ability/Move filters
-          } else if (fid < fidThreshold[4]) { // Gen[3], Cost[4]
-            if (fid < fidThreshold[3])    return item.ge == fid - fidThreshold[2] + 1; // Gen filters
-            if (fid < fidThreshold[3]+10) return item.co == fid - fidThreshold[3] + 1; // Cost equal filters
-            if (fid < fidThreshold[3]+18) return item.co <= fid - fidThreshold[3] - 8; // Cost LEQ filters
-            return item.co >= fid - fidThreshold[3] - 16; // Cost GEQ filters
-          } else if (fid < fidThreshold[7]) { // Gender[5], Mode[6], EggTier[7]
-            if (fid === fidThreshold[4])   return 'fe' in item; // Gender filter
+          } else if (fid < fidThreshold[5]) { // Gen[3], Cost[4], EggTier[5]
+            if (fid < fidThreshold[3])    return item.ge == fid - fidThreshold[2] + 1;  // Gen filters
+            if (fid < fidThreshold[3]+10) return item.co == fid - fidThreshold[3] + 1;  // Cost equal filters
+            if (fid < fidThreshold[3]+18) return item.co <= fid - fidThreshold[3] - 8;  // Cost LEQ filters
+            if (fid < fidThreshold[4])    return item.co >= fid - fidThreshold[3] - 16; // Cost GEQ filters
+            if (fid < fidThreshold[5]-1)  return item.et == fid - fidThreshold[4];      // Egg tier filters
+            return item?.ex < 5; // Egg exclusive filter
+          } else if (fid < fidThreshold[6]) { // Mode[6]
             if (fid === fidThreshold[5])   return 'st' in item && !('fx' in item); // Starter select filter
             if (fid === fidThreshold[5]+1) return 'fs' in item; // Fresh start filter
             if (fid === fidThreshold[5]+2) return true; // Flipped stats filter
-            if (fid  <  fidThreshold[7]-1) return item.et === fid - fidThreshold[6]; // Egg tier filter
-            return [1,2,3].includes(item?.ex); // Egg exclusive
-          } else if (fid  <  fidThreshold[10]) { // ShinyVariants[8], Biomes[9], Family[10]
-            if (fid === fidThreshold[7])   return 'nv' in item; // New variants
-            if (fid === fidThreshold[7]+1) return item.sh == 3; // All variants
-            if (fid === fidThreshold[7]+2) return item.sh == 1; // No variants
-            if (fid  <  fidThreshold[9])   return fid in item; // Biome filter
-            return item?.fa === fid; // Family filter
-          } else if (fid  <  fidThreshold[11]) { // Tags[11]
-            if (fid < fidThreshold[11] && headerState.ability) // Restricted ability tag filter
+          } else if (fid < fidThreshold[8]) { // Evolution[7], Form[8]
+            if (fid === fidThreshold[6])   return 'st' in item;    // Starter evolution filter
+            if (fid === fidThreshold[6]+1) return 'ev' in item;    // Fully evolved filter
+            if (fid === fidThreshold[7])   return !('fx' in item); // Base form filter
+            if (fid === fidThreshold[7]+1) return item?.fx <= 2;   // Mega filter
+            if (fid  <  fidThreshold[7]+5) return item?.fx == fid-fidThreshold[7]; // New mega, giga, transformed filters
+            if (fid === fidThreshold[7]+5) return 'fe' in item;    // Female filter
+          } else if (fid < fidThreshold[11]) { // Biomes[9], Family[10], ShinyVariants[11]
+            if (fid  <  fidThreshold[9])    return fid in item;     // Biome filter
+            if (fid  <  fidThreshold[10])   return item?.fa == fid; // Family filter
+            if (fid === fidThreshold[10])   return 'nv' in item;    // New variants
+            if (fid === fidThreshold[10]+1) return item.sh == 3;    // All variants
+            if (fid === fidThreshold[10]+2) return item.sh == 1;    // No variants
+          } else if (fid < fidThreshold[12]) { // Tags[12]
+            if (fid < fidThreshold[12] && headerState.ability) // Restricted ability tag filter
               return tagToFID[fid].some(f => item?.[f] == 309+headerState.ability 
                 || (headerState.ability == 1 && item?.[f] == 309));
             return tagToFID[fid].some(f => f in item); // Regular tag filter
-          } else if (fid  >= fidThreshold[11]) { // Exclusion filters
-            const excFID = fid-fidThreshold[11];
-            if (excFID < fidThreshold[2])    return !(excFID in item); // Type/Ability/Move exclusions
-            if (excFID < fidThreshold[3])    return item.ge !== excFID - fidThreshold[2] + 1; // Gen exclusions
-            if (excFID < fidThreshold[3]+10) return item.co !== excFID - fidThreshold[3] + 1; // Cost equal exclusions
-            if (excFID < fidThreshold[6])    return true; // Invalid exclusion filters
-            if (excFID < fidThreshold[7]-1)  return item.et !== excFID - fidThreshold[6]; // Egg tier exclusions
-            if (excFID < fidThreshold[7])    return ![1,2,3].includes(item?.ex); // Egg exclusive exclusion
-            if (excFID < fidThreshold[8])    return true; // Invalid exclusion filters
-            if (excFID < fidThreshold[9])    return !(excFID in item); // Biome exclusions
+          } else if (fid >= fidThreshold[12]) { // Exclusion filters
+            const excFID = fid-fidThreshold[12];
+            if (excFID < fidThreshold[4]) {
+              if (excFID < fidThreshold[2])    return !(excFID in item); // Type/Ability/Move exclusions
+              if (excFID < fidThreshold[3])    return item.ge !== excFID - fidThreshold[2] + 1; // Gen exclusions
+              if (excFID < fidThreshold[3]+10) return item.co !== excFID - fidThreshold[3] + 1; // Cost equal exclusions
+            } else if (excFID < fidThreshold[6]) {
+              if (excFID < fidThreshold[5]-1) return item.et !== excFID - fidThreshold[4]; // Egg tier exclusions
+              if (excFID < fidThreshold[5])   return !('ex' in item); // Egg exclusive exclusion
+            } else {
+              if (excFID == fidThreshold[6])   return !('st' in item);   // Starter evolution filter
+              if (excFID == fidThreshold[6]+1) return !('ev' in item);   // Fully evolved filter
+              if (excFID == fidThreshold[7])   return 'fx' in item;      // Base form filter
+              if (excFID == fidThreshold[7]+1) return !(item?.fx <= 2);  // Mega filter
+              if (excFID <  fidThreshold[7]+5) return item?.fx != excFID-fidThreshold[7]; // New mega, giga, transformed filters
+              if (excFID == fidThreshold[7]+5) return !('fe' in item);   // Female filter
+              if (excFID <  fidThreshold[9])   return !(excFID in item); // Biome exclusions
+            }
           }
+          return true; // General invalid filters
         })
       );
     });
@@ -209,7 +224,7 @@ function refreshAllItems() { // Display items based on query and locked filters 
   // Add moves/biomes to track in the move column  ==============
   toShowMovesBiomes = lockedFilters.filter(f => [2,9].includes(fidToCategory(f)));
   // For the move tag filters, add the associated FIDs to that shown list
-  // lockedFilters.filter(f => f>fidThreshold[10]+x && f<fidThreshold[11]).forEach(f => 
+  // lockedFilters.filter(f => f>fidThreshold[11]+x && f<fidThreshold[12]).forEach(f => 
   //   toShowMovesBiomes.push(...tagToFID[f].filter(fid => !toShowMovesBiomes.some(ff => ff == fid))));
     
   // Remove the pinned items for now ==============
@@ -272,7 +287,7 @@ function refreshAllItems() { // Display items based on query and locked filters 
   if (!filteredItemIDs.length) { // No pokemon
     const helpMessage = document.createElement('div');  helpMessage.className = 'item-help-message';
     helpMessage.innerHTML = '<hr>';
-    if (lockedFilters.some(f => f == fidThreshold[7] || f == fidThreshold[7]+1)) helpMessage.innerHTML += 
+    if (lockedFilters.some(f => f == fidThreshold[10] || f == fidThreshold[10]+1)) helpMessage.innerHTML += 
       `<img src="ui/shiny2.png"> <img src="ui/shiny3.png"> <b><span style="color:${col.pu};">${warningText[0]}</b><br><br></span>`;
     if (headerState.ability && (query.length || lockedFilters.some(f => fidToCategory(f)==1) || headerState.ability==2)) {
       // Show ability warning if toggled, and an ability filter or search query
@@ -299,7 +314,7 @@ function renderMoreItems() { // Create each list item, with columns of info ****
     const pokeImg = document.createElement('img');  pokeImg.className = 'item-image';  
     pokeImg.stars = []; // Keep a list of stars that can change the pokemon image 
     pokeImg.shinyOverride = Math.min(item.sh, headerState.shiny);  
-    pokeImg.femOverride = (item?.fe == 1 ? +lockedFilters.some((f) => f == fidThreshold[4]) : 0);
+    pokeImg.femOverride = (item?.fe == 1 ? +lockedFilters.some((f) => f == fidThreshold[7]+5) : 0);
     pokeImg.src = `images/${item.img}_${pokeImg.shinyOverride}${(pokeImg.femOverride ? 'f' : '')}.png`; 
     pokeImg.addEventListener('click', () => showInfoSplash(thisID, 3, pokeImg.shinyOverride, pokeImg.femOverride));
     
@@ -611,7 +626,7 @@ function showInfoSplash(specID, forcePage=null, forceShiny=null, forceFem=null) 
             biomeDesc.innerHTML += `<span style="font-size:16px;"> (${timeText})</span>`;
           }
         });
-        if (!lockedFilters.some((f) => f%fidThreshold[11] == fid)) { // Button to add biome directly to filters
+        if (!lockedFilters.some((f) => f%fidThreshold[12] == fid)) { // Button to add biome directly to filters
           const splashButton = document.createElement('div'); splashButton.className = 'splash-button';
           splashButton.innerHTML = altText[8];  
           splashButton.addEventListener('click', () => { lockFilter(fid); 
@@ -735,7 +750,7 @@ function showDescSplash(fid) { // Create the ability/move details splash *******
     });
     splashContent.appendChild(splashMoveTags);
   }
-  if (!lockedFilters.some((f) => f%fidThreshold[11] == fid)) { // Button to add ability/move directly to filters
+  if (!lockedFilters.some((f) => f%fidThreshold[12] == fid)) { // Button to add ability/move directly to filters
     const splashButton = document.createElement('div'); splashButton.className = 'splash-button'; 
     splashButton.innerHTML = altText[8];  
     splashButton.addEventListener('click', () => { lockFilter(fid); 
@@ -758,12 +773,13 @@ function fidToColor(fid) {
   if (fid < fidThreshold[3]+10) return [col.ye, col.wh];
   if (fid < fidThreshold[3]+18) return [col.ye, col.re];
   if (fid < fidThreshold[4]) return [col.ye, col.ge];
-  if (fid < fidThreshold[5]) return [col.pi, col.wh];
+  if (fid < fidThreshold[5]) return [col.wh, eggTierColors(fid)]
   if (fid < fidThreshold[6]) return [col.wh, col.re];
-  if (fid < fidThreshold[7]) return [col.wh, eggTierColors(fid)]
-  if (fid < fidThreshold[8]) return [col.cy, col.wh];
+  if (fid < fidThreshold[7]) return [col.wh, col.bl];
+  if (fid < fidThreshold[8]) return [col.wh, col.pi];
   if (fid < fidThreshold[9]) return [col.ge, col.wh];
   if (fid < fidThreshold[10])return [col.wh, col.pu];
+  if (fid < fidThreshold[11]) return [col.cy, col.wh];
   else return [col.ga, col.or];
 }
 function abToColor(src) {
@@ -772,7 +788,7 @@ function abToColor(src) {
   return ([0,1].includes(headerState.ability) ? col.wh:col.ga)
 }
 function eggTierColors(fid) {
-  if (fid >= fidThreshold[6]) fid -= fidThreshold[6];
+  if (fid >= fidThreshold[4]) fid -= fidThreshold[4];
   if (fid == 0) return col.wh;
   if (fid == 1) return col.bl;
   if (fid == 2) return col.ye;
@@ -795,11 +811,13 @@ function displaySuggestions() {
     if (offerFamilies.length > 4) offerFamilies = [];
     // Filter suggestions based on query and exclude already locked filters
     let matchingFID = possibleFID.filter((fid) => {
-      if (isExclusion && ![0,1,2,3,4,7,9].includes(fidToCategory(fid))) return false; // Only some categories can be exclusion filters
-      if (isExclusion && fidToCategory(fid)==4 && fid>=fidThreshold[3]+10) return false; // Disallow relative cost exclusions
-      if (lockedFilters.some((f) => f%fidThreshold[11] == fid)) return false; // Don't suggest if already locked
+      if (isExclusion && ( fid>=fidThreshold[9]
+        || (fid>=fidThreshold[5] && fid<fidThreshold[6]) 
+        || (fid>=fidThreshold[3]+10 && fid<fidThreshold[4]) 
+      )) return false; // Only some categories can be exclusion filters
+      if (lockedFilters.some((f) => f%fidThreshold[12] == fid)) return false; // Don't suggest if already locked
       if (fid >= fidThreshold[9] && offerFamilies.includes(fid)) return true; // Suggest matching families
-      if (fid >= fidThreshold[10] && tagToFID[fid].some(f => fidToSearch[f].includes(query))) return true; // Suggest related tags
+      if (fid >= fidThreshold[11] && tagToFID[fid].some(f => fidToSearch[f].includes(query))) return true; // Suggest related tags
       return fidToSearch[fid].includes(query); // Suggest if it contains the search query
     });
     // Erase the list of suggestions if it is too large, and no exact matches
@@ -823,12 +841,12 @@ function displaySuggestions() {
 function lockFilter(newLockFID, clearQuery = true, forceOR = null) {
   if (newLockFID == null || newLockFID < 0 || newLockFID > fidThreshold[fidThreshold.length-1]) return;
   if (!lockedFilters.some((f) => f == newLockFID)) {
-    const isExclusion = searchBox.value.startsWith('-')*fidThreshold[11];
+    const isExclusion = searchBox.value.startsWith('-')*fidThreshold[12];
     lockedFilters.push(newLockFID+isExclusion); // Add the filter to the locked filters list
     let filterMod = null;
     if (lockedFilters.length > 1) {
-      // Default to "OR" for certain categories if matching previous filter
-      const defaultOR = ([3,4,8,9,10].includes(fidToCategory(newLockFID)) 
+      // Default to "OR" for certain categories if matching previous filter category
+      const defaultOR = ([3,4,9,10].includes(fidToCategory(newLockFID)) 
         && fidToCategory(newLockFID) == fidToCategory(lockedFilters[lockedFilters.length-2]));
       filterMod = document.createElement("span"); filterMod.toggleOR = forceOR ?? defaultOR;
       filterMod.className = "filter-mod";         filterMod.innerHTML = (filterMod.toggleOR?'OR':'&');
@@ -843,9 +861,9 @@ function lockFilter(newLockFID, clearQuery = true, forceOR = null) {
     if (clearQuery) searchBox.value = ""; 
     updateFilterGroups();   
     // Update sorting if required, then refresh items and suggestions
-    if ((newLockFID == fidThreshold[7] || newLockFID == fidThreshold[7]+1) && !headerState.shiny) { // Has variants
+    if ((newLockFID == fidThreshold[10] || newLockFID == fidThreshold[10]+1) && !headerState.shiny) { // Has variants
       updateHeader(headerColumns[1]);
-    } else if (newLockFID == fidThreshold[7]+2 && headerState.shiny > 1) { // No variants
+    } else if (newLockFID == fidThreshold[10]+2 && headerState.shiny > 1) { // No variants
       headerState.shiny = 0; updateHeader(headerColumns[1]);
     } else if (sortState.sortAttr === 'row' && [2,9].includes(fidToCategory(newLockFID+isExclusion))) {
       updateHeader(headerColumns[5]); // Sort by Move/Biome for those new filters
@@ -878,7 +896,7 @@ function removeFilter(fidToRemove, tagToRemove, modToRemove) {
   // Remove the fid from the filter list, and remove the actual filter tag 
   lockedFilters = lockedFilters.filter((f) => f != fidToRemove);  tagToRemove.remove();
   updateFilterGroups();  
-  if ((fidToRemove == fidThreshold[7] || fidToRemove == fidThreshold[7]+1) && headerState.shiny > 1) { 
+  if ((fidToRemove == fidThreshold[10] || fidToRemove == fidThreshold[10]+1) && headerState.shiny > 1) { 
     headerState.shiny = 0;  headerColumns[1].innerHTML = headerNames[1]; // Update header if removing shiny filter
   }
   // Reset the sorting if there aren't any more locked moves/biomes
@@ -922,7 +940,7 @@ function updateHeader(clickTarget = null, ignoreFlip = false) {
   // Find the new sorting attribute, and update the headers
   if (sortAttribute == 'shiny') { // Toggle the global shiny state
     // Cap the selector to T1 if the "None" filter is selected or if the entire list only has T1
-    const shinyCap = lockedFilters.some(f => f == fidThreshold[7]+2) 
+    const shinyCap = lockedFilters.some(f => f == fidThreshold[10]+2) 
     || (!filteredItemIDs.some(specID => items[specID].sh>1) && !!filteredItemIDs.length);
     headerState.shiny = (headerState.shiny+3)%(shinyCap?2:4);
   } else if (sortAttribute == 'ab') { // Toggle the global ability state
@@ -970,8 +988,8 @@ function updateHeader(clickTarget = null, ignoreFlip = false) {
     const starImg = document.createElement('img');  starImg.className = 'star-header';
     starImg.src = `ui/shiny${headerState.shiny}.png`;
     headerColumns[1].appendChild(starImg);
-    if (headerState.shiny == 3 && !lockedFilters.some(f => f == fidThreshold[7] || f == fidThreshold[7]+1)) {
-      lockFilter(fidThreshold[7]+1,false);
+    if (headerState.shiny == 3 && !lockedFilters.some(f => f == fidThreshold[10] || f == fidThreshold[10]+1)) {
+      lockFilter(fidThreshold[10]+1,false);
     }
   } else {
     headerColumns[1].innerHTML = headerNames[1];
