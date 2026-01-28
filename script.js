@@ -1048,7 +1048,8 @@ document.addEventListener('keydown', (event) => { // All key press events
     // Ignore all key presses if 'Ctrl' is held, except when pasting
     if (!event.ctrlKey || event.code == "KeyV") {
       if (movesetScreen.classList.contains("show")) movesetScreen.classList.remove("show");
-      if (splashScreen.classList.contains("show")) splashScreen.classList.remove("show");
+      if (splashScreen.classList.contains("show"))  splashScreen.classList.remove("show");
+      if (helpScreen.classList.contains("show"))    helpScreen.classList.remove("show");
       searchBox.focus(); // Focus the search box on any key press
     }
   }
@@ -1072,10 +1073,12 @@ document.addEventListener('keydown', (event) => { // All key press events
   if (event.key == "PageDown" || event.key == "PageUp") searchBox.blur();
   // Hit escape to clear search box, text, last filter, or headers
   if (event.key == "Escape") {
-    if (movesetScreen.classList.contains("show") && !splashScreen.classList.contains("show")) {
-      movesetScreen.classList.remove("show");
-    } else if (splashScreen.classList.contains("show")) { // Close splash screen
+    if (splashScreen.classList.contains("show")) { // Close splash screen
       splashScreen.classList.remove("show");
+    } else if (movesetScreen.classList.contains("show")) { // Close moveset screen
+      movesetScreen.classList.remove("show");
+    } else if (helpScreen.classList.contains("show")) { // Close help screen
+      helpScreen.classList.remove("show");
     } else if (searchBox.value.length) { // Clear text from the search box
       searchBox.value = '';
       refreshAllItems();
@@ -1086,8 +1089,7 @@ document.addEventListener('keydown', (event) => { // All key press events
       const lastMod = lockedMods[lockedMods.length - 1];
       removeFilter(lastFilter, lastTag, lastMod); // Remove last filter
     } else if (headerState.shiny || headerState.ability) { // Clear header restrictions
-      headerState.shiny = 0;   headerColumns[1].innerHTML = headerNames[1];
-      headerState.ability = 0; headerColumns[4].innerHTML = headerNames[4];
+      headerState.shiny = 0;  headerState.ability = 0; 
       updateHeader();
     }
   }
