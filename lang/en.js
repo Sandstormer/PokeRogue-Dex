@@ -1,8 +1,8 @@
 // Do not edit these files directly
 // They are changed automatically by the update script
 // Changes must be made through the updater repository
-headerNames = ['Dex','Shiny','Species','Types','Abilities','Egg Moves','Cost','BST','HP','Atk','Def','SpA','SpD','Spe'];
-altText = ['Moves','Main Only','Hidden Only','Passive Only','Search','Pow','Acc','PP','Add to filters','Memory','Evolution','Egg Move','Rare Egg Move','Common','Great','Ultra','TM','Lv.','Evo','Egg'];
+headerNames = ['Dex','Image','Species','Types','Abilities','Egg Moves','Cost','BST','HP','Atk','Def','SpA','SpD','Spe'];
+altText = ['Moves','Main Only','Hidden Only','Passive Only','Search','Pow','Acc','PP','Add to filters','Memory','Shiny','Egg Move','Rare Egg Move','Common','Great','Ultra','TM','Lv.','Evo','Egg'];
 catToName = ['Type','Ability','Move','Gen','Cost','Egg Tier','Mode','Evolution','Form','Biome','Related To','Shiny Variants','Tag'];
 infoText = ['Friendship per Candy','Passive','Cost Reduction','Species Egg','Hidden Ability','Egg Exclusive','Baby Exclusive','Paradox Pokemon','Form Change','Biomes','Filters','Reduced after ## eggs','via Level','via Egg','via TM'];
 biomeText = ['Common','Uncommon','Rare','Super Rare','Ultra Rare','Boss','Com.','Unc.','Rare','SR','UR','Dawn','Day','Dusk','Night'];

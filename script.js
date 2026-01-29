@@ -426,7 +426,7 @@ function renderMoreItems() { // Create each list item, with columns of info ****
           // biomeText = ['Common','Uncommon','Rare','Super Rare','Ultra Rare','Boss','Com','Unc','Rare','SR','UR','Dawn','Day','Dusk','Night']
         } else { // For moves
           if (src == -1) srcText += `rgb(251, 173, 124);">${altText[9]}`;
-          else if (src == 0) srcText += `rgb(131, 182, 239);">${altText[10]}`;
+          else if (src == 0) srcText += `rgb(131, 182, 239);">${catToName[7]}`;
           else if (src == 201) srcText += `rgb(255, 255, 255);">${altText[19]} / ${altText[16]}`;
           else if (src == 202) srcText += `rgb(255, 255, 255);">${altText[19]} / </span><span style="color:rgb(131, 182, 239);">${altText[16]}`;
           else if (src == 203) srcText += `rgb(255, 255, 255);">${altText[19]} / </span><span style="color:rgb(240, 230, 140);">${altText[16]}`;
@@ -977,14 +977,15 @@ function updateHeader(clickTarget = null, ignoreFlip = false) {
       else if (headerState.move == 1) headerColumns[5].innerHTML = `<span style="color:${col.pu};">${altText[0]}</span><span style="color:${col.wh}; font-size:12px;">(${infoText[12]})${sortArrow}</span>`;
       else if (headerState.move == 2) headerColumns[5].innerHTML = `<span style="color:${col.pu};">${altText[0]}</span><span style="color:${col.ye}; font-size:12px;">(${infoText[13]})${sortArrow}</span>`;
       else if (headerState.move == 3) headerColumns[5].innerHTML = `<span style="color:${col.pu};">${altText[0]}</span><span style="color:${col.pu}; font-size:12px;">(${infoText[14]})${sortArrow}</span>`;
-    } else {
+    } else { // Show as "Filters" if it's just biomes
       headerColumns[5].innerHTML = `${infoText[10]}${sortArrow}`;
     }
   } else {
-    headerColumns[5].innerHTML = headerState.biome ? `<span style="color:${col.pu};">${infoText[9]}</span>` : headerNames[5];
+    headerColumns[5].innerHTML = headerState.biome ? `<span style="color:${col.pu};">${infoText[9]}</span>`
+      : `${headerNames[5]}<span style="color:${col.dg}; font-size:12px;">${infoText[9]}</span>`;
   }
   if (headerState.shiny) { // Update the "Shiny" column text
-    headerColumns[1].innerHTML = `<span style="color:${col.pu};">${headerNames[1]}</span>`;
+    headerColumns[1].innerHTML = `<span style="color:${col.pu};">${altText[10]}</span>`;
     const starImg = document.createElement('img');  starImg.className = 'star-header';
     starImg.src = `ui/shiny${headerState.shiny}.png`;
     headerColumns[1].appendChild(starImg);
@@ -992,7 +993,7 @@ function updateHeader(clickTarget = null, ignoreFlip = false) {
       lockFilter(fidThreshold[10]+1,false);
     }
   } else {
-    headerColumns[1].innerHTML = headerNames[1];
+    headerColumns[1].innerHTML = `${headerNames[1]}<span style="color:${col.dg}; font-size:12px;">${altText[10]}</span>`;
   }
   if (headerState.ability) { // Update the "Ability" column text
     headerColumns[4].innerHTML = `<span style="color:${col.pu};">${headerNames[4]}</span>`;
