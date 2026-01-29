@@ -52,6 +52,11 @@ let splashState = { speciesID: -1, page: 0, shiny: 0, fem: 0, zoomImgh: 300 }
 let headerState = { shiny: 0, ability: 0, biome: 0, move: 0 } 
 let sortState = { sortAttr: 'row', ascending: true, index: 0 }; // State of sorting order
 let persistentState = false; // Whether filters are reloaded upon refresh
+const formToFamily = {
+  [fidThreshold[9]]:   new Set(possibleSID.filter(s => items[s].fx <= 2).map(s => items[s].fa)),
+  [fidThreshold[9]+1]: new Set(possibleSID.filter(s => items[s].fx == 2).map(s => items[s].fa)),
+  [fidThreshold[9]+2]: new Set(possibleSID.filter(s => items[s].fx == 3).map(s => items[s].fa)),
+};
   
 // Perform initial display with detected language
 let pageLang = detectLanguage();
@@ -187,13 +192,14 @@ function refreshAllItems() { // Display items based on query and locked filters 
             if (fid  <  fidThreshold[7]+5) return item?.fx == fid-fidThreshold[7]; // New mega, giga, transformed filters
             if (fid === fidThreshold[7]+5) return 'fe' in item;    // Female filter
           } else if (fid < fidThreshold[11]) { // Biomes[9], Family[10], ShinyVariants[11]
-            if (fid  <  fidThreshold[9])    return fid in item;     // Biome filter
-            if (fid  <  fidThreshold[10])   return item?.fa == fid; // Family filter
-            if (fid === fidThreshold[10])   return 'nv' in item;    // New variants
-            if (fid === fidThreshold[10]+1) return item.sh == 3;    // All variants
-            if (fid === fidThreshold[10]+2) return item.sh == 1;    // No variants
+            if (fid  <  fidThreshold[9])    return fid in item;    // Biome filter
+            if (fid  <  fidThreshold[9]+3)  return formToFamily[fid].has(item.fa); // Family of forms
+            if (fid  <  fidThreshold[10])   return item.fa == fid; // Family filter
+            if (fid === fidThreshold[10])   return 'nv' in item;   // New variants
+            if (fid === fidThreshold[10]+1) return item.sh == 3;   // All variants
+            if (fid === fidThreshold[10]+2) return item.sh == 1;   // No variants
           } else if (fid < fidThreshold[12]) { // Tags[12]
-            if (fid < fidThreshold[12] && headerState.ability) // Restricted ability tag filter
+            if (headerState.ability) // Restricted ability tag filter
               return tagToFID[fid].some(f => item?.[f] == 309+headerState.ability 
                 || (headerState.ability == 1 && item?.[f] == 309));
             return tagToFID[fid].some(f => f in item); // Regular tag filter
@@ -766,20 +772,21 @@ function fidToCategory(fid) {
   }
 }
 function fidToColor(fid) {
-  if (fid < fidThreshold[0]) return [col.wh, typeColors[fid]];
-  if (fid < fidThreshold[1]) return [col.pu, col.wh];
-  if (fid < fidThreshold[2]) return [col.ga, col.wh];
-  if (fid < fidThreshold[3]) return [col.bl, col.wh];
+  if (fid < fidThreshold[0])    return [col.wh, typeColors[fid]];
+  if (fid < fidThreshold[1])    return [col.pu, col.wh];
+  if (fid < fidThreshold[2])    return [col.ga, col.wh];
+  if (fid < fidThreshold[3])    return [col.bl, col.wh];
   if (fid < fidThreshold[3]+10) return [col.ye, col.wh];
   if (fid < fidThreshold[3]+18) return [col.ye, col.re];
-  if (fid < fidThreshold[4]) return [col.ye, col.ge];
-  if (fid < fidThreshold[5]) return [col.wh, eggTierColors(fid)]
-  if (fid < fidThreshold[6]) return [col.wh, col.re];
-  if (fid < fidThreshold[7]) return [col.wh, col.bl];
-  if (fid < fidThreshold[8]) return [col.wh, col.pi];
-  if (fid < fidThreshold[9]) return [col.ge, col.wh];
-  if (fid < fidThreshold[10])return [col.wh, col.pu];
-  if (fid < fidThreshold[11]) return [col.cy, col.wh];
+  if (fid < fidThreshold[4])    return [col.ye, col.ge];
+  if (fid < fidThreshold[5])    return [col.wh, eggTierColors(fid)]
+  if (fid < fidThreshold[6])    return [col.wh, col.re];
+  if (fid < fidThreshold[7])    return [col.wh, col.bl];
+  if (fid < fidThreshold[8])    return [col.wh, col.pi];
+  if (fid < fidThreshold[9])    return [col.ge, col.wh];
+  if (fid < fidThreshold[9]+3)  return [col.ga, col.pi];
+  if (fid < fidThreshold[10])   return [col.wh, col.pu];
+  if (fid < fidThreshold[11])   return [col.cy, col.wh];
   else return [col.ga, col.or];
 }
 function abToColor(src) {
@@ -815,6 +822,7 @@ function displaySuggestions() {
         || (fid>=fidThreshold[5] && fid<fidThreshold[6]) 
         || (fid>=fidThreshold[3]+10 && fid<fidThreshold[4]) 
       )) return false; // Only some categories can be exclusion filters
+      if (fid == fidThreshold[7]+2 || fid == fidThreshold[9]+1) return false; // Hide new mega filters until launch
       if (lockedFilters.some((f) => f%fidThreshold[12] == fid)) return false; // Don't suggest if already locked
       if (fid >= fidThreshold[9] && offerFamilies.includes(fid)) return true; // Suggest matching families
       if (fid >= fidThreshold[11] && tagToFID[fid].some(f => fidToSearch[f].includes(query))) return true; // Suggest related tags
