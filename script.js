@@ -47,7 +47,7 @@ let pinnedRows = [];  // List of pinned row numbers
 let isMobile = false; // Change display for mobile devices
 let filteredItemIDs = null; // List of all displayed row numbers
 // State of info screen: species shown, page(moveset,biome,family,zoom), shiny(0,1,2,3), fem(0,1), zoomImageHeight
-let splashState = { speciesID: -1, page: 0, shiny: 0, fem: 0, zoomImgh: 300 }
+let splashState = { speciesID: -1, page: 0, shiny: 0, fem: 0, back: 0, zoomImgh: 300 }
 // State of header toggles: shiny(0,1,2,3), ability(0,1,2,3), biome(0,1), move(0,1,2,3)
 let headerState = { shiny: 0, ability: 0, biome: 0, move: 0 } 
 let sortState = { sortAttr: 'row', ascending: true, index: 0 }; // State of sorting order
@@ -568,48 +568,56 @@ function showInfoSplash(specID, forcePage=null, forceShiny=null, forceFem=null) 
     if (item.sh < splashState.shiny) splashState.shiny = 1;
     if (forceFem != null) splashState.fem = forceFem;
     if (item?.fe != 1) splashState.fem = 0;
-    const zoomImg = document.createElement('img');
-    zoomImg.src = `images/${item.img}_${splashState.shiny}${(splashState.fem ? 'f' : '')}.png`; 
-    zoomImg.className = "zoom-img";
-    // movesetScrollable.style.height = splashState.zoomImgh + "px"; // Use prev height to prevent jumping
+    const zoomImg = quickElement('img',"hidden");
+    zoomImg.update = () => zoomImg.src = `images/${item.img}_${splashState.shiny}${(splashState.fem?'f':'')}${(splashState.back?'b':'')}.png`;
+    zoomImg.update();
+    movesetScrollable.style.height = splashState.zoomImgh + "px"; // Use prev height to prevent jumping
     factor = (isMobile ? 3:6);
     zoomImg.onload = () => { // Image needs to load before reading dimensions
       zoomImg.style.width  = zoomImg.naturalWidth*factor + "px";
       zoomImg.style.height = zoomImg.naturalHeight*factor + "px";
       splashState.zoomImgh = zoomImg.naturalHeight*factor + 56;
-      // movesetScrollable.style.height = splashState.zoomImgh + "px";
+      movesetScrollable.style.height = splashState.zoomImgh + "px";
+      zoomImg.classList.remove("hidden");
     };
     movesetScrollable.appendChild(zoomImg);
     movesetScrollable.appendChild(document.createElement('br'));
     movesetScrollable.stars = [];
     for (let i = 1; i < 4; i++) { // Create up to 3 shiny stars
       if (item.sh >= i) {
-        const starImg = document.createElement('img'); starImg.className = 'zoom-star';
-        starImg.src = `ui/shiny${(splashState.shiny==i?i:0)}.png`;
+        const starImg = quickElement('img','zoom-star',`ui/shiny${(splashState.shiny==i?i:0)}.png`);
         if (!isMobile) starImg.addEventListener('mouseover', () => starImg.src = `ui/shiny${i}.png`);
         if (!isMobile) starImg.addEventListener('mouseout',  () => starImg.src = `ui/shiny${(splashState.shiny==i?i:0)}.png`);
         starImg.addEventListener('click', () => { // Add click events to all the stars, changing the zoom image
           movesetScrollable.stars.forEach((thisStar) => thisStar.src = 'ui/shiny0.png');
           splashState.shiny = (splashState.shiny==i?0:i);
-          zoomImg.src = `images/${items[splashState.speciesID].img}_${splashState.shiny}${(splashState.fem ? 'f' : '')}.png`;  
           starImg.src = `ui/shiny${(splashState.shiny==i?i:0)}.png`;
+          zoomImg.update();
         });
         movesetScrollable.stars.push(starImg);
         movesetScrollable.appendChild(starImg);
       }
     }
     if (item?.fe == 1) {
-      const femImg = document.createElement('img'); femImg.className = 'zoom-star';
-      femImg.src = `ui/fem${splashState.fem}.png`;
+      const femImg = quickElement('img','zoom-star',`ui/fem${splashState.fem}.png`);
       if (!isMobile) femImg.addEventListener('mouseover', () => femImg.src = `ui/fem1.png`);
       if (!isMobile) femImg.addEventListener('mouseout',  () => femImg.src = `ui/fem${splashState.fem}.png`);
       femImg.addEventListener('click', () => {
         splashState.fem = 1-splashState.fem;
-        zoomImg.src = `images/${item.img}_${splashState.shiny}${(splashState.fem ? 'f' : '')}.png`;
         femImg.src = `ui/fem${splashState.fem}.png`;
+        zoomImg.update();
       });
       movesetScrollable.appendChild(femImg);
     }
+    const rotateButton = quickElement('img','zoom-star',`ui/rotate${splashState.back}.png`);
+    if (!isMobile) rotateButton.addEventListener('mouseover', () => rotateButton.src = `ui/rotate1.png`);
+    if (!isMobile) rotateButton.addEventListener('mouseout',  () => rotateButton.src = `ui/rotate${splashState.back}.png`);
+    rotateButton.addEventListener('click', () => {
+      splashState.back = 1-splashState.back;
+      rotateButton.src = `ui/rotate${splashState.back}.png`;
+      zoomImg.update();
+    });
+    movesetScrollable.appendChild(rotateButton);
     movesetContent.style.width = (isMobile ? '351px':'auto');
   }
   else if (splashState.page == 1) { // Show biomes
@@ -622,7 +630,7 @@ function showInfoSplash(specID, forcePage=null, forceShiny=null, forceFem=null) 
         if (!movesetScrollable.innerHTML) biomeRow.style.marginTop = '4px'; // Add margin if empty
         const biomeLink = document.createElement('a');
         biomeLink.href = `https://wiki.pokerogue.net/biomes:biomes#interactive_map`;  biomeLink.target = '_blank'; // Open in new tab
-        const biomeImg = document.createElement('img');  biomeImg.src = `ui/biomes/${fid}.png`;  biomeImg.className = 'biome-img';
+        const biomeImg = quickElement('img','biome-img',`ui/biomes/${fid}.png`);  
         biomeLink.appendChild(biomeImg);
         const biomeDesc = document.createElement('div'); biomeDesc.innerHTML = `<b>${fidToName[fid]}:</b>`;
         item[fid].forEach(src => {
@@ -633,8 +641,7 @@ function showInfoSplash(specID, forcePage=null, forceShiny=null, forceFem=null) 
           }
         });
         if (!lockedFilters.some((f) => f%fidThreshold[12] == fid)) { // Button to add biome directly to filters
-          const splashButton = document.createElement('div'); splashButton.className = 'splash-button';
-          splashButton.innerHTML = altText[8];  
+          const splashButton = quickElement('div','splash-button',altText[8]);  
           splashButton.addEventListener('click', () => { lockFilter(fid); 
             splashScreen.classList.remove("show"); movesetScreen.classList.remove("show"); });
           biomeDesc.appendChild(document.createElement('br'));
@@ -646,7 +653,7 @@ function showInfoSplash(specID, forcePage=null, forceShiny=null, forceFem=null) 
       }
     });
     movesetScrollable.appendChild(document.createElement('hr'));
-    const splashCostInfo = document.createElement('div');  splashCostInfo.className = 'splash-move-tags';
+    const splashCostInfo = quickElement('div','splash-move-tags');
     const HAtext = ('ha' in item ? `<br>${infoText[4]}: 1 in 8` : '');
     // Info on friendship and candy
     splashCostInfo.innerHTML = `
@@ -662,7 +669,7 @@ function showInfoSplash(specID, forcePage=null, forceShiny=null, forceFem=null) 
       `;
     movesetScrollable.appendChild(splashCostInfo);
   } else { // Show moveset
-    const msHeaderText = document.createElement('div'); msHeaderText.className = 'moveset-row-header';
+    const msHeaderText = quickElement('div','moveset-row-header');
     msHeaderText.innerHTML = `<div>${altText[17]}</div><div>${catToName[2]}</div>
       <div>${altText[5]}</div><div>${altText[6]}</div><div>${altText[7]}</div>`;
     movesetHeader.appendChild(msHeaderText); 
@@ -691,7 +698,7 @@ function showInfoSplash(specID, forcePage=null, forceShiny=null, forceFem=null) 
   }
 }
 function makeMovesetRow(fid, item, table) {
-  const moveRow = document.createElement('div');  moveRow.className = 'moveset-row';
+  const moveRow = quickElement('div','moveset-row');
   const procs = fidToProc[fid-fidThreshold[0]];
   moveRow.innerHTML = `<div style="color:${moveSrcText(item[fid],table)}</div>
     <div style="color:${typeColors[procs[2]]};">${fidToName[fid]}</div>
