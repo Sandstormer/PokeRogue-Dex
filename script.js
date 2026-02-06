@@ -992,16 +992,11 @@ function updateHeader(clickTarget = null, ignoreFlip = false) {
     headerColumns[5].innerHTML = headerState.biome ? `<span style="color:${col.pu};">${infoText[9]}</span>`
       : `${headerNames[5]}<span style="color:${col.dg}; font-size:12px;">${infoText[9]}</span>`;
   }
-  if (headerState.shiny) { // Update the "Shiny" column text
-    headerColumns[1].innerHTML = `<span style="color:${col.pu};">${altText[10]}</span>`;
-    const starImg = document.createElement('img');  starImg.className = 'star-header';
-    starImg.src = `ui/shiny${headerState.shiny}.png`;
-    headerColumns[1].appendChild(starImg);
-    if (headerState.shiny == 3 && !lockedFilters.some(f => f == fidThreshold[10] || f == fidThreshold[10]+1)) {
-      lockFilter(fidThreshold[10]+1,false);
-    }
-  } else {
-    headerColumns[1].innerHTML = `${headerNames[1]}<span style="color:${col.dg}; font-size:12px;">${altText[10]}</span>`;
+  // Update the "Shiny" column text
+  headerColumns[1].innerHTML = ( headerState.shiny ? `<span style="color:${col.pu};">${altText[10]}</span>` : headerNames[1] );
+  headerColumns[1].appendChild(quickElement('img','star-header',`ui/shiny${headerState.shiny}.png`));
+  if (headerState.shiny == 3 && !lockedFilters.some(f => f == fidThreshold[10] || f == fidThreshold[10]+1)) {
+    lockFilter(fidThreshold[10]+1,false);
   }
   if (headerState.ability) { // Update the "Ability" column text
     headerColumns[4].innerHTML = `<span style="color:${col.pu};">${headerNames[4]}</span>`;
