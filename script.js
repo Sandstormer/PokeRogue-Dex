@@ -848,7 +848,7 @@ function displaySuggestions() {
 // Lock a filter *************************
 function lockFilter(newLockFID, clearQuery = true, forceOR = null) {
   if (newLockFID == null || newLockFID < 0 || newLockFID > fidThreshold[fidThreshold.length-1]) return;
-  if (!lockedFilters.some((f) => f == newLockFID)) {
+  if (!lockedFilters.some((f) => f%fidThreshold[12] == newLockFID)) {
     const isExclusion = searchBox.value.startsWith('-')*fidThreshold[12];
     lockedFilters.push(newLockFID+isExclusion); // Add the filter to the locked filters list
     let filterMod = null;
@@ -1149,20 +1149,85 @@ function openLangMenu() {
 openHelpButton.addEventListener('mouseover', () => openHelpButton.src = `ui/helph.png`);
 openHelpButton.addEventListener('mouseout',  () => openHelpButton.src = `ui/help.png` ); 
 openHelpButton.addEventListener('click',     () => openHelpMenu());
-function openHelpMenu() { // Show the instructions
+function openHelpMenu() { // Show the help screen with instructions and options
   helpContent.style.width = '382px';
-  helpContent.innerHTML = helpMenuText;
+  helpContent.innerHTML = '';
+  helpContent.appendChild(quickElement('div','', // First half of instructions
+    `<b>${helpMenuText[0]}</b>
+    <hr>
+    <p style="margin: 1px 0px; font-weight: bold;">${helpMenuText[1]}<br></p>`
+  ));
+  catToName.forEach((thisCat,index) => { // Create clickable buttons for each filter category
+    const catButton = document.createElement('div'); catButton.className = 'splash-button';
+    catButton.style.margin = '3px'; catButton.style.padding = '4px 6px';
+    catButton.innerHTML = thisCat.replace(" ","&nbsp");
+    let thisColor = fidToColor(fidThreshold[index-1]??0)[0]; // Get a nice color for the category name
+    if (thisColor == col.wh) thisColor = fidToColor((fidThreshold[index-1]??0))[1];
+    if (thisColor == col.wh) thisColor = fidToColor((fidThreshold[index-1]??0)+4)[1];
+    if (thisColor == col.ga) thisColor = fidToColor((fidThreshold[index-1]??0)+4)[1];
+    catButton.style.color = thisColor;
+    catButton.addEventListener('click', () => {
+      showFilterCategory(index);
+    });
+    helpContent.appendChild(catButton);
+  });
+  helpContent.appendChild(quickElement('div','', // Second half of instructions
+    `<p style="margin: 8px 0px;">${helpMenuText[2]}<br>
+    <span style="color:rgb(145, 145, 145);">${helpMenuText[3]}</span></p>
+    <hr>
+    <p style="margin: 10px 0px; font-weight: bold;">${helpMenuText[4]}</p>
+    ${helpMenuText[5]}
+    <p style="margin: 10px 0px;">${helpMenuText[6]}<br>
+    <b>${helpMenuText[7]}</b>, 
+    <span style="color:rgb(240, 230, 140); font-weight: bold;">${helpMenuText[8]}</span>, 
+    <span style="color:rgb(140, 130, 240); font-weight: bold;">${helpMenuText[9]}</span></p>
+    ${helpMenuText[10]}<br> 
+    <span style="color:rgb(145, 145, 145);">${helpMenuText[11]}<br>
+    ${helpMenuText[12]}</span>
+    <p style="margin: 10px 0px;">${helpMenuText[13]}<br> 
+    <b>${fidToName[fidThreshold[4]]}</b>, <span style="color:rgb(131, 182, 239);"><b>${fidToName[fidThreshold[4]+1]}</b></span>, <span style="color:rgb(240, 230, 140);"><b>${fidToName[fidThreshold[4]+2]}</b></span>, <span style="color:rgb(239, 131, 131);"><b>${fidToName[fidThreshold[4]+3]}</b></span>, <span style="color:rgb(216, 143, 205);"><b>${fidToName[fidThreshold[4]+4]}</b></span></p>
+    <hr>
+    <p style="margin: 10px 0px; font-weight: bold;">${helpMenuText[14]}
+    <br><span style="color:rgb(145, 145, 145);">${altText[0]}, ${headerNames[4]}, ${headerNames[6]}, ${headerNames[1]}, ${headerNames[2]}</span></p>
+    <p style="margin: 10px 0px;">${helpMenuText[15]}<br>${helpMenuText[16]}<br>${helpMenuText[17]}</p>
+    <hr style="margin-bottom: 10px;">
+    <span style="color:rgb(145, 145, 145); font-size:11px">${helpMenuText[18]}
+    <br>${helpMenuText[19]}: ${gameVersion}&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp${helpMenuText[20]}: ${latestDate}</span><br>`
+  ));
   // Create the button that toggles persistent filters
-  const persistentButton = document.createElement('div'); persistentButton.className = 'splash-button'; 
-  persistentButton.innerHTML = `Persistent Filters (Experimental) - ${persistentState?"ON":"OFF"}`;  
-  persistentButton.style.color = persistentState?col.pu:col.wh;
-  persistentButton.style.fontSize = "12px";
+  const persistentButton = quickElement('div','splash-button',`${helpMenuText[21]}: ${persistentState?"ON":"OFF"}`);  
+  persistentButton.style.color = persistentState?col.pu:col.wh;  persistentButton.style.fontSize = "12px";
   persistentButton.addEventListener('click', () => { 
     persistentState = !persistentState;
     localStorage.setItem("persistentState",persistentState);
-    persistentButton.innerHTML = `Persistent Filters (Experimental) - ${persistentState?"ON":"OFF"}`;  
+    persistentButton.innerHTML = `${helpMenuText[21]}: ${persistentState?"ON":"OFF"}`;  
     persistentButton.style.color = persistentState?col.pu:col.wh;
   });
   helpContent.appendChild(persistentButton);
-  helpScreen.classList.add("show"); // Make the help screen visible
+  // Make the help screen visible
+  helpScreen.classList.add("show");
+}
+function showFilterCategory(index) {
+  splashContent.style.width = '340px';
+  let thisColor = fidToColor(fidThreshold[index-1]??0)[0]; // Get a nice color for the category name
+  if (thisColor == col.ga) thisColor = fidToColor((fidThreshold[index-1]??0)+4)[1];
+  splashContent.innerHTML = `<b>${infoText[10]}: <span style="color:${thisColor}; display:inline;">${catToName[index]}</span></b><hr>`; // Name header
+  possibleFID.slice(fidThreshold[index-1]??0,fidThreshold[index]).forEach(fid => {
+    const splashButton = document.createElement('div'); splashButton.className = 'splash-button';
+    splashButton.style.margin = '5px';
+    splashButton.innerHTML = `<span style="color:${fidToColor(fid)[1]}; display:inline;">${fidToName[fid]}</span>`;
+    splashButton.addEventListener('click', () => {
+      lockFilter(fid); splashScreen.classList.remove("show"); helpScreen.classList.remove("show");
+      // Click tag to see related filters?
+    });
+    splashContent.appendChild(splashButton);
+  });
+  splashScreen.classList.add("show");
+}
+function quickElement(type, className, innerHTML = '') {
+  const newElement = document.createElement(type);
+  newElement.className = className;
+  if (type == "img") newElement.src = innerHTML;
+  else newElement.innerHTML = innerHTML;
+  return newElement;
 }

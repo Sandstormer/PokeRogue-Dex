@@ -2,8 +2,8 @@
 // They are changed automatically by the update script
 // Changes must be made through the updater repository
 headerNames = ['번호','이미지','종','타입','특성','알기술','코스트','합계','HP','공격','방어','특공','특방','스핏'];
-altText = ['기술','일반 특성','숨겨진 특성','패시브 특성','검색','위력','명중률','PP','필터에 추가','기억버섯','이로치','알 기술','레어 알 기술','일반','슈퍼','하이퍼','머신','레벨','진화','알'];
-catToName = ['타입','특성','기술','세대','코스트','알','모드','진화','폼','바이옴','관련','색 다른 이로치','태그'];
+altText = ['기술','일반 특성만','숨겨진 특성만','패시브만 특성','검색','위력','명중률','PP','필터에 추가','기억버섯','색이 다른','알 기술','레어 알 기술','일반','슈퍼','하이퍼','머신','레벨','진화','알'];
+catToName = ['타입','특성','기술','세대','코스트','알 희귀도','모드','진화','폼','바이옴','관련','커스텀 색이 다른','태그'];
 infoText = ['사탕당 친밀도','패시브','코스트 감소','알 구매하기','숨겨진 특성','알 한정','베이비 포켓몬','패러독스 포켓몬','형태 변화','바이옴','선택 필터','## 알 후 감소','레벨로','알로','기술머신으로'];
 biomeText = ['보통','드묾','레어','슈퍼 레어','하이퍼 레어','보스','보통','드묾','레어','슈퍼','하이퍼','새벽','낮','황혼','밤'];
 biomeLongText = [
@@ -14,7 +14,7 @@ biomeLongText = [
 '이 포켓몬은 <b><span style="color:rgb(239, 131, 131);">모든 다른 포켓몬</span></b>을 획득한 후에만 잡을 수 있습니다.<br>일반 알에서는 등장하지 않습니다.',
 '<b>이 형태는 획득할 수 없습니다.</b>'];
 warningText = [
-'색이 다른 포켓몬(이로치)만 사용할 수 있습니다.',
+'커스텀 색이 다른 포켓몬만 표시할 수 있습니다',
 '특성은 일반 특성으로만 제한됩니다.',
 '특성은 숨겨진 특성으로만 제한됩니다.',
 '특성은 패시브 특성으로만 제한됩니다.',
@@ -4536,38 +4536,26 @@ fidToName = [
 '눈 특성',
 '쾌청 특성'
 ];
-helpMenuText = `
-<b>포켓로그용 <span style="color:rgb(140, 130, 240);">빠르고 강력한 검색</span> 사이트입니다.</b>
-<hr>
-<p style="margin: 10px; font-weight: bold;"><span style="color:rgb(140, 130, 240);">검색 창</span> 으로 필터를 추가할 수 있습니다:<br></p>
-<p style="margin: 10px; font-weight: bold;"><span style="color:${typeColors[9]};">${catToName[0]}</span>, 
-<span style="color:${fidToColor(fidThreshold[0])[0]};">${catToName[1]}</span>,
-<span style="color:${fidToColor(fidThreshold[1])[0]};">${catToName[2]}</span>,
-<span style="color:${fidToColor(fidThreshold[2])[0]};">${catToName[3]}</span>,
-<span style="color:${fidToColor(fidThreshold[3])[0]};">${catToName[4]}</span>,
-<span style="color:${fidToColor(fidThreshold[4])[0]};">${catToName[5]}</span>,<br>
-<span style="color:${fidToColor(fidThreshold[5])[1]};">${catToName[6]}</span>,
-<span style="color:${eggTierColors(2)};">${catToName[7]}</span>,
-<span style="color:${fidToColor(fidThreshold[7])[0]};">${headerNames[1]}</span>,
-<span style="color:${fidToColor(fidThreshold[8])[0]};">${catToName[9]}</span></p>
-여러 필터를 조합하여 원하는 결과를 얻으세요. <br>
-<span style="color:rgb(145, 145, 145);">필터를 클릭하여 둘 중 하나와 일치시킬 수 있습니다.</span>
-<hr>
-<p style="margin: 10px; font-weight: bold;">결과를 정렬하려면 <span style="color:rgb(140, 130, 240);">헤더</span> 를 클릭하세요:</p>
-<b>${headerNames[1]}</b> 열은 이로치 포켓몬으로만 제한할 수 있어요.
-<p style="margin: 10px;"><b>${headerNames[4]}</b> 열은 특정 슬롯으로 제한할 수 있습니다:<br>
-<b>주요 특성</b>, 
-<span style="color:rgb(240, 230, 140); font-weight: bold;">숨겨진 특성</span>, 또는 
-<span style="color:rgb(140, 130, 240); font-weight: bold;">패시브</span></p>
-<b>${headerNames[5]}</b>는 <b>${fidToName[fidThreshold[6]]}</b> 및 <span style="color:rgb(240, 230, 140); font-weight: bold;">${fidToName[fidThreshold[6]+1]}</span>로 표시됩니다.<br> 
-<span style="color:rgb(145, 145, 145);">필터링된 기술의 출처도 표시할 수 있습니다.</span>
-<p style="margin: 10px;"><b>${headerNames[6]}</b> 열은 <b>${catToName[7]}</b>의 색상을 표시합니다:<br> 
-<b>${fidToName[fidThreshold[6]]}</b>, <span style="color:rgb(131, 182, 239);"><b>${fidToName[fidThreshold[6]+1]}</b></span>, <span style="color:rgb(240, 230, 140);"><b>${fidToName[fidThreshold[6]+2]}</b></span>, <span style="color:rgb(239, 131, 131);"><b>${fidToName[fidThreshold[6]+3]}</b></span>, <span style="color:rgb(216, 143, 205);"><b>${fidToName[fidThreshold[6]+4]}</b></span></p>
-<hr>
-<p style="margin: 10px;">포켓몬을 <span style="color:rgb(240, 230, 140); font-weight: bold;">고정</span> 하거나, <a href="https://wiki.pokerogue.net/start" target="_blank"><b>위키</b></a> 또는 <span style="color:${fidToColor(fidThreshold[7])[0]}; font-weight: bold;">이로치</span> 확인.</p>
-<p style="margin: 10px;">클릭하면
-<span style="color:rgb(140, 130, 240); font-weight: bold;">${catToName[1]}</span> 또는 
-<span style="color:rgb(140, 130, 240); font-weight: bold;">${catToName[2]}</span> 의 설명을 볼 수 있습니다.</p>
-<hr style="margin-bottom: 10px;">
-<span style="color:rgb(145, 145, 145); font-size:11px">이 사이트는 Sandstorm 이 만들었으며, Misdreavus 가 번역을 도왔습니다. 쿠키를 저장하거나 개인 데이터를 수집하지 않습니다. 이미지와 게임 데이터는 PokeRogue GitHub 에서 제공되며, 자산 권리는 원 제작자에게 있습니다.</span>
-`;
+helpMenuText = [
+`포켓로그용 <span style="color:rgb(140, 130, 240);">빠르고 강력한 검색</span> 사이트입니다`,
+`<span style="color:rgb(140, 130, 240);">검색 창</span> 으로 필터를 추가할 수 있습니다:`,
+`여러 필터를 조합하여 원하는 결과를 얻으세요`,
+`잠긴 필터 사이를 클릭하여 "OR" 조건을 사용하세요`,
+`결과를 정렬하려면 <span style="color:rgb(140, 130, 240);">헤더</span> 를 클릭하세요:`,
+`<b>${headerNames[1]}</b> 열은 색이 다른 포켓몬만 표시할 수 있어요`,
+`<b>${headerNames[4]}</b> 열은 특정 슬롯으로 제한할 수 있습니다:`,
+`주요 특성`,
+`${infoText[4]}`,
+`${infoText[1]}`,
+`<b>${headerNames[5]}</b>는 <b>${fidToName[fidThreshold[4]]}</b> 및 <span style="color:rgb(240, 230, 140); font-weight: bold;">${fidToName[fidThreshold[4]+1]}</span>로 표시됩니다.`,
+`헤더를 클릭하여 <b>${infoText[9]}</b>(으)로 전환하세요`,
+`이 열에는 <b>필터된 ${altText[0]}/${infoText[9]}</b>도 표시됩니다`,
+`<b>${catToName[4]}</b> 열은 <b>${catToName[5]}</b>의 색상을 표시합니다:`,
+`항목을 클릭해 상세 정보를 확인하세요:`,
+`<b>${headerNames[2]}</b>를 클릭하여 전체 기술 구성을 확인하세요.`,
+`<b>${altText[5]}</b>의 색상은 <span style="color:${col.or}; font-weight: bold;">물리</span> 또는 <span style="color:${col.bl}; font-weight: bold;">특수</span> 데미지를 나타냅니다`,
+`<b>${altText[6]}</b>의 색상은 <span style="color:${col.re}; font-weight: bold;">다중 대상</span> 기술을 나타냅니다`,
+`이 사이트는 Sandstorm 이 만들었으며, Misdreavus 가 번역을 도왔습니다. 쿠키를 저장하거나 개인 데이터를 수집하지 않습니다. 이미지와 게임 데이터는 PokeRogue GitHub 에서 제공되며, 자산 권리는 원 제작자에게 있습니다.`,
+`게임 버전`,
+`날짜`,
+`필터 유지`,];

@@ -4536,43 +4536,26 @@ fidToName = [
 'Snow Ability',
 'Sun Ability'
 ];
-helpMenuText = `
-<b>This is a <span style="color:rgb(140, 130, 240);">fast and powerful search</span> for PokeRogue</b>
-<hr>
-<p style="margin: 10px; font-weight: bold;">Use the <span style="color:rgb(140, 130, 240);">Search Bar</span> to add filters:<br></p>
-<p style="margin: 10px; font-weight: bold;"><span style="color:${typeColors[9]};">${catToName[0]}</span>, 
-<span style="color:${fidToColor(fidThreshold[0])[0]};">${catToName[1]}</span>,
-<span style="color:${fidToColor(fidThreshold[1])[0]};">${catToName[2]}</span>,
-<span style="color:${fidToColor(fidThreshold[2])[0]};">${catToName[3]}</span>,
-<span style="color:${fidToColor(fidThreshold[3])[0]};">${catToName[4]}</span>,
-<span style="color:${fidToColor(fidThreshold[4])[0]};">${catToName[5]}</span>,<br>
-<span style="color:${fidToColor(fidThreshold[5])[1]};">${catToName[6]}</span>,
-<span style="color:${eggTierColors(2)};">${catToName[7]}</span>,
-<span style="color:${fidToColor(fidThreshold[7])[0]};">${headerNames[1]}</span>, or
-<span style="color:${fidToColor(fidThreshold[8])[0]};">${catToName[9]}</span></p>
-Combine multiple filters to get what you want <br>
-<span style="color:rgb(145, 145, 145);">Click between locked filters to use the "OR" condition</span>
-<hr>
-<p style="margin: 10px; font-weight: bold;">Click the <span style="color:rgb(140, 130, 240);">Headers</span> to sort results:</p>
-Click the <b>${headerNames[1]}</b> column to see only shiny variants
-<p style="margin: 10px;">Click the <b>${headerNames[4]}</b> column to restrict to one slot:<br>
-<b>Main Abilities</b>, 
-<span style="color:rgb(240, 230, 140); font-weight: bold;">Hidden Ability</span>, or 
-<span style="color:rgb(140, 130, 240); font-weight: bold;">Passive</span></p>
-<b>${headerNames[5]}</b> are shown as <b>${fidToName[fidThreshold[6]]}</b> and <span style="color:rgb(240, 230, 140); font-weight: bold;">${fidToName[fidThreshold[6]+1]}</span><br> 
-<span style="color:rgb(145, 145, 145);">Click the header to switch to <b>${infoText[9]}</b> instead<br>
-This column will also show <b>filtered ${altText[0]}/${infoText[9]}</b></span>
-<p style="margin: 10px;"><b>${headerNames[6]}</b> column shows rarity color of <b>${catToName[7]}</b>:<br> 
-<b>${fidToName[fidThreshold[6]]}</b>, <span style="color:rgb(131, 182, 239);"><b>${fidToName[fidThreshold[6]+1]}</b></span>, <span style="color:rgb(240, 230, 140);"><b>${fidToName[fidThreshold[6]+2]}</b></span>, <span style="color:rgb(239, 131, 131);"><b>${fidToName[fidThreshold[6]+3]}</b></span>, <span style="color:rgb(216, 143, 205);"><b>${fidToName[fidThreshold[6]+4]}</b></span></p>
-<hr>
-<p style="margin: 10px; font-weight: bold;">Click on a <span style="color:rgb(140, 130, 240);">Pokemon</span> entry to see details:
-<br><span style="color:rgb(145, 145, 145);">${altText[0]}, ${headerNames[4]}, ${headerNames[6]}, Image, Pin, ${headerNames[2]}</span></p>
-<p style="margin: 10px;">
-Click a Pokemon's <b>Name</b> to see their full moveset.<br>
-Color of <b>Pow</b> shows <span style="color:${col.or}; font-weight: bold;">Physical</span> or <span style="color:${col.bl}; font-weight: bold;">Special</span> damage<br>
-Color of <b>Acc</b> shows <span style="color:${col.re}; font-weight: bold;">Multi-target</span> moves
-</p>
-<hr style="margin-bottom: 10px;">
-<span style="color:rgb(145, 145, 145); font-size:11px">This site was created by Sandstorm, with a lot of hard work. I do not store any cookies or collect any personal data. Images and game data are from the PokeRogue GitHub. All asset rights are retained by their original creators.
-<br>Game Version: ${gameVersion}&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbspDate: ${latestDate}</span>
-`;
+helpMenuText = [
+`This is a <span style="color:rgb(140, 130, 240);">fast and powerful search</span> for PokeRogue`,
+`Use the <span style="color:rgb(140, 130, 240);">Search Bar</span> to add filters:`,
+`Combine multiple filters to get what you want`,
+`Click between locked filters to use the "OR" condition`,
+`Click the <span style="color:rgb(140, 130, 240);">Headers</span> to sort results:`,
+`Click the <b>${headerNames[1]}</b> column to see shiny variants`,
+`Click the <b>${headerNames[4]}</b> column to restrict to one slot:`,
+`Main Abilities`,
+`${infoText[4]}`,
+`${infoText[1]}`,
+`<b>${headerNames[5]}</b> are shown as <b>${fidToName[fidThreshold[4]]}</b> and <span style="color:rgb(240, 230, 140); font-weight: bold;">${fidToName[fidThreshold[4]+1]}</span>`,
+`Click the header to switch to <b>${infoText[9]}</b> instead`,
+`That column will also show <b>filtered ${altText[0]}/${infoText[9]}</b>`,
+`<b>${catToName[4]}</b> column shows rarity color of <b>${catToName[5]}</b>:`,
+`Click on an entry to see details for:`,
+`Click a <b>${headerNames[2]}</b> to see their full moveset.`,
+`Color of <b>${altText[5]}</b> shows <span style="color:${col.or}; font-weight: bold;">Physical</span> or <span style="color:${col.bl}; font-weight: bold;">Special</span> damage`,
+`Color of <b>${altText[6]}</b> shows <span style="color:${col.re}; font-weight: bold;">Multi-Target</span> moves`,
+`This site was created by Sandstorm, with a lot of hard work. I do not store any cookies or collect any personal data. Images and game data are from the PokeRogue GitHub. All asset rights are retained by their original creators.`,
+`Game Version`,
+`Date`,
+`Persistent Filters`,];

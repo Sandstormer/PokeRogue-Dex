@@ -4536,36 +4536,26 @@ fidToName = [
 'Talent Neige',
 'Talent Soleil'
 ];
-helpMenuText = `
-<b><span style="color:rgb(140, 130, 240);">Recherche rapide et puissante</span> pour PokeRogue</b>
-<hr>
-<p style="margin: 10px; font-weight: bold;">Ajoutez des filtres via la <span style="color:rgb(140, 130, 240);">barre de recherche</span>:<br></p>
-<p style="margin: 10px; font-weight: bold;"><span style="color:${typeColors[9]};">${catToName[0]}</span>, 
-<span style="color:${fidToColor(fidThreshold[0])[0]};">${catToName[1]}</span>,
-<span style="color:${fidToColor(fidThreshold[1])[0]};">${catToName[2]}</span>,
-<span style="color:${fidToColor(fidThreshold[2])[0]};">${catToName[3]}</span>,
-<span style="color:${fidToColor(fidThreshold[3])[0]};">${catToName[4]}</span>,
-<span style="color:${fidToColor(fidThreshold[4])[0]};">${catToName[5]}</span>,<br>
-<span style="color:${fidToColor(fidThreshold[5])[1]};">${catToName[6]}</span>,
-<span style="color:${eggTierColors(2)};">${catToName[7]}</span>,
-<span style="color:${fidToColor(fidThreshold[7])[0]};">${headerNames[1]}</span>, ou
-<span style="color:${fidToColor(fidThreshold[8])[0]};">${catToName[9]}</span></p>
-Combinez plusieurs filtres pour affiner la recherche <br>  
-<span style="color:rgb(145, 145, 145);">Cliquez entre eux pour correspondre à l’un ou l’autre</span>
-<hr>
-<p style="margin: 10px; font-weight: bold;">Cliquez sur les <span style="color:rgb(140, 130, 240);">Entêtes</span> pour trier les résultats</p>
-<b>Chromatique</b> peut filtrer les variantes chromatique
-<p style="margin: 10px;"><b>${headerNames[4]}</b> peut filtrer un seul slot de talents:<br>
-<b>Talents principaux</b>,
-<span style="color:rgb(240, 230, 140); font-weight: bold;">Talent caché</span>, ou
-<span style="color:rgb(140, 130, 240); font-weight: bold;">Passif</span></p>
-<b>${headerNames[5]}</b> affichées comme <b>${fidToName[fidThreshold[6]]}</b> et <span style="color:rgb(240, 230, 140); font-weight: bold;">${fidToName[fidThreshold[6]+1]}</span><br>
-<span style="color:rgb(145, 145, 145);">Peut aussi afficher la source des mouvements filtrés</span>
-<p style="margin: 10px;"><b>${headerNames[6]}</b> affiche la couleur de <b>${catToName[7]}</b>:<br>
-<b>${fidToName[fidThreshold[6]]}</b>, <span style="color:rgb(131, 182, 239);"><b>${fidToName[fidThreshold[6]+1]}</b></span>, <span style="color:rgb(240, 230, 140);"><b>${fidToName[fidThreshold[6]+2]}</b></span>, <span style="color:rgb(239, 131, 131);"><b>${fidToName[fidThreshold[6]+3]}</b></span>, <span style="color:rgb(216, 143, 205);"><b>${fidToName[fidThreshold[6]+4]}</b></span></p>
-<hr>
-<p style="margin: 10px;">Cliquez pour <span style="color:rgb(240, 230, 140); font-weight: bold;">Épingler</span>, ou voir <a href="https://wiki.pokerogue.net/start" target="_blank"><b>Wiki</b></a> ou <span style="color:${fidToColor(fidThreshold[7])[0]}; font-weight: bold;">Variantes</span></p>
-<p style="margin: 10px;">Cliquez un <span style="color:rgb(140, 130, 240); font-weight: bold;">${catToName[1]}</span> ou <span style="color:rgb(140, 130, 240); font-weight: bold;">${catToName[2]}</span> pour descriptions</p>
-<hr style="margin-bottom: 10px;">
-<span style="color:rgb(145, 145, 145); font-size:11px">Site créé par Sandstorm, et traduit de l'anglais. Aucune données personnelles collectées. Les images et données proviennent du Github de PokéRogue. Tous droits sont réservés à leurs créateurs respectifs.</span>
-`;
+helpMenuText = [
+`<span style="color:rgb(140, 130, 240);">Recherche rapide et puissante</span> pour PokeRogue`,
+`Ajoutez des filtres via la <span style="color:rgb(140, 130, 240);">barre de recherche</span>:`,
+`Combinez plusieurs filtres pour affiner la recherche`,
+`Cliquez entre eux pour correspondre à l’un ou l’autre`,
+`Cliquez sur les <span style="color:rgb(140, 130, 240);">Entêtes</span> pour trier les résultats:`,
+`Cliquez <b>${headerNames[1]}</b> pour voir les variantes chromatique`,
+`<b>${headerNames[4]}</b> peut filtrer un seul slot de talents:`,
+`Talents principaux`,
+`${infoText[4]}`,
+`${infoText[1]}`,
+`<b>${headerNames[5]}</b> affichées comme <b>${fidToName[fidThreshold[4]]}</b> et <span style="color:rgb(240, 230, 140); font-weight: bold;">${fidToName[fidThreshold[4]+1]}</span>`,
+`Cliquez sur l’en-tête pour passer à <b>${infoText[9]}</b>`,
+`Affichera également <b>${altText[0]}/${infoText[9]} filtré</b>`,
+`<b>${catToName[4]}</b> montre la couleur de <b>Rareté de ${catToName[5]}</b>:`,
+`Cliquez sur une entrée pour voir les détails de:`,
+`Cliquez sur <b>${headerNames[2]}</b> pour voir toutes ses capacités.`,
+`Couleur de <b>${altText[6]}</b> indique les attaques <span style="color:${col.re}; font-weight: bold;">Multi-Cibles</span>`,
+`<b>${altText[5]}</b> indique des dégâts <span style="color:${col.or}; font-weight: bold;">Physiques</span> ou <span style="color:${col.bl}; font-weight: bold;">Spéciaux</span>`,
+`Site créé par Sandstorm, et traduit de l’anglais. Aucune donnée personnelles collectées. Les images et données proviennent du GitHub de PokéRogue. Tous droits sont réservés à leurs créateurs respectifs.`,
+`Version du Jeu`,
+`Date`,
+`Filtres Persistants`,];

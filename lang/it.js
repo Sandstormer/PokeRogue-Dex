@@ -4,7 +4,7 @@
 headerNames = ['N°','Immagine','Nome','Tipo','Abilità','Mosse Uovo','Costo','Tot','PS','Att','Dif','ASp','DSp','Vel'];
 altText = ['Mosse','Principale','Speciale','Passiva','Cerca','Pot','Prec','PP','Aggiungi ai filtri','Memoria','Crom.','Mossa Uovo','Mossa Uovo Rara','Comuni','Mega','Ultra','MT','L.','Evo','Uova'];
 catToName = ['Tipo','Abilità','Mossa','Gen','Costo','Uova','Modalità','Evoluzione','Forma','Bioma','Relativo a','Varianti Cromatiche','Etichetta'];
-infoText = ['Amicizia per Caramella','Passiva','Riduzione di Costo','Costi di un Uovo','Abilità Nascosta','Solo da Uovo','Solo Baby','Pokémon Paradosso','Cambio Forma','Biomi','Filtri','Ridotto dopo ## uova','per Livello','da Uovo','per MT'];
+infoText = ['Amicizia per Caramella','Passiva','Riduzione di Costo','Costi di un Uovo','Abilità Speciale','Solo da Uovo','Solo Baby','Pokémon Paradosso','Cambio Forma','Biomi','Filtri','Ridotto dopo ## uova','per Livello','da Uovo','per MT'];
 biomeText = ['Comune','Non Comune','Raro','Super Raro','Ultra Raro','Boss','Com.','NC','Raro','SR','UR','Alba','Giorno','Tramonto','Notte'];
 biomeLongText = [
 '<b>Questa forma è disponibile solo tramite <span style="color:rgb(140, 130, 240);">Cambio di Forma</span>.</b> Altre forme possono essere incontrate nel bioma mostrato.<br>',
@@ -4536,33 +4536,26 @@ fidToName = [
 'Abilità Neve',
 'Abilità Sole'
 ];
-helpMenuText = `
-<b>Un <span style="color:rgb(140, 130, 240);">potente strumento di ricerca</span> per PokéRogue</b>
-<hr>
-<p style="margin: 10px; font-weight: bold;">Usa la <span style="color:rgb(140, 130, 240);">Barra di Ricerca</span> per aggiungere filtri:<br></p>
-Combina diversi filtri per ottenere ciò che vuoi <br>
-<span style="color:rgb(145, 145, 145);">Clicca tra i filtri per usare la condizione "OR"</span>
-<hr>
-<p style="margin: 10px; font-weight: bold;">Clicca le <span style="color:rgb(140, 130, 240);">Intestazioni</span> per ordinare i risultati:</p>
-Clicca su <b>${headerNames[1]}</b> per vedere le varianti cromatiche
-<p style="margin: 10px;">Clicca su <b>${headerNames[4]}</b> per restringere solo a un tipo:<br>
-<b>Abilità Principali</b>, 
-<span style="color:rgb(240, 230, 140); font-weight: bold;">Abilità Speciale</span>, o 
-<span style="color:rgb(140, 130, 240); font-weight: bold;">Passiva</span></p>
-<b>${headerNames[5]}</b> sono mostrate come <b>${fidToName[fidThreshold[6]]}</b> e <span style="color:rgb(240, 230, 140); font-weight: bold;">${fidToName[fidThreshold[6]+1]}</span><br> 
-<span style="color:rgb(145, 145, 145);">Clicca l’intestazione per passare ai <b>${infoText[9]}</b><br>
-Questa colonna mostrerà anche <b>filtrati ${altText[0]}/${infoText[9]}</b></span>
-<p style="margin: 10px;"><b>${headerNames[6]}</b> indica la rarità delle <b>${catToName[7]}</b>:<br>
-<b>${fidToName[fidThreshold[6]]}</b>, <span style="color:rgb(131, 182, 239);"><b>${fidToName[fidThreshold[6]+1]}</b></span>, <span style="color:rgb(240, 230, 140);"><b>${fidToName[fidThreshold[6]+2]}</b></span>, <span style="color:rgb(239, 131, 131);"><b>${fidToName[fidThreshold[6]+3]}</b></span>, <span style="color:rgb(216, 143, 205);"><b>${fidToName[fidThreshold[6]+4]}</b></span></p>
-<hr>
-<p style="margin: 10px; font-weight: bold;">Clicca su un <span style="color:rgb(140, 130, 240);">Pokémon</span> per vederne i dettagli:
-<span style="color:rgb(145, 145, 145);">${altText[0]}, ${headerNames[4]}, ${headerNames[6]}, Immagine, Fissa, ${headerNames[2]}</span></p>
-<p style="margin: 10px;">
-Clicca sul <b>Nome</b> per vedere tutte le mosse.<br>
-Il colore di <b>Pot</b> indica <span style="color:${col.or}; font-weight: bold;">Fisico</span> o <span style="color:${col.bl}; font-weight: bold;">Speciale</span> danno<br>
-Il colore di <b>Prec</b> indica <span style="color:${col.re}; font-weight: bold;">le mosse multicolpo</span></p>
-</p>
-<hr style="margin-bottom: 10px;">
-<span style="color:rgb(145, 145, 145); font-size:11px">Questo sito è stato creato da Sandstorm e tradotto in italiano con un po’ di aiuto. Non memorizzo cookie né raccolgo dati personali. Le immagini e i dati di gioco provengono dal GitHub di PokeRogue. Tutti i diritti sugli asset appartengono ai rispettivi creatori originali.
-<br>Versione del gioco: ${gameVersion}&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbspData: ${latestDate}</span>
-`;
+helpMenuText = [
+`Un <span style="color:rgb(140, 130, 240);">potente strumento di ricerca</span> per PokéRogue`,
+`Usa la <span style="color:rgb(140, 130, 240);">Barra di Ricerca</span> per aggiungere filtri:`,
+`Combina diversi filtri per ottenere ciò che vuoi`,
+`Clicca tra i filtri per usare la condizione "OR"`,
+`Clicca le <span style="color:rgb(140, 130, 240);">Intestazioni</span> per ordinare i risultati:`,
+`Clicca su <b>${headerNames[1]}</b> per vedere le varianti cromatiche`,
+`Clicca su <b>${headerNames[4]}</b> per restringere solo a un tipo:`,
+`Abilità Principali`,
+`${infoText[4]}`,
+`${infoText[1]}`,
+`<b>${headerNames[5]}</b> sono mostrate come <b>${fidToName[fidThreshold[4]]}</b> e <span style="color:rgb(240, 230, 140); font-weight: bold;">${fidToName[fidThreshold[4]+1]}</span>`,
+`Clicca l’intestazione per passare ai <b>${infoText[9]}</b>`,
+`Questa colonna mostrerà anche <b>filtrati ${altText[0]}/${infoText[9]}</b>`,
+`<b>${catToName[4]}</b> indica la rarità delle <b>${catToName[5]}</b>:`,
+`Clicca su una voce per vedere i dettagli di:`,
+`Clicca su un <b>${headerNames[2]}</b> per vedere tutte le mosse.`,
+`Il colore di <b>Pot</b> indica <span style="color:${col.or}; font-weight: bold;">Fisico</span> o <span style="color:${col.bl}; font-weight: bold;">Speciale</span> danno`,
+`Il colore di <b>Prec</b> indica <span style="color:${col.re}; font-weight: bold;">le Mosse Multicolpo</span>`,
+`Questo sito è stato creato da Sandstorm e tradotto in italiano con un po’ di aiuto. Non memorizzo cookie né raccolgo dati personali. Le immagini e i dati di gioco provengono dal GitHub di PokeRogue. Tutti i diritti sugli asset appartengono ai rispettivi creatori originali.`,
+`Versione del Gioco`,
+`Data`,
+`Filtri persistenti`,];
