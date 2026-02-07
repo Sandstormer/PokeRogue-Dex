@@ -751,7 +751,7 @@ function showDescSplash(fid) { // Create the ability/move details splash *******
       const tagColor = (index in tagColors ? ` style="color:${tagColors[index]};"` : '');
       if (index == 44) thisDesc += `<br><span style="color:${col.ga}; font-size:12px;">35% / 35% / 15% / 15%</span>`;
       if (thisProcs[1].includes(index)) splashMoveTags.innerHTML += `<p${tagColor}>${thisDesc}</p>`;
-      if (index == 2) { // Show procs after targets
+      if (index == 2) { // Show procs right after targets (first two tags)
         thisProcs[0].forEach((thisProc) => { // Procs for stat boost, status, flinch, etc.
           const procChance = ((thisProc[0]>0)?`${thisProc[0]}% `:'');
           const procStages = ((thisProc[2]=='0')?'':` ${(thisProc[0]==-2?'× ':(thisProc[2]>0?'+':''))}${thisProc[2]}${thisProc[0]==-3?'%':''}`);
