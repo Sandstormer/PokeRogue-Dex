@@ -399,9 +399,8 @@ function renderMoreItems() { // Create each list item, with columns of info ****
     const abilityColumn = document.createElement('div'); abilityColumn.className = 'item-column';
     ['a1','a2','ha','pa'].forEach((name) => {
       if (name in item) {
-        const clickableRow = document.createElement('div');  clickableRow.className = 'clickable-name';
+        const clickableRow = quickElement('div','clickable-name',fidToName[item[name]]);
         clickableRow.style.color = abToColor(name);
-        clickableRow.innerHTML = fidToName[item[name]];
         clickableRow.addEventListener('click', () => showDescSplash(item[name]));
         abilityColumn.appendChild(clickableRow); 
       }
@@ -642,8 +641,7 @@ function showInfoSplash(specID, forcePage=null, forceShiny=null, forceFem=null) 
         });
         if (!lockedFilters.some((f) => f%fidThreshold[12] == fid)) { // Button to add biome directly to filters
           const splashButton = quickElement('div','splash-button',altText[8]);  
-          splashButton.addEventListener('click', () => { lockFilter(fid); 
-            splashScreen.classList.remove("show"); movesetScreen.classList.remove("show"); });
+          splashButton.addEventListener('click', () => { lockFilter(fid); closeAllOverlays(); });
           biomeDesc.appendChild(document.createElement('br'));
           biomeDesc.appendChild(splashButton);
         }
@@ -766,8 +764,7 @@ function showDescSplash(fid) { // Create the ability/move details splash *******
   if (!lockedFilters.some((f) => f%fidThreshold[12] == fid)) { // Button to add ability/move directly to filters
     const splashButton = document.createElement('div'); splashButton.className = 'splash-button'; 
     splashButton.innerHTML = altText[8];  
-    splashButton.addEventListener('click', () => { lockFilter(fid); 
-      splashScreen.classList.remove("show"); movesetScreen.classList.remove("show"); });
+    splashButton.addEventListener('click', () => { lockFilter(fid); closeAllOverlays(); });
     splashContent.appendChild(splashButton);
   }
   splashScreen.classList.add("show");
@@ -1058,9 +1055,7 @@ document.addEventListener('keydown', (event) => { // All key press events
   if (!ignoredKeys.includes(event.key)) { // Ignore certain key presses
     // Ignore all key presses if 'Ctrl' is held, except when pasting
     if (!event.ctrlKey || event.code == "KeyV") {
-      if (movesetScreen.classList.contains("show")) movesetScreen.classList.remove("show");
-      if (splashScreen.classList.contains("show"))  splashScreen.classList.remove("show");
-      if (helpScreen.classList.contains("show"))    helpScreen.classList.remove("show");
+      closeAllOverlays();
       searchBox.focus(); // Focus the search box on any key press
     }
   }
@@ -1140,7 +1135,7 @@ function openLangMenu() {
     thisLangRow.addEventListener('click', () => {
       localStorage.setItem("preferredLang", thisLang);
       loadAndApplyLanguage(thisLang);
-      splashScreen.classList.remove("show");
+      closeAllOverlays();
     });
     if (thisLang != 'en') splashContent.appendChild(document.createElement('br'));
     splashContent.appendChild(thisLangRow);
@@ -1169,7 +1164,7 @@ function openHelpMenu() { // Show the help screen with instructions and options
     if (thisColor == col.ga) thisColor = fidToColor((fidThreshold[index-1]??0)+4)[1];
     catButton.style.color = thisColor;
     catButton.addEventListener('click', () => {
-      showFilterCategory(index);
+      showFiltersInCategory(index);
     });
     helpContent.appendChild(catButton);
   });
@@ -1209,22 +1204,40 @@ function openHelpMenu() { // Show the help screen with instructions and options
   // Make the help screen visible
   helpScreen.classList.add("show");
 }
-function showFilterCategory(index) {
-  splashContent.style.width = '340px';
+function showFiltersInCategory(index) {
   let thisColor = fidToColor(fidThreshold[index-1]??0)[0]; // Get a nice color for the category name
   if (thisColor == col.ga) thisColor = fidToColor((fidThreshold[index-1]??0)+4)[1];
-  splashContent.innerHTML = `<b>${infoText[10]}: <span style="color:${thisColor}; display:inline;">${catToName[index]}</span></b><hr>`; // Name header
-  possibleFID.slice(fidThreshold[index-1]??0,fidThreshold[index]).forEach(fid => {
-    const splashButton = document.createElement('div'); splashButton.className = 'splash-button';
+  movesetScrollable.innerHTML = `<div style="margin-top: 5px"><b>${infoText[10]}: <span style="color:${thisColor}; display:inline;">${catToName[index]}</span></b></div><hr>`; // Name header
+  const tagList = quickElement('div','splash-move-tags');
+  possibleFID.slice(fidThreshold[index-1]??0,fidThreshold[index]).forEach(fid => { // For each filter in category
+    const splashButton = quickElement('div','splash-button');
     splashButton.style.margin = '5px';
-    splashButton.innerHTML = `<span style="color:${fidToColor(fid)[1]}; display:inline;">${fidToName[fid]}</span>`;
-    splashButton.addEventListener('click', () => {
-      lockFilter(fid); splashScreen.classList.remove("show"); helpScreen.classList.remove("show");
-      // Click tag to see related filters?
-    });
-    splashContent.appendChild(splashButton);
+    let thisColor = fidToColor(fid)[1]; // Show the standard category color
+    if (index == 2) thisColor = typeColors[fidToProc[fid-fidThreshold[0]][2]]; // Show move type color
+    splashButton.innerHTML = `<span style="color:${thisColor}; display:inline;">${fidToName[fid]}</span>`;
+    if (index < 12) { // For non-tag filters, lock the filter upon click
+      splashButton.addEventListener('click', () => { lockFilter(fid); closeAllOverlays(); });
+    } else { // For tag filters, click to see related filters
+      splashButton.addEventListener('click', () => {
+        tagList.innerHTML = '<hr>'; tagList.style.marginBottom = "-10px";
+        const tagName = quickElement('p','',`<span style="color:${fidToColor(fid)[0]}; display:inline;">${catToName[fidToCategory(fid)]}: <span style="color:${fidToColor(fid)[1]}; display:inline;">${fidToName[fid]}</span></span>`);
+        const splashButton = quickElement('div','splash-button',altText[8]); // Show button to lock
+        splashButton.addEventListener('click', () => { lockFilter(fid); closeAllOverlays(); });
+        tagList.append(tagName, splashButton);
+        tagToFID[fid].forEach(f => {
+          const clickableRow = quickElement('p','clickable-name',`<p>${fidToName[f]}</p>`);
+          clickableRow.addEventListener('click', () => showDescSplash(f));
+          tagList.appendChild(clickableRow);
+        });
+      });
+    }
+    movesetScrollable.appendChild(splashButton);
   });
-  splashScreen.classList.add("show");
+  movesetScrollable.appendChild(tagList);
+  movesetScreen.classList.add("show");
+}
+function closeAllOverlays() {
+  [splashScreen,helpScreen,movesetScreen].forEach(s => s.classList.remove("show"));
 }
 function quickElement(type, className, innerHTML = '') {
   const newElement = document.createElement(type);
