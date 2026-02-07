@@ -1,7 +1,7 @@
 // Main script for handling all functionality
 // Some variables are imported from other scripts
 // pokedex_data.js: items
-// filters_global.js: typeColors, fidThreshold, fidToProc
+// filter_data.js: typeColors, fidThreshold, fidToProc
 // lang/en.js: headerNames, altText, catToName, infoText, biomeText, biomeLongText,
 //             warningText, procTodesc, tagToDesc, fidToDesc, speciesNames, fidToName, helpMenuText
     
@@ -35,8 +35,8 @@ const moveCatColor = [col.or,col.bl,col.wh];
 const tmColors = [col.wh,col.bl,col.ye];
 const flipStats = {bst:'bst',hp:'spe',atk:'spd',def:'spa',spa:'def',spd:'atk',spe:'hp'};
 const REMchance = [16,12,6,6,3];
-let increment = 10;     // Number of items to load at a time
-let renderLimit = 0;    // This value is updated when scrolling down (starts at 0)
+let increment = 10;  // Number of items to load at a time
+let renderLimit = 0; // This value is updated when scrolling down (starts at 0)
 let toShowMovesBiomes = []; // Filtered moves/biomes to show sources
 let filterToEnter = null; // Filter to apply when hitting Enter
 let tabSelect = null;     // Filter that is tab selected
@@ -399,9 +399,10 @@ function renderMoreItems() { // Create each list item, with columns of info ****
     const abilityColumn = document.createElement('div'); abilityColumn.className = 'item-column';
     ['a1','a2','ha','pa'].forEach((name) => {
       if (name in item) {
-        const clickableRow = quickElement('div','clickable-name',fidToName[item[name]]);
-        clickableRow.style.color = abToColor(name);
-        clickableRow.addEventListener('click', () => showDescSplash(item[name]));
+        const fid = item[name];
+        const clickableRow = quickElement('div','clickable-name',fidToName[fid]);
+        clickableRow.style.color = abToColor(name, fid);
+        clickableRow.addEventListener('click', () => showDescSplash(fid));
         abilityColumn.appendChild(clickableRow); 
       }
     });
@@ -793,10 +794,12 @@ function fidToColor(fid) {
   if (fid < fidThreshold[11])   return [col.cy, col.wh];
   else return [col.ga, col.or];
 }
-function abToColor(src) {
-  if (src == 'ha') return ([0,2].includes(headerState.ability) ? col.ye:col.dg)
-  if (src == 'pa') return ([0,3].includes(headerState.ability) ? col.pu:col.ga)
-  return ([0,1].includes(headerState.ability) ? col.wh:col.ga)
+function abToColor(src, fid) {
+  const tagFilters = lockedFilters.filter(f => f >= fidThreshold[11] && f < fidThreshold[12]);
+  const isLit = (tagFilters.length ? tagFilters.some(t => tagToFID[t].some(f => f == fid)) : true );
+  if (src == 'ha') return ([0,2].includes(headerState.ability) && isLit ? col.ye:col.dg);
+  if (src == 'pa') return ([0,3].includes(headerState.ability) && isLit ? col.pu:col.ga);
+  return ([0,1].includes(headerState.ability) && isLit ? col.wh:col.ga);
 }
 function eggTierColors(fid) {
   if (fid >= fidThreshold[4]) fid -= fidThreshold[4];
@@ -1060,7 +1063,7 @@ document.addEventListener('keydown', (event) => { // All key press events
     }
   }
   // Hit left/right to cycle moveset splash
-  if (movesetScreen.classList.contains('show') && !splashScreen.classList.contains("show")) {
+  if (movesetScreen.classList.contains('show') && !splashScreen.classList.contains("show") && !helpScreen.classList.contains("show")) {
     if (event.key == "ArrowLeft") changeMoveset(-1);
     if (event.key == "ArrowRight") changeMoveset(1);
   }
@@ -1205,6 +1208,7 @@ function openHelpMenu() { // Show the help screen with instructions and options
   helpScreen.classList.add("show");
 }
 function showFiltersInCategory(index) {
+  movesetHeader.innerHTML = '';
   let thisColor = fidToColor(fidThreshold[index-1]??0)[0]; // Get a nice color for the category name
   if (thisColor == col.ga) thisColor = fidToColor((fidThreshold[index-1]??0)+4)[1];
   movesetScrollable.innerHTML = `<div style="margin-top: 5px"><b>${infoText[10]}: <span style="color:${thisColor}; display:inline;">${catToName[index]}</span></b></div><hr>`; // Name header
