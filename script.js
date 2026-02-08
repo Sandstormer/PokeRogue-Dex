@@ -31,8 +31,9 @@ const col = {pu:'rgb(140, 130, 240)', wh:'rgb(255, 255, 255)', ga:'rgb(145, 145,
              bl:'rgb(131, 182, 239)', ye:'rgb(240, 230, 140)', re:'rgb(239, 131, 131)', pi:'rgb(216, 143, 205)',
              ge:'rgb(143, 214, 154)', or:'rgb(251, 173, 124)', cy:'rgb( 83, 237, 229)', dr:'rgb(247, 82,  49)'};
 const tagColors = {0:col.pi, 1:col.re, 2:col.dr, 57:col.ye, 58:col.re, 61:col.ye, 62:col.re};
-const moveCatColor = [col.or,col.bl,col.wh];
-const tmColors = [col.wh,col.bl,col.ye];
+const biomeColors = [col.wh, col.bl, col.ye, col.re, col.pi];
+const moveCatColor = [col.or, col.bl, col.wh];
+const tmColors = [col.wh, col.bl, col.ye];
 const flipStats = {bst:'bst',hp:'spe',atk:'spd',def:'spa',spa:'def',spd:'atk',spe:'hp'};
 const REMchance = [16,12,6,6,3];
 let increment = 10;  // Number of items to load at a time
@@ -420,7 +421,7 @@ function renderMoreItems() { // Create each list item, with columns of info ****
       if (isShowing && numMovesShown < 3) {
         numMovesShown += 2;
         let src = item[thisFID];  let srcText = '<span style="color:';
-        const clickableRow = document.createElement('div');  clickableRow.className = 'clickable-name';
+        const clickableRow = quickElement('div','clickable-name');
         if (thisFID >= fidThreshold[8]) { // For biomes
           const rarityN = ~~(src[0]/20);  const rarityB = ~~(src[1]/20);
           if (rarityN && rarityB && [3,5,7,9].includes(rarityB)) { // Show both, with short labels
@@ -455,7 +456,7 @@ function renderMoreItems() { // Create each list item, with columns of info ****
     // Show egg moves or biomes, depending on header state
     if (headerState.biome && (!numMovesShown || (toShowMovesBiomes.every(f => fidToCategory(f)==2) && numMovesShown < 4))) {
       if ([1,2].includes(item?.ex) && !numMovesShown) { // Show egg exclusives only if blank
-        const clickableRow = document.createElement('div');  clickableRow.className = 'clickable-name';
+        const clickableRow = quickElement('div','clickable-name');
         if (item.ex == 1) clickableRow.innerHTML += `<span style="color:rgb(143, 214, 154);">${infoText[5]}</span>`;
         if (item.ex == 2) clickableRow.innerHTML += `<span style="color:rgb(216, 143, 205);">${infoText[6]}</span>`;
         clickableRow.addEventListener('click', () => showInfoSplash(thisID,1));
@@ -464,9 +465,9 @@ function renderMoreItems() { // Create each list item, with columns of info ****
         possibleFID.slice(fidThreshold[8],fidThreshold[9]).forEach((fid) => {
           if (fid in item) {
             if (numMovesShown < 4) {
-              const clickableRow = document.createElement('div');  clickableRow.className = 'clickable-name';
+              const clickableRow = quickElement('div','clickable-name',fidToName[fid]);
+              clickableRow.style.color = biomeColors[~~(Math.min(item[fid][0],item[fid][1]??200)/40)];
               if (toShowMovesBiomes.length) clickableRow.style.color = col.ga; // Color gray if peeking
-              clickableRow.innerHTML = fidToName[fid];
               clickableRow.addEventListener('click', () => showInfoSplash(thisID,1));
               moveColumn.appendChild(clickableRow);
             } else if (numMovesShown == 4) { // Add dots if there is no room
@@ -480,7 +481,7 @@ function renderMoreItems() { // Create each list item, with columns of info ****
       }
     } else if (!toShowMovesBiomes.length) { // Show egg moves if there are no filtered moves/biomes
       ['e1','e2','e3','e4'].forEach((name) => {
-        const clickableRow = document.createElement('div');  clickableRow.className = 'clickable-name';
+        const clickableRow = quickElement('div','clickable-name');
         if (name == 'e4') clickableRow.style.color = col.ye;
         clickableRow.innerHTML = fidToName[item[name]]; // Show the move name, with click event for splash screen
         clickableRow.addEventListener('click', () => showDescSplash(item[name]));
@@ -489,14 +490,14 @@ function renderMoreItems() { // Create each list item, with columns of info ****
     }
 
     // Show the cost, colored by the egg tier
-    const costColumn = document.createElement('div'); costColumn.className = 'clickable-name';
+    const costColumn = quickElement('div','clickable-name');
           costColumn.innerHTML = `${headerNames[6]}<br><span style="color:${eggTierColors(item.et)};">${item.co}</span>`;  
           costColumn.addEventListener('click', () => showInfoSplash(thisID,1));
     // Create the stats columns
     const statColumns = [];
     const flipped = lockedFilters.includes(fidThreshold[5]+2);
     sortAttributes.slice(7,14).forEach((thisAtt,index) => {
-      const newColumn = document.createElement('div');  newColumn.className = 'item-column';
+      const newColumn = quickElement('div','item-column');
       newColumn.innerHTML = `${headerNames[index+7]}<br>${item[(flipped?flipStats[thisAtt]:thisAtt)]}`;
       statColumns.push(newColumn);
     });
@@ -506,7 +507,7 @@ function renderMoreItems() { // Create each list item, with columns of info ****
       [[dexColumn,pokeImg,specColumn,typeColumn,abilityColumn,moveColumn,costColumn,...statColumns]]
     );
     layoutColumns.forEach(thisRow => {
-      const newRow = document.createElement('div'); newRow.className = 'row';
+      const newRow = quickElement('div','row');
       thisRow.forEach(thisColumn => newRow.appendChild(thisColumn));
       li.appendChild(newRow);
     });
@@ -515,30 +516,30 @@ function renderMoreItems() { // Create each list item, with columns of info ****
 }
 
 function makeBiomeDesc(src, isSmall=0) {
-  const offset = isSmall*6;
-  if (src == 1) return `${col.wh};">${biomeText[0+offset]}`;
-  if (src == 2) return `${col.bl};">${biomeText[1+offset]}`;
-  if (src == 3) return `${col.bl};">${biomeText[5]} ${biomeText[0+offset]}`;
-  if (src == 4) return `${col.ye};">${biomeText[2+offset]}`;
-  if (src == 5) return `${col.ye};">${biomeText[5]} ${biomeText[2+offset]}`;
-  if (src == 6) return `${col.re};">${biomeText[3+offset]}`;
-  if (src == 7) return `${col.re};">${biomeText[5]} ${biomeText[3+offset]}`;
-  if (src == 8) return `${col.pi};">${biomeText[4+offset]}`;
-  if (src == 9) return `${col.pi};">${biomeText[5]} ${biomeText[4+offset]}`;
+  const offset = isSmall*6; const thisColor = biomeColors[~~(src/2)];
+  if (src == 1) return `${thisColor};">${biomeText[0+offset]}`;
+  if (src == 2) return `${thisColor};">${biomeText[1+offset]}`;
+  if (src == 3) return `${thisColor};">${biomeText[5]} ${biomeText[0+offset]}`;
+  if (src == 4) return `${thisColor};">${biomeText[2+offset]}`;
+  if (src == 5) return `${thisColor};">${biomeText[5]} ${biomeText[2+offset]}`;
+  if (src == 6) return `${thisColor};">${biomeText[3+offset]}`;
+  if (src == 7) return `${thisColor};">${biomeText[5]} ${biomeText[3+offset]}`;
+  if (src == 8) return `${thisColor};">${biomeText[4+offset]}`;
+  if (src == 9) return `${thisColor};">${biomeText[5]} ${biomeText[4+offset]}`;
 }
 
 function makeMovesetHeader(specID) { // Create the moveset/info splash **************************
   movesetHeader.innerHTML = '';
   const item = items[specID]; splashState.speciesID = specID;
   
-  const headerRow = document.createElement('div'); headerRow.className = 'moveset-banner';
+  const headerRow = quickElement('div','moveset-banner');
   const arrowL = createArrow(false);  const arrowR = createArrow(true);
-  const msImg = document.createElement('img'); msImg.src = `images/${item.img}_0.png`; msImg.className = 'moveset-image';
-  const nameAndType = document.createElement('div'); nameAndType.style.maxHeight = '46px';
+  const msImg = quickElement('img','moveset-image',`images/${item.img}_0.png`);
+  const nameAndType = quickElement('div'); nameAndType.style.maxHeight = '46px';
   const secondTypeText = ('t2' in item ? ` / <span style="color:${typeColors[item.t2]}; display:inline">${fidToName[item.t2]}</span>` : '')
   nameAndType.innerHTML = `${speciesNames[specID]}<br><span style="color:${typeColors[item.t1]}; display:inline">${fidToName[item.t1]}</span>${secondTypeText}`;
   [arrowL, msImg, nameAndType, arrowR].forEach(e => headerRow.appendChild(e));
-  movesetHeader.append(headerRow, document.createElement('hr'));
+  movesetHeader.append(headerRow, quickElement('hr'));
   
   // const splashButton = document.createElement('div'); splashButton.className = 'splash-button'; 
   // splashButton.innerHTML = 'eeeeeeee'; splashButton.style.margin = '-10px auto -10px auto';
@@ -547,7 +548,7 @@ function makeMovesetHeader(specID) { // Create the moveset/info splash *********
   // movesetHeader.appendChild(document.createElement('hr'));
 }
 function createArrow(isRight) {
-  const arrow = document.createElement('img');  arrow.src = 'ui/arrow.png';  arrow.className = 'moveset-arrow';
+  const arrow = quickElement('img','moveset-arrow','ui/arrow.png');
   if (isRight) arrow.style.transform = 'scaleX(-1)';
   if (!isMobile) arrow.addEventListener('mouseover', () => arrow.src = 'ui/arrowh.png');
   if (!isMobile) arrow.addEventListener('mouseout',  () => arrow.src = 'ui/arrow.png');
@@ -581,7 +582,7 @@ function showInfoSplash(specID, forcePage=null, forceShiny=null, forceFem=null) 
       zoomImg.classList.remove("hidden");
     };
     movesetScrollable.appendChild(zoomImg);
-    movesetScrollable.appendChild(document.createElement('br'));
+    movesetScrollable.appendChild(quickElement('br'));
     movesetScrollable.stars = [];
     for (let i = 1; i < 4; i++) { // Create up to 3 shiny stars
       if (item.sh >= i) {
@@ -626,13 +627,13 @@ function showInfoSplash(specID, forcePage=null, forceShiny=null, forceFem=null) 
     if (item?.ex) movesetScrollable.innerHTML += biomeLongText[item.ex]; // Description of species exclusivity
     possibleFID.slice(fidThreshold[8],fidThreshold[9]).forEach((fid) => {
       if (fid in item) {
-        const biomeRow = document.createElement('div');  biomeRow.className = 'biome-row';
+        const biomeRow = quickElement('div','biome-row');
         if (!movesetScrollable.innerHTML) biomeRow.style.marginTop = '4px'; // Add margin if empty
         const biomeLink = document.createElement('a');
         biomeLink.href = `https://wiki.pokerogue.net/biomes:biomes#interactive_map`;  biomeLink.target = '_blank'; // Open in new tab
         const biomeImg = quickElement('img','biome-img',`ui/biomes/${fid}.png`);  
         biomeLink.appendChild(biomeImg);
-        const biomeDesc = document.createElement('div'); biomeDesc.innerHTML = `<b>${fidToName[fid]}:</b>`;
+        const biomeDesc = quickElement('div','',`<b>${fidToName[fid]}:</b>`);
         item[fid].forEach(src => {
           biomeDesc.innerHTML += `<br><span style="font-weight:bold; color:${makeBiomeDesc(~~(src/20))}</span>`;
           if (src%20) { // If limited to time of day (bitmasked in the 4 lowest bits)
@@ -643,7 +644,7 @@ function showInfoSplash(specID, forcePage=null, forceShiny=null, forceFem=null) 
         if (!lockedFilters.some((f) => f%fidThreshold[12] == fid)) { // Button to add biome directly to filters
           const splashButton = quickElement('div','splash-button',altText[8]);  
           splashButton.addEventListener('click', () => { lockFilter(fid); closeAllOverlays(); });
-          biomeDesc.appendChild(document.createElement('br'));
+          biomeDesc.appendChild(quickElement('br'));
           biomeDesc.appendChild(splashButton);
         }
         biomeRow.appendChild(biomeLink);
@@ -651,7 +652,7 @@ function showInfoSplash(specID, forcePage=null, forceShiny=null, forceFem=null) 
         movesetScrollable.appendChild(biomeRow);
       }
     });
-    movesetScrollable.appendChild(document.createElement('hr'));
+    movesetScrollable.appendChild(quickElement('hr'));
     const splashCostInfo = quickElement('div','splash-move-tags');
     const HAtext = ('ha' in item ? `<br>${infoText[4]}: 1 in 8` : '');
     // Info on friendship and candy
@@ -672,7 +673,7 @@ function showInfoSplash(specID, forcePage=null, forceShiny=null, forceFem=null) 
     msHeaderText.innerHTML = `<div>${altText[17]}</div><div>${catToName[2]}</div>
       <div>${altText[5]}</div><div>${altText[6]}</div><div>${altText[7]}</div>`;
     movesetHeader.appendChild(msHeaderText); 
-    movesetHeader.appendChild(document.createElement('hr'));
+    movesetHeader.appendChild(quickElement('hr'));
     const moveList = [[],[]]; // Assemble list of moves
     for (const [key, value] of Object.entries(item)) {
       const intKey = Number(key);
@@ -687,7 +688,7 @@ function showInfoSplash(specID, forcePage=null, forceShiny=null, forceFem=null) 
     moveList[1].sort((a, b) => item[a]%4 > item[b]%4 ? 1 : (item[a]%4 < item[b]%4) ? -1 : 
       (fidToName[a] > fidToName[b] ? 1 : (fidToName[a] < fidToName[b] ? -1 : 0 ))); // TM rarity is mod 4
     [moveList[0],[item.e1,item.e2,item.e3,item.e4],moveList[1]].forEach((thisList, tableIndex) => {
-      if (thisList != moveList[0]) movesetScrollable.appendChild(document.createElement('hr'));
+      if (thisList != moveList[0]) movesetScrollable.appendChild(quickElement('hr'));
       thisList.forEach(move => makeMovesetRow(move, item, tableIndex));
     });
   }
@@ -733,18 +734,18 @@ function showDescSplash(fid) { // Create the ability/move details splash *******
   splashContent.innerHTML = `<b>${fidToName[fid]}</b><hr>`; // Name header
   const thisProcs = fidToProc[fid-fidThreshold[0]]; // List of atts, procs, tags
   if (fid>=fidThreshold[1]) { // For moves only
-    const splashMoveRow = document.createElement('div');  splashMoveRow.className = 'splash-move-row';
+    const splashMoveRow = quickElement('div','splash-move-row');
     altText.slice(4,8).forEach((attName,index) => { // Show type and damage category, then Power, Accuracy, PP
-      const splashMoveCol = document.createElement('div');
+      const splashMoveCol = quickElement('div');
       if (!index) splashMoveCol.innerHTML = `<span style="color:${typeColors[thisProcs[2]]};">${fidToName[thisProcs[2]]}</span><br><img src="ui/cat${thisProcs[3]}.png">`;
       else splashMoveCol.innerHTML = `${attName}<br>${(thisProcs[3+index]==-1 ? '-' : thisProcs[3+index])}`;
       splashMoveRow.appendChild(splashMoveCol);
     });
-    splashContent.appendChild(splashMoveRow);  splashContent.appendChild(document.createElement('hr'));
+    splashContent.appendChild(splashMoveRow);  splashContent.appendChild(quickElement('hr'));
   }
   splashContent.innerHTML += fidToDesc[fid-fidThreshold[0]]; // Description of ability/move
   if (thisProcs[0] || thisProcs[1] || thisProcs[7]) {
-    const splashMoveTags = document.createElement('div');  splashMoveTags.className = 'splash-move-tags';
+    const splashMoveTags = quickElement('div','splash-move-tags');
     if (thisProcs[7]) { // If a non-zero priority move
       splashMoveTags.innerHTML += `<p style="color:${thisProcs[7]>0?col.ge:col.re};">${procToDesc[27]}: ${thisProcs[7]>0?'+':''}${thisProcs[7]}</p>`;
     }
@@ -763,8 +764,7 @@ function showDescSplash(fid) { // Create the ability/move details splash *******
     splashContent.appendChild(splashMoveTags);
   }
   if (!lockedFilters.some((f) => f%fidThreshold[12] == fid)) { // Button to add ability/move directly to filters
-    const splashButton = document.createElement('div'); splashButton.className = 'splash-button'; 
-    splashButton.innerHTML = altText[8];  
+    const splashButton = quickElement('div','splash-button',altText[8]);  
     splashButton.addEventListener('click', () => { lockFilter(fid); closeAllOverlays(); });
     splashContent.appendChild(splashButton);
   }
@@ -843,8 +843,9 @@ function displaySuggestions() {
       filterToEnter = matchingFID[tabSelect ?? 0];
     }
     matchingFID.forEach((fid) => { // Create the suggestion tag elements
-      let newSugg = document.createElement('div');  newSugg.className = 'suggestion';
-      newSugg.innerHTML = `${isExclusion?'<img src="ui/x.png">':''}<span style="color:${fidToColor(fid)[0]}; display:inline;">${catToName[fidToCategory(fid)]}: <span style="color:${fidToColor(fid)[1]}; display:inline;">${fidToName[fid]}</span></span>`;
+      let newSugg = quickElement('div','suggestion',`${isExclusion?'<img src="ui/x.png">':''}
+        <span style="color:${fidToColor(fid)[0]}; display:inline;">${catToName[fidToCategory(fid)]}:
+        <span style="color:${fidToColor(fid)[1]}; display:inline;">${fidToName[fid]}</span></span>`);
       newSugg.addEventListener('click', () => lockFilter(fid));
       if (filterToEnter == fid && tabSelect != null) newSugg.style.borderColor = col.pu;
       suggestions.appendChild(newSugg);
@@ -863,12 +864,12 @@ function lockFilter(newLockFID, clearQuery = true, forceOR = null) {
       // Default to "OR" for certain categories if matching previous filter category
       const defaultOR = ([3,4,9,10].includes(fidToCategory(newLockFID)) 
         && fidToCategory(newLockFID) == fidToCategory(lockedFilters[lockedFilters.length-2]));
-      filterMod = document.createElement("span"); filterMod.toggleOR = forceOR ?? defaultOR;
-      filterMod.className = "filter-mod";         filterMod.innerHTML = (filterMod.toggleOR?'OR':'&');
+      filterMod = quickElement("span","filter-mod",(filterMod.toggleOR?'OR':'&'));
+      filterMod.toggleOR = forceOR ?? defaultOR;
       filterMod.addEventListener('click', () => toggleOR(filterMod));
       lockedMods.push(filterMod); filterContainer.appendChild(filterMod);
     }
-    const filterTag = document.createElement("span"); filterTag.className = `filter-tag filter-tag-${isExclusion?"exc":"norm"}`;
+    const filterTag = quickElement("span",`filter-tag filter-tag-${isExclusion?"exc":"norm"}`);
     filterTag.innerHTML = `<img src="ui/${isExclusion?"x":"lock"}.png">${catToName[fidToCategory(newLockFID)]}: ${fidToName[newLockFID]}`;
     filterTag.addEventListener('click', () => removeFilter(newLockFID+isExclusion, filterTag, filterMod));
     filterContainer.appendChild(filterTag);
@@ -1243,7 +1244,7 @@ function showFiltersInCategory(index) {
 function closeAllOverlays() {
   [splashScreen,helpScreen,movesetScreen].forEach(s => s.classList.remove("show"));
 }
-function quickElement(type, className, innerHTML = '') {
+function quickElement(type, className = '', innerHTML = '') {
   const newElement = document.createElement(type);
   newElement.className = className;
   if (type == "img") newElement.src = innerHTML;
