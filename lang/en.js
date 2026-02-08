@@ -99,7 +99,7 @@ tagToDesc = [
 "Hits 3 times",
 "Hits 10 times",
 "Hits 2 to 5 times",
-"Repeats for 2-3 turns",
+"Repeats for 2 to 3 turns",
 "Removes hazards",
 "Traps and damages target",
 "Can't be suppressed",

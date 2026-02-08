@@ -47,7 +47,7 @@ procToDesc = [
 "Brule",
 "Rend confus",
 "Apeure",
-"User Atq/Déf/AtS/DéS/Vit",
+"User Atq/Déf/ASp/DSp/Vit",
 "Poison/Para/Sommeil",
 "Brule/Para/Gel",
 "Lanceur Stellaire Atq/AtqSp",
