@@ -94,9 +94,8 @@ function loadAndApplyLanguage(lang) {
     // Set up the header columns
     headerColumns = [];
     headerNames.forEach((thisHeaderName, index) => {
-      const newColumn = document.createElement('div');
-      newColumn.innerHTML = thisHeaderName;  newColumn.textDef = thisHeaderName;  newColumn.index = index;
-      newColumn.className = 'header-column'; newColumn.sortattr = sortAttributes[index];
+      const newColumn = quickElement('div','header-column',thisHeaderName);  
+      newColumn.textDef = thisHeaderName;  newColumn.index = index; newColumn.sortattr = sortAttributes[index];
       newColumn.addEventListener('click', () => updateHeader(newColumn));
       headerColumns.push(newColumn); // Push the column element into the array
     });      
@@ -292,8 +291,7 @@ function refreshAllItems() { // Display items based on query and locked filters 
   
   // Show error messages if there are no results
   if (!filteredItemIDs.length) { // No pokemon
-    const helpMessage = document.createElement('div');  helpMessage.className = 'item-help-message';
-    helpMessage.innerHTML = '<hr>';
+    const helpMessage = quickElement('div','item-help-message','<hr>');
     if (lockedFilters.some(f => f == fidThreshold[10] || f == fidThreshold[10]+1)) helpMessage.innerHTML += 
       `<img src="ui/shiny2.png"> <img src="ui/shiny3.png"> <b><span style="color:${col.pu};">${warningText[0]}</b><br><br></span>`;
     if (headerState.ability && (query.length || lockedFilters.some(f => fidToCategory(f)==1) || headerState.ability==2)) {
@@ -318,7 +316,7 @@ function renderMoreItems() { // Create each list item, with columns of info ****
     const item = items[thisID]; // Grab the actual item from its ID
     
     // Show image of the pokemon
-    const pokeImg = document.createElement('img');  pokeImg.className = 'item-image';  
+    const pokeImg = quickElement('img','item-image');  
     pokeImg.stars = []; // Keep a list of stars that can change the pokemon image 
     pokeImg.shinyOverride = Math.min(item.sh, headerState.shiny);  
     pokeImg.femOverride = (item?.fe == 1 ? +lockedFilters.some((f) => f == fidThreshold[7]+5) : 0);
@@ -326,11 +324,11 @@ function renderMoreItems() { // Create each list item, with columns of info ****
     pokeImg.addEventListener('click', () => showInfoSplash(thisID, 3, pokeImg.shinyOverride, pokeImg.femOverride));
     
     // Create the dex column, with stars and pin only on desktop
-    const dexColumn = document.createElement('div');  dexColumn.className = 'item-column';
-    const starColumn = document.createElement('div'); starColumn.className = 'item-column';
-    const pinColumn = document.createElement('div');  pinColumn.className = 'item-column';
-    const pinImg = document.createElement('img');     pinImg.className = 'pin-img';   
-    const femImg = document.createElement('img');     femImg.className = 'pin-img';   
+    const dexColumn  = quickElement('div','item-column');
+    const starColumn = quickElement('div','item-column');
+    const pinColumn  = quickElement('div','item-column');
+    const pinImg = quickElement('img','pin-img');   
+    const femImg = quickElement('img','pin-img');   
     pinImg.src = `ui/pin${pinnedRows.includes(thisID)*1}.png`; femImg.src = `ui/fem${pokeImg.femOverride}.png`;
     if (!isMobile) pinImg.addEventListener('mouseover', () => pinImg.src = `ui/pinh.png`);
     if (!isMobile) pinImg.addEventListener('mouseout',  () => pinImg.src = `ui/pin${pinnedRows.includes(thisID)*1}.png`);
@@ -355,8 +353,7 @@ function renderMoreItems() { // Create each list item, with columns of info ****
     }
     for (let i = 1; i < 4; i++) { // Create up to 3 shiny stars
       if (item.sh >= i) {
-        const starImg = document.createElement('img'); starImg.className = 'star-img';
-        starImg.src = `ui/shiny${(pokeImg.shinyOverride==i?i:0)}.png`;
+        const starImg = quickElement('img','star-img',`ui/shiny${(pokeImg.shinyOverride==i?i:0)}.png`);
         if (!isMobile) starImg.addEventListener('mouseover', () => starImg.src = `ui/shiny${i}.png`);
         if (!isMobile) starImg.addEventListener('mouseout',  () => starImg.src = `ui/shiny${(pokeImg.shinyOverride==i?i:0)}.png`);
         starImg.addEventListener('click', () => { // Add click events to all the stars, changing the poke image
@@ -380,36 +377,31 @@ function renderMoreItems() { // Create each list item, with columns of info ****
     } else { // Append all to the dex column on desktop
       dexColumn.appendChild(pinImg);
       if (item?.fe == 1) dexColumn.appendChild(femImg);
-      const dexText = document.createElement('div');
-      dexText.innerHTML = wikiLink;
+      const dexText = quickElement('div','',wikiLink);
       dexColumn.appendChild(dexText);
       pokeImg.stars.forEach((thisStar) => dexColumn.appendChild(thisStar));
     }
     
-    const specColumn = document.createElement('div'); // Show species name
-    specColumn.className = 'clickable-name';
-    specColumn.innerHTML = speciesNames[thisID];
-    specColumn.addEventListener('click', () => showInfoSplash(thisID, 0));
+    const specColumn = quickElement('div','clickable-name',speciesNames[thisID]); // Show species name
+    specColumn.addEventListener('click', () => showInfoSplash(thisID, 1));
     
-    const typeColumn = document.createElement('div'); // Show both types
-    typeColumn.className = 'item-column';
+    const typeColumn = quickElement('div','item-column'); // Show both types
     typeColumn.innerHTML = `<p style="color:${typeColors[item.t1]}; margin: 0;">${fidToName[item.t1]}</p>`;
     if ('t2' in item) typeColumn.innerHTML += `<p style="color:${typeColors[item.t2]}; margin: 0;">${fidToName[item.t2]}</p>`;
     
     // Show all four abilities
-    const abilityColumn = document.createElement('div'); abilityColumn.className = 'item-column';
+    const abilityColumn = quickElement('div','item-column');
     ['a1','a2','ha','pa'].forEach((name) => {
       if (name in item) {
         const fid = item[name];
-        const clickableRow = quickElement('div','clickable-name',fidToName[fid]);
-        clickableRow.style.color = abToColor(name, fid);
+        const clickableRow = quickElement('div','clickable-name',fidToName[fid],abToColor(name,fid));
         clickableRow.addEventListener('click', () => showDescSplash(fid));
         abilityColumn.appendChild(clickableRow); 
       }
     });
     
     // Show the column of egg moves, biomes, or filtered moves/biomes and their sources
-    const moveColumn = document.createElement('div');  moveColumn.className = 'item-column';  moveColumn.innerHTML = '';
+    const moveColumn = quickElement('div','item-column');
     let numMovesShown = 0;
     toShowMovesBiomes.forEach((thisFID) => { // Show filtered moves/biomes
       let isShowing = ( thisFID in item );
@@ -429,7 +421,7 @@ function renderMoreItems() { // Create each list item, with columns of info ****
           } else { // Show the only rarity
             srcText += makeBiomeDesc(rarityN);
           }
-          clickableRow.addEventListener('click', () => showInfoSplash(thisID,1));
+          clickableRow.addEventListener('click', () => showInfoSplash(thisID,2));
           // biomeText = ['Common','Uncommon','Rare','Super Rare','Ultra Rare','Boss','Com','Unc','Rare','SR','UR','Dawn','Day','Dusk','Night']
         } else { // For moves
           if (src == -1) srcText += `rgb(251, 173, 124);">${altText[9]}`;
@@ -459,16 +451,15 @@ function renderMoreItems() { // Create each list item, with columns of info ****
         const clickableRow = quickElement('div','clickable-name');
         if (item.ex == 1) clickableRow.innerHTML += `<span style="color:rgb(143, 214, 154);">${infoText[5]}</span>`;
         if (item.ex == 2) clickableRow.innerHTML += `<span style="color:rgb(216, 143, 205);">${infoText[6]}</span>`;
-        clickableRow.addEventListener('click', () => showInfoSplash(thisID,1));
+        clickableRow.addEventListener('click', () => showInfoSplash(thisID,2));
         moveColumn.appendChild(clickableRow);
       } else { // Show biomes if toggled, and if column is empty or if peeking over a move
         possibleFID.slice(fidThreshold[8],fidThreshold[9]).forEach((fid) => {
           if (fid in item) {
             if (numMovesShown < 4) {
-              const clickableRow = quickElement('div','clickable-name',fidToName[fid]);
-              clickableRow.style.color = biomeColors[~~(Math.min(item[fid][0],item[fid][1]??200)/40)];
+              const clickableRow = quickElement('div','clickable-name',fidToName[fid],biomeColors[~~(Math.min(item[fid][0],item[fid][1]??200)/40)]);
               if (toShowMovesBiomes.length) clickableRow.style.color = col.ga; // Color gray if peeking
-              clickableRow.addEventListener('click', () => showInfoSplash(thisID,1));
+              clickableRow.addEventListener('click', () => showInfoSplash(thisID,2));
               moveColumn.appendChild(clickableRow);
             } else if (numMovesShown == 4) { // Add dots if there is no room
               moveColumn.lastChild.innerHTML += ' ...';
@@ -480,10 +471,8 @@ function renderMoreItems() { // Create each list item, with columns of info ****
         if (numMovesShown == 3 && toShowMovesBiomes.length) moveColumn.lastChild.style.marginTop = '6px'; 
       }
     } else if (!toShowMovesBiomes.length) { // Show egg moves if there are no filtered moves/biomes
-      ['e1','e2','e3','e4'].forEach((name) => {
-        const clickableRow = quickElement('div','clickable-name');
-        if (name == 'e4') clickableRow.style.color = col.ye;
-        clickableRow.innerHTML = fidToName[item[name]]; // Show the move name, with click event for splash screen
+      ['e1','e2','e3','e4'].forEach((name) => { // Show the move name, with click event for splash screen
+        const clickableRow = quickElement('div','clickable-name',fidToName[item[name]],(name == 'e4' ? col.ye : ''));
         clickableRow.addEventListener('click', () => showDescSplash(item[name]));
         moveColumn.appendChild(clickableRow);
       });
@@ -492,7 +481,7 @@ function renderMoreItems() { // Create each list item, with columns of info ****
     // Show the cost, colored by the egg tier
     const costColumn = quickElement('div','clickable-name');
           costColumn.innerHTML = `${headerNames[6]}<br><span style="color:${eggTierColors(item.et)};">${item.co}</span>`;  
-          costColumn.addEventListener('click', () => showInfoSplash(thisID,1));
+          costColumn.addEventListener('click', () => showInfoSplash(thisID,2));
     // Create the stats columns
     const statColumns = [];
     const flipped = lockedFilters.includes(fidThreshold[5]+2);
@@ -530,22 +519,25 @@ function makeBiomeDesc(src, isSmall=0) {
 
 function makeMovesetHeader(specID) { // Create the moveset/info splash **************************
   movesetHeader.innerHTML = '';
-  const item = items[specID]; splashState.speciesID = specID;
+  const item = items[specID];
   
   const headerRow = quickElement('div','moveset-banner');
-  const arrowL = createArrow(false);  const arrowR = createArrow(true);
   const msImg = quickElement('img','moveset-image',`images/${item.img}_0.png`);
-  const nameAndType = quickElement('div'); nameAndType.style.maxHeight = '46px';
-  const secondTypeText = ('t2' in item ? ` / <span style="color:${typeColors[item.t2]}; display:inline">${fidToName[item.t2]}</span>` : '')
-  nameAndType.innerHTML = `${speciesNames[specID]}<br><span style="color:${typeColors[item.t1]}; display:inline">${fidToName[item.t1]}</span>${secondTypeText}`;
-  [arrowL, msImg, nameAndType, arrowR].forEach(e => headerRow.appendChild(e));
+  msImg.addEventListener('click', () => showInfoSplash(specID, 3));
+  const headerText = quickElement('div','',speciesNames[specID]); headerText.style.maxHeight = '46px';
+  headerText.append(quickElement('span','',`<br>${fidToName[item.t1]}`,typeColors[item.t1]));
+  if ('t2' in item) headerText.append(quickElement('span','',` / ${fidToName[item.t2]}`,typeColors[item.t2]));
+  headerRow.append(createArrow(false), msImg, headerText, createArrow(true));
   movesetHeader.append(headerRow, quickElement('hr'));
   
-  // const splashButton = document.createElement('div'); splashButton.className = 'splash-button'; 
-  // splashButton.innerHTML = 'eeeeeeee'; splashButton.style.margin = '-10px auto -10px auto';
-  // splashButton.addEventListener('click', () => mode = 3 );
-  // movesetHeader.appendChild(splashButton);
-  // movesetHeader.appendChild(document.createElement('hr'));
+  const movesetButtons = quickElement('div','moveset-buttons');
+  [catToName[10],infoText[15],infoText[16]].forEach((thisCat, index) => {
+    const splashButton = quickElement('div','splash-button',thisCat);
+    splashButton.addEventListener('click', () => showInfoSplash(specID, index) );
+    movesetButtons.appendChild(splashButton);
+  });
+  movesetHeader.appendChild(movesetButtons);
+  movesetHeader.appendChild(quickElement('hr'));
 }
 function createArrow(isRight) {
   const arrow = quickElement('img','moveset-arrow','ui/arrow.png');
@@ -557,14 +549,13 @@ function createArrow(isRight) {
 }
 function showInfoSplash(specID, forcePage=null, forceShiny=null, forceFem=null) {
   if (forcePage != null) splashState.page = forcePage;
-  if (splashState.page == 2) return;
+  splashState.speciesID = specID;
   const item = items[specID];
   makeMovesetHeader(specID);
   movesetScrollable.innerHTML = '';
-  // movesetScrollable.style.height = 'auto';
+  movesetScrollable.style.height = 'auto';
   movesetContent.style.width = '330px';
-  if (splashState.page == 3) { // Show zoom image
-    splashState.speciesID = specID;
+  if (splashState.page == 3) { // Show zoom image (splashState.page == 3)
     if (forceShiny != null) splashState.shiny = forceShiny;
     if (item.sh < splashState.shiny) splashState.shiny = 1;
     if (forceFem != null) splashState.fem = forceFem;
@@ -621,7 +612,7 @@ function showInfoSplash(specID, forcePage=null, forceShiny=null, forceFem=null) 
     movesetScrollable.appendChild(rotateButton);
     movesetContent.style.width = (isMobile ? '351px':'auto');
   }
-  else if (splashState.page == 1) { // Show biomes
+  else if (splashState.page == 2) { // Show biomes (splashState.page == 2)
     if (item?.fx) movesetScrollable.innerHTML += biomeLongText[0]; // Description of form exclusivity
     if (item?.fx && item?.ex) movesetScrollable.innerHTML += '<br><br>';
     if (item?.ex) movesetScrollable.innerHTML += biomeLongText[item.ex]; // Description of species exclusivity
@@ -668,7 +659,7 @@ function showInfoSplash(specID, forcePage=null, forceShiny=null, forceFem=null) 
       <br>${headerNames[1]}: 1 in 12</span></p>
       `;
     movesetScrollable.appendChild(splashCostInfo);
-  } else { // Show moveset
+  } else if (splashState.page == 1) { // Show moveset (splashState.page == 1)
     const msHeaderText = quickElement('div','moveset-row-header');
     msHeaderText.innerHTML = `<div>${altText[17]}</div><div>${catToName[2]}</div>
       <div>${altText[5]}</div><div>${altText[6]}</div><div>${altText[7]}</div>`;
@@ -690,6 +681,19 @@ function showInfoSplash(specID, forcePage=null, forceShiny=null, forceFem=null) 
     [moveList[0],[item.e1,item.e2,item.e3,item.e4],moveList[1]].forEach((thisList, tableIndex) => {
       if (thisList != moveList[0]) movesetScrollable.appendChild(quickElement('hr'));
       thisList.forEach(move => makeMovesetRow(move, item, tableIndex));
+    });
+  } else { // Show family (splashState.page == 0)
+    possibleSID.filter(SID => items[SID].fa == item.fa).forEach(SID => {
+      const famRow = quickElement('div','moveset-fam-row');
+      const famImg = quickElement('img','moveset-image',`images/${items[SID].img}_0.png`);
+      const famText = quickElement('div','',speciesNames[SID]); // Name, type, and passive
+      famText.append(quickElement('span','',`<br>${fidToName[items[SID].t1]}`,typeColors[items[SID].t1]));
+      if ('t2' in items[SID]) famText.append(quickElement('span','',` / ${fidToName[items[SID].t2]}`,typeColors[items[SID].t2]));
+      const passiveText = quickElement('span','clickable-name',fidToName[items[SID].pa],col.pu);
+      passiveText.addEventListener('click', () => showDescSplash(items[SID].pa));
+      famText.append(quickElement('br'),passiveText);
+      famRow.append(famImg, famText);
+      movesetScrollable.appendChild(famRow);
     });
   }
   if (!movesetScreen.classList.contains('show')) {
@@ -1025,13 +1029,13 @@ function adjustLayout(forceAdjust = false, headerClick = null) {
     isMobile = (window.innerWidth <= 768);
     // Redraw all the header columns into the header container
     headerContainer.innerHTML = '';
-    const thisRow = document.createElement('div'); thisRow.className = 'header-row';
+    const thisRow = quickElement('div','header-row');
     if (isMobile) {
       thisRow.appendChild(headerColumns[0]);  thisRow.appendChild(headerColumns[1]);
       thisRow.appendChild(headerColumns[4]);  thisRow.appendChild(headerColumns[2]);
       thisRow.appendChild(headerColumns[5]);
       headerContainer.appendChild(thisRow);
-      const row2 = document.createElement('div'); row2.className = 'header-row';
+      const row2 = quickElement('div','header-row');
       row2.appendChild(headerColumns[3]);
       for (const thisColumn of headerColumns.slice(6,14)) row2.appendChild(thisColumn);  
       headerContainer.appendChild(row2);
@@ -1133,7 +1137,7 @@ function openLangMenu() {
   splashContent.style.width = '270px';
   splashContent.innerHTML = '<img src="ui/globe.png" class="lang-head-img">&nbsp<b>Change Language</b><hr style="margin-bottom: 0px;">';
   supportedLangs.forEach((thisLang, index) => {
-    const thisLangRow = document.createElement('div'); thisLangRow.className = "splash-button";
+    const thisLangRow = quickElement('div',"splash-button");
     if (pageLang == thisLang) thisLangRow.style.color = col.pu;
     thisLangRow.innerHTML = `${languageNames[index]}`;
     thisLangRow.addEventListener('click', () => {
@@ -1141,7 +1145,7 @@ function openLangMenu() {
       loadAndApplyLanguage(thisLang);
       closeAllOverlays();
     });
-    if (thisLang != 'en') splashContent.appendChild(document.createElement('br'));
+    if (thisLang != 'en') splashContent.appendChild(quickElement('br'));
     splashContent.appendChild(thisLangRow);
   });
   splashScreen.classList.add("show"); // Make the language screen visible
@@ -1159,17 +1163,14 @@ function openHelpMenu() { // Show the help screen with instructions and options
     <p style="margin: 1px 0px; font-weight: bold;">${helpMenuText[1]}<br></p>`
   ));
   catToName.forEach((thisCat,index) => { // Create clickable buttons for each filter category
-    const catButton = document.createElement('div'); catButton.className = 'splash-button';
+    const catButton = quickElement('div','splash-button',thisCat.replace(" ","&nbsp"));
     catButton.style.margin = '3px'; catButton.style.padding = '4px 6px';
-    catButton.innerHTML = thisCat.replace(" ","&nbsp");
     let thisColor = fidToColor(fidThreshold[index-1]??0)[0]; // Get a nice color for the category name
     if (thisColor == col.wh) thisColor = fidToColor((fidThreshold[index-1]??0))[1];
     if (thisColor == col.wh) thisColor = fidToColor((fidThreshold[index-1]??0)+4)[1];
     if (thisColor == col.ga) thisColor = fidToColor((fidThreshold[index-1]??0)+4)[1];
     catButton.style.color = thisColor;
-    catButton.addEventListener('click', () => {
-      showFiltersInCategory(index);
-    });
+    catButton.addEventListener('click', () => showFiltersInCategory(index));
     helpContent.appendChild(catButton);
   });
   helpContent.appendChild(quickElement('div','', // Second half of instructions
@@ -1244,9 +1245,10 @@ function showFiltersInCategory(index) {
 function closeAllOverlays() {
   [splashScreen,helpScreen,movesetScreen].forEach(s => s.classList.remove("show"));
 }
-function quickElement(type, className = '', innerHTML = '') {
+function quickElement(type, className = '', innerHTML = '', color = '') {
   const newElement = document.createElement(type);
-  newElement.className = className;
+  if (className) newElement.className = className;
+  if (color) newElement.style.color = color;
   if (type == "img") newElement.src = innerHTML;
   else newElement.innerHTML = innerHTML;
   return newElement;

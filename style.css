@@ -534,6 +534,21 @@ h1 {
   min-width: 330px;
   max-width: 330px;
 }
+.moveset-buttons {
+  display: flex;
+  flex-direction: row;
+  margin: -18px 0px -5px;
+  width: 100%;
+}
+.moveset-fam-row {
+  display: grid;
+  grid-template-columns: 117px 1fr;
+  align-items: center;
+  min-width: 330px;
+  max-width: 330px;
+  font-weight: bold;
+  min-height: 76px;
+}
 .biome-row {
   margin-top: 12px;
   display: grid;

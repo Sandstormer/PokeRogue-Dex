@@ -4,7 +4,7 @@
 headerNames = ['N°','Image','Nom','Type','Talents','Capacités Œuf','Cout','Total','PV','Atq','Déf','ASp','DSp','Vit'];
 altText = ['Capacités','Principaux','Caché','Passif','Chercher','Puis.','Préc.','PP','Ajouter aux filtres','Champi Mémoriel','Chrom.','Capacités Œuf','Rare Capac. Œuf','Commun','Super','Hyper','CT','N.','Évo','Œuf'];
 catToName = ['Type','Talent','Capacité','Gen','Cout','Œuf','Mode','Évolution','Forme','Biome','Lié à','Variantes Chromatique','Étiquette'];
-infoText = ['Bonheur par Bonbon','Passif','Cout réduit','Acheter un Œuf','Talent Caché','Exclusif aux Œufs','Exclusif aux Bébés','Pokémon Paradoxe','Changement de forme','Biomes','Filtres','Réduit après ## œufs','par Niveau','par Œuf','par CT'];
+infoText = ['Bonheur par Bonbon','Passif','Cout réduit','Acheter un Œuf','Talent Caché','Exclusif aux Œufs','Exclusif aux Bébés','Pokémon Paradoxe','Changement de forme','Biomes','Filtres','Réduit après ## œufs','par Niveau','par Œuf','par CT','Capacités','Infos'];
 biomeText = ['Commun','Peu Commun','Rare','Super Rare','Hyper Rare','Boss','Com.','PC','Rare','SR','HR','Aube','Jour','Crépuscule','Nuit'];
 biomeLongText = [
 '<b>Forme disponible uniquement par <span style="color:rgb(140, 130, 240);">changement de forme</span>.</b> Les autres formes peuvent être rencontrées dans les biomes affichés.',
