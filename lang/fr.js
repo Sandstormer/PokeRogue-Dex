@@ -4528,13 +4528,18 @@ fidToName = [
 'Non',
 'Talent d’Appât',
 'Ignore les Talents',
+'Ne peut pas être annulée',
+'Ne peut pas être remplacé',
+'Ne peut pas être ignoré',
 'Immunité Électrik',
 'Immunité Feu',
 'Immunité Eau',
-'Talent Pluie',
-'Talent Tempête de Sable',
-'Talent Neige',
-'Talent Soleil'
+'Synergie Pluie',
+'Invoque la Pluie',
+'Synergie Sable',
+'Synergie Neige',
+'Synergie Soleil',
+'Invoque le Soleil'
 ];
 helpMenuText = [
 `<span style="color:rgb(140, 130, 240);">Recherche rapide et puissante</span> pour PokeRogue`,

@@ -4528,13 +4528,18 @@ fidToName = [
 'None',
 'Lure Ability',
 'Ignores Abilities',
+'Can’t be suppressed',
+'Can’t be replaced',
+'Can’t be ignored',
 'Electric Immunity',
 'Fire Immunity',
 'Water Immunity',
-'Rain Ability',
-'Sand Ability',
-'Snow Ability',
-'Sun Ability'
+'Rain Synergy',
+'Creates Rain',
+'Sand Synergy',
+'Snow Synergy',
+'Sun Synergy',
+'Creates Sun'
 ];
 helpMenuText = [
 `This is a <span style="color:rgb(140, 130, 240);">fast and powerful search</span> for PokeRogue`,

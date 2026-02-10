@@ -823,12 +823,12 @@ function displaySuggestions() {
   const query = makeSearchable(searchBox.value); // Get search query
   if (query.length) {
     // Filter by species name, to suggest families
-    let filteredSID = possibleSID.filter((ID) => items[ID].dex.toString().includes(query) || specToSearch[ID].includes(query));
+    let filteredSID = possibleSID.filter(ID => items[ID].dex.toString().includes(query) || specToSearch[ID].includes(query));
     if (filteredSID.length > 20) filteredSID = [];
     let offerFamilies = [...new Set(filteredSID.map(ID => items[ID].fa))];
     if (offerFamilies.length > 4) offerFamilies = [];
     // Filter suggestions based on query and exclude already locked filters
-    let matchingFID = possibleFID.filter((fid) => {
+    let matchingFID = possibleFID.filter(fid => {
       if (isExclusion && ( fid>=fidThreshold[9]
         || (fid>=fidThreshold[5] && fid<fidThreshold[6]) 
         || (fid>=fidThreshold[3]+10 && fid<fidThreshold[4]) 
@@ -836,9 +836,13 @@ function displaySuggestions() {
       if (fid == fidThreshold[7]+2 || fid == fidThreshold[9]+1) return false; // Hide new mega filters until launch
       if (lockedFilters.some((f) => f%fidThreshold[12] == fid)) return false; // Don't suggest if already locked
       if (fid >= fidThreshold[9] && offerFamilies.includes(fid)) return true; // Suggest matching families
-      if (fid >= fidThreshold[11] && tagToFID[fid].some(f => fidToSearch[f].includes(query))) return true; // Suggest related tags
+      // if (fid >= fidThreshold[11] && tagToFID[fid].some(f => fidToSearch[f].includes(query))) return true; // Suggest related tags
       return fidToSearch[fid].includes(query); // Suggest if it contains the search query
     });
+    if (matchingFID.length < 10 && !isExclusion) {
+      const tagsToAdd = possibleFID.filter(fid => fid >= fidThreshold[11] && tagToFID[fid].some(f => fidToSearch[f].includes(query)) && !matchingFID.some(f => f == fid));
+      matchingFID.push(...tagsToAdd);
+    }
     // Erase the list of suggestions if it is too large, and no exact matches
     if (matchingFID.length > 25 + 2*query.length && !matchingFID.filter(f => fidToSearch[f]==query).length) matchingFID = [];
     // Highlight a suggestion if tab is hit
@@ -846,7 +850,7 @@ function displaySuggestions() {
       if (tabSelect) tabSelect = (tabSelect+matchingFID.length)%matchingFID.length;
       filterToEnter = matchingFID[tabSelect ?? 0];
     }
-    matchingFID.forEach((fid) => { // Create the suggestion tag elements
+    matchingFID.forEach(fid => { // Create the suggestion tag elements
       let newSugg = quickElement('div','suggestion',`${isExclusion?'<img src="ui/x.png">':''}
         <span style="color:${fidToColor(fid)[0]}; display:inline;">${catToName[fidToCategory(fid)]}:
         <span style="color:${fidToColor(fid)[1]}; display:inline;">${fidToName[fid]}</span></span>`);
@@ -868,8 +872,8 @@ function lockFilter(newLockFID, clearQuery = true, forceOR = null) {
       // Default to "OR" for certain categories if matching previous filter category
       const defaultOR = ([3,4,9,10].includes(fidToCategory(newLockFID)) 
         && fidToCategory(newLockFID) == fidToCategory(lockedFilters[lockedFilters.length-2]));
-      filterMod = quickElement("span","filter-mod",(filterMod.toggleOR?'OR':'&'));
-      filterMod.toggleOR = forceOR ?? defaultOR;
+      filterMod = quickElement("span","filter-mod");
+      filterMod.toggleOR = forceOR ?? defaultOR; filterMod.innerHTML = filterMod.toggleOR?'OR':'&';
       filterMod.addEventListener('click', () => toggleOR(filterMod));
       lockedMods.push(filterMod); filterContainer.appendChild(filterMod);
     }
@@ -1232,6 +1236,7 @@ function showFiltersInCategory(index) {
         tagList.append(tagName, splashButton);
         tagToFID[fid].forEach(f => {
           const clickableRow = quickElement('p','clickable-name',`<p>${fidToName[f]}</p>`);
+          clickableRow.style.margin = '-5px 0px';
           clickableRow.addEventListener('click', () => showDescSplash(f));
           tagList.appendChild(clickableRow);
         });
