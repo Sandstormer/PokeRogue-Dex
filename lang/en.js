@@ -4537,10 +4537,12 @@ fidToName = [
 'Can’t be ignored',
 'Electric Immunity',
 'Fire Immunity',
+'Ground Immunity',
 'Water Immunity',
 'Rain Synergy',
 'Creates Rain',
 'Sand Synergy',
+'Creates Sand',
 'Snow Synergy',
 'Sun Synergy',
 'Creates Sun'

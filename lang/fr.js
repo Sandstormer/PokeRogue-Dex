@@ -4537,13 +4537,15 @@ fidToName = [
 'Ne peut pas être ignoré',
 'Immunité Électrik',
 'Immunité Feu',
+'Immunité Sol',
 'Immunité Eau',
 'Synergie Pluie',
-'Invoque la Pluie',
+'Invoque Pluie',
 'Synergie Sable',
+'Invoque Sable',
 'Synergie Neige',
 'Synergie Soleil',
-'Invoque le Soleil'
+'Invoque Soleil'
 ];
 helpMenuText = [
 `<span style="color:rgb(140, 130, 240);">Recherche rapide et puissante</span> pour PokeRogue`,

@@ -1232,14 +1232,16 @@ function showFiltersInCategory(index) {
         tagList.innerHTML = '<hr>'; tagList.style.marginBottom = "-10px";
         const tagName = quickElement('p','',`<span style="color:${fidToColor(fid)[0]}; display:inline;">${catToName[fidToCategory(fid)]}: <span style="color:${fidToColor(fid)[1]}; display:inline;">${fidToName[fid]}</span></span>`);
         const splashButton = quickElement('div','splash-button',altText[8]); // Show button to lock
+        splashButton.style.margin = '9px 0px 2px';
         splashButton.addEventListener('click', () => { lockFilter(fid); closeAllOverlays(); });
         tagList.append(tagName, splashButton);
         tagToFID[fid].forEach(f => {
           const clickableRow = quickElement('p','clickable-name',`<p>${fidToName[f]}</p>`);
-          clickableRow.style.margin = '-5px 0px';
+          clickableRow.style.margin = '-6px 0px';
           clickableRow.addEventListener('click', () => showDescSplash(f));
           tagList.appendChild(clickableRow);
         });
+        movesetScrollable.scrollTo({ top: movesetScrollable.scrollHeight, behavior: "smooth" });
       });
     }
     movesetScrollable.appendChild(splashButton);

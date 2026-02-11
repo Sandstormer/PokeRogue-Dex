@@ -4555,10 +4555,12 @@ fidToName = [
 'Non può essere ignorata',
 'Immunità Elettro',
 'Immunità Fuoco',
+'Immunità Terra',
 'Immunità Acqua',
 'Sinergia Pioggia',
 'Crea Pioggia',
 'Sinergia Sabbia',
+'Crea Sabbia',
 'Sinergia Neve',
 'Sinergia Sole',
 'Crea Sole'
