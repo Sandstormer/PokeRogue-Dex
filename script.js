@@ -656,7 +656,7 @@ function showInfoSplash(specID, forcePage=null, forceShiny=null, forceFem=null) 
       <span style="color:${col.ga}; font-size:12px;">
       <br>${infoText[11].replace('##',upgradeCosts[item.co-1][3].join(' / '))}
       <br>${altText[12]}: 1 in ${REMchance[item.et]}${HAtext}
-      <br>${headerNames[1]}: 1 in 12</span></p>
+      <br>${altText[10]}: 1 in 12</span></p>
       `;
     movesetScrollable.appendChild(splashCostInfo);
   } else if (splashState.page == 1) { // Show moveset (splashState.page == 1)
@@ -921,7 +921,7 @@ function removeFilter(fidToRemove, tagToRemove, modToRemove) {
   lockedFilters = lockedFilters.filter((f) => f != fidToRemove);  tagToRemove.remove();
   updateFilterGroups();  
   if ((fidToRemove == fidThreshold[10] || fidToRemove == fidThreshold[10]+1) && headerState.shiny > 1) { 
-    headerState.shiny = 0;  headerColumns[1].innerHTML = headerNames[1]; // Update header if removing shiny filter
+    headerState.shiny = 0; // Reset shiny header if removing shiny filter
   }
   // Reset the sorting if there aren't any more locked moves/biomes
   if (sortState.sortAttr === 'moves' && !lockedFilters.some(f => [2,9].includes(fidToCategory(f)))) { 
@@ -996,7 +996,7 @@ function updateHeader(clickTarget = null, ignoreFlip = false) {
   if (hasMovesBiomes) { // Update the "Moves" column text
     const sortArrow = ( sortState.sortAttr != 'moves' ? '' :
       `<span style="color:${col.pu}; font-size:16px"> ${sortState.ascending?"&#9650;":"&#9660;"}</span>` );
-    if (lockedFilters.some(f =>fidToCategory(f)==2)) { // Show the title as "Moves" if there is at least one move
+    if (lockedFilters.some(f =>fidToCategory(f)==2)) { // Show as "Moves" if there is at least one move
       if      (headerState.move == 0) headerColumns[5].innerHTML = `${altText[0]}${sortArrow}`;
       else if (headerState.move == 1) headerColumns[5].innerHTML = `<span style="color:${col.pu};">${altText[0]}</span><span style="color:${col.wh}; font-size:12px;">(${infoText[12]})${sortArrow}</span>`;
       else if (headerState.move == 2) headerColumns[5].innerHTML = `<span style="color:${col.pu};">${altText[0]}</span><span style="color:${col.ye}; font-size:12px;">(${infoText[13]})${sortArrow}</span>`;

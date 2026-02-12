@@ -401,7 +401,7 @@ h1 {
     cursor: pointer;
   }
   #movesetScrollable {
-    max-height: calc(100vh - 300px);
+    max-height: calc(100vh - 350px);
   }
 }
 
@@ -447,9 +447,11 @@ h1 {
   position: fixed;
   top: -10%;
   left: 0;
-  width: 100%;
-  height: 100%;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
   padding: 10vh 0;
+  padding: 10dvh 0;
   background: rgba(0, 0, 0, 0.6);
   justify-content: center;
   align-items: center;
@@ -478,7 +480,7 @@ h1 {
   -ms-overflow-style: none;
 }
 #splashContent, #helpContent {
-  max-height: calc(100vh - 100px);
+  max-height: calc(100vh - 200px);
 }
 
 .scrollable::-webkit-scrollbar {
