@@ -1226,29 +1226,32 @@ function showFiltersInCategory(index) {
     let thisColor = fidToColor(fid)[1]; // Show the standard category color
     if (index == 2) thisColor = typeColors[fidToProc[fid-fidThreshold[0]][2]]; // Show move type color
     splashButton.innerHTML = `<span style="color:${thisColor}; display:inline;">${fidToName[fid]}</span>`;
-    if (index < 12) { // For non-tag filters, lock the filter upon click
+    if (index == 1 || index == 2) { // For abilities and moves, show the description first
+      splashButton.addEventListener('click', () => showDescSplash(fid));
+    } else if (index < 12) { // For non-tag filters, lock the filter upon click
       splashButton.addEventListener('click', () => { lockFilter(fid); closeAllOverlays(); });
     } else { // For tag filters, click to see related filters
       splashButton.addEventListener('click', () => {
         tagList.innerHTML = '<hr>'; tagList.style.marginBottom = "-10px";
         const tagName = quickElement('p','',`<span style="color:${fidToColor(fid)[0]}; display:inline;">${catToName[fidToCategory(fid)]}: <span style="color:${fidToColor(fid)[1]}; display:inline;">${fidToName[fid]}</span></span>`);
-        const splashButton = quickElement('div','splash-button',altText[8]); // Show button to lock
-        splashButton.style.margin = '9px 0px 2px';
-        splashButton.addEventListener('click', () => { lockFilter(fid); closeAllOverlays(); });
-        tagList.append(tagName, splashButton);
+        const tagButton = quickElement('div','splash-button',altText[8]); // Show button to lock
+        tagButton.style.margin = '9px 0px 2px'; tagButton.style.scrollMarginTop = "50px";
+        tagButton.addEventListener('click', () => { lockFilter(fid); closeAllOverlays(); });
+        tagList.append(tagName, tagButton);
         tagToFID[fid].forEach(f => {
           const clickableRow = quickElement('p','clickable-name',`<p>${fidToName[f]}</p>`);
           clickableRow.style.margin = '-6px 0px';
           clickableRow.addEventListener('click', () => showDescSplash(f));
           tagList.appendChild(clickableRow);
         });
-        movesetScrollable.scrollTo({ top: movesetScrollable.scrollHeight, behavior: "smooth" });
+        tagButton.scrollIntoView({ behavior: "smooth" });
       });
     }
     movesetScrollable.appendChild(splashButton);
   });
   movesetScrollable.appendChild(tagList);
   movesetScreen.classList.add("show");
+  movesetScrollable.scrollTo({ top: 0 });
 }
 // patchButton.innerHTML = `${gameVersion}`;
 patchButton.addEventListener('mouseover', () => patchButton.style.color = col.pu);
