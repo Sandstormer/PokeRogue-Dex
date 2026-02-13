@@ -21,6 +21,7 @@ const helpScreen = document.getElementById("helpScreen");
 const helpContent = document.getElementById("helpContent");
 const openHelpButton = document.getElementById("help-img");
 const openLangButton = document.getElementById("lang-img");
+const patchButton = document.getElementById("patch-button");
 const clearIcon = document.getElementById("clearIcon");
 const sortAttributes = ['row','shiny','sp','type','ab','moves','co','bst','hp','atk','def','spa','spd','spe'];
 const possibleFID = [...Array(fidThreshold[fidThreshold.length-1]).keys()];
@@ -1248,6 +1249,25 @@ function showFiltersInCategory(index) {
   });
   movesetScrollable.appendChild(tagList);
   movesetScreen.classList.add("show");
+}
+// patchButton.innerHTML = `${gameVersion}`;
+patchButton.addEventListener('mouseover', () => patchButton.style.color = col.pu);
+patchButton.addEventListener('mouseout',  () => patchButton.style.color = col.dg); 
+// patchButton.addEventListener('click',     () => showPatchSplash());
+function showPatchSplash() {
+  // Will be enabled in a later version *****
+  helpContent.style.width = '382px';
+  helpContent.innerHTML = '';
+  
+  for (const [specID, patchLine] of Object.entries(patchData)) {
+    const patchItem = quickElement('div','patch-item',`<br><img src=images/${items[specID].img}_0.png>${speciesNames[specID]}`);
+    for (const [attID, prePost] of Object.entries(patchLine)) {
+      patchItem.innerHTML += attID;
+      patchItem.innerHTML += `<br><b>${fidToName[prePost[0]]} => ${fidToName[prePost[1]]}</b>`;
+    }
+    helpContent.appendChild(patchItem);
+  }
+  helpScreen.classList.add("show");
 }
 function closeAllOverlays() {
   [splashScreen,helpScreen,movesetScreen].forEach(s => s.classList.remove("show"));

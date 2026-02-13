@@ -53,7 +53,6 @@ h1 {
   font-family: Verdana, sans-serif;
 }
 .colorful-text-holiday span {
-  display: inline-block;
   animation: colorChangeHoliday 2s step-start infinite, forceWhite 0s linear forwards;
   animation-delay: calc(var(--i) * -0.5s), 3.5s; /* Delay each letter, then become white */
 }
@@ -68,14 +67,23 @@ h1 {
   to { color: white; }
 }
 .colorful-text span, .colorful-text.colorful-text-holiday span {
-  display: inline-block;
   animation: colorChange 2s ease-in-out;
   animation-delay: calc(var(--i) * 0.05s); /* Delay each letter */
+}
+.colorful-text {
+  display: inline;
 }
 @keyframes colorChange {
   0% { color: rgb(255, 255, 255); }
   50% { color: rgb(140, 130, 240); }
   100% { color: rgb(255, 255, 255); }
+}
+#patch-button {
+  color: rgb(105, 105, 105);
+  font-family: Arial, Helvetica, sans-serif, sans-serif;
+  /* cursor: pointer; */
+  align-content: end;
+  /* outline: 1px solid red; */
 }
 
 /* Search box */
@@ -192,7 +200,10 @@ h1 {
 @media (min-width: 769px) { /* Desktop View - Single Row Layout */
   h1 {
     font-size: 34px;
-    grid-template-columns: 81px 1fr 50px 31px;
+    grid-template-columns: 40px 41px 1fr 50px 31px;
+  }
+  #patch-button {
+    font-size: 13px;
   }
   .header-icon-img {
     width: 31px;
@@ -298,7 +309,10 @@ h1 {
 @media (max-width: 768px) { /* Mobile View - Triple Row Layout */
   h1 {
     font-size: 20px;
-    grid-template-columns: 46px 1fr 26px 20px;
+    grid-template-columns: 30px 16px 1fr 26px 20px;
+  }
+  #patch-button {
+    font-size: 11px;
   }
   .header-icon-img {
     width: 22px;
