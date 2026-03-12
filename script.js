@@ -49,7 +49,7 @@ let pinnedRows = [];  // List of pinned row numbers
 let isMobile = false; // Change display for mobile devices
 let filteredItemIDs = null; // List of all displayed row numbers
 // State of info screen: species shown, page(moveset,biome,family,zoom), shiny(0,1,2,3), fem(0,1), zoomImageHeight
-let splashState = { speciesID: -1, page: 0, shiny: 0, fem: 0, back: 0, zoomImgh: 300 }
+let splashState = { speciesID: -1, list: [], page: 0, shiny: 0, fem: 0, back: 0, zoomImgh: 300 }
 // State of header toggles: shiny(0,1,2,3), ability(0,1,2,3), biome(0,1), move(0,1,2,3)
 let headerState = { shiny: 0, ability: 0, biome: 0, move: 0 } 
 let sortState = { sortAttr: 'row', ascending: true, index: 0 }; // State of sorting order
@@ -322,7 +322,7 @@ function renderMoreItems() { // Create each list item, with columns of info ****
     pokeImg.shinyOverride = Math.min(item.sh, headerState.shiny);  
     pokeImg.femOverride = (item?.fe == 1 ? +lockedFilters.some((f) => f == fidThreshold[7]+5) : 0);
     pokeImg.src = `images/${item.img}_${pokeImg.shinyOverride}${(pokeImg.femOverride ? 'f' : '')}.png`; 
-    pokeImg.addEventListener('click', () => showInfoSplash(thisID, 3, pokeImg.shinyOverride, pokeImg.femOverride));
+    pokeImg.addEventListener('click', () => showPokeSplash(thisID, 3, filteredItemIDs, pokeImg.shinyOverride, pokeImg.femOverride));
     
     // Create the dex column, with stars and pin only on desktop
     const dexColumn  = quickElement('div','item-column');
@@ -384,7 +384,7 @@ function renderMoreItems() { // Create each list item, with columns of info ****
     }
     
     const specColumn = quickElement('div','clickable-name',speciesNames[thisID]); // Show species name
-    specColumn.addEventListener('click', () => showInfoSplash(thisID, 1));
+    specColumn.addEventListener('click', () => showPokeSplash(thisID, 1, filteredItemIDs));
     
     const typeColumn = quickElement('div','item-column'); // Show both types
     typeColumn.innerHTML = `<p style="color:${typeColors[item.t1]}; margin: 0;">${fidToName[item.t1]}</p>`;
@@ -422,7 +422,7 @@ function renderMoreItems() { // Create each list item, with columns of info ****
           } else { // Show the only rarity
             srcText += makeBiomeDesc(rarityN);
           }
-          clickableRow.addEventListener('click', () => showInfoSplash(thisID,2));
+          clickableRow.addEventListener('click', () => showPokeSplash(thisID,2,filteredItemIDs));
           // biomeText = ['Common','Uncommon','Rare','Super Rare','Ultra Rare','Boss','Com','Unc','Rare','SR','UR','Dawn','Day','Dusk','Night']
         } else { // For moves
           if (src == -1) srcText += `rgb(251, 173, 124);">${altText[9]}`;
@@ -452,7 +452,7 @@ function renderMoreItems() { // Create each list item, with columns of info ****
         const clickableRow = quickElement('div','clickable-name');
         if (item.ex == 1) clickableRow.innerHTML += `<span style="color:rgb(143, 214, 154);">${infoText[5]}</span>`;
         if (item.ex == 2) clickableRow.innerHTML += `<span style="color:rgb(216, 143, 205);">${infoText[6]}</span>`;
-        clickableRow.addEventListener('click', () => showInfoSplash(thisID,2));
+        clickableRow.addEventListener('click', () => showPokeSplash(thisID,2,filteredItemIDs));
         moveColumn.appendChild(clickableRow);
       } else { // Show biomes if toggled, and if column is empty or if peeking over a move
         possibleFID.slice(fidThreshold[8],fidThreshold[9]).forEach((fid) => {
@@ -460,7 +460,7 @@ function renderMoreItems() { // Create each list item, with columns of info ****
             if (numMovesShown < 4) {
               const clickableRow = quickElement('div','clickable-name',fidToName[fid],biomeColors[~~(Math.min(item[fid][0],item[fid][1]??200)/40)]);
               if (toShowMovesBiomes.length) clickableRow.style.color = col.ga; // Color gray if peeking
-              clickableRow.addEventListener('click', () => showInfoSplash(thisID,2));
+              clickableRow.addEventListener('click', () => showPokeSplash(thisID,2,filteredItemIDs));
               moveColumn.appendChild(clickableRow);
             } else if (numMovesShown == 4) { // Add dots if there is no room
               moveColumn.lastChild.innerHTML += ' ...';
@@ -482,7 +482,7 @@ function renderMoreItems() { // Create each list item, with columns of info ****
     // Show the cost, colored by the egg tier
     const costColumn = quickElement('div','clickable-name');
           costColumn.innerHTML = `${headerNames[6]}<br><span style="color:${eggTierColors(item.et)};">${item.co}</span>`;  
-          costColumn.addEventListener('click', () => showInfoSplash(thisID,2));
+          costColumn.addEventListener('click', () => showPokeSplash(thisID,2,filteredItemIDs));
     // Create the stats columns
     const statColumns = [];
     const flipped = lockedFilters.includes(fidThreshold[5]+2);
@@ -524,7 +524,7 @@ function makeMovesetHeader(specID) { // Create the moveset/info splash *********
   
   const headerRow = quickElement('div','moveset-banner');
   const msImg = quickElement('img','moveset-image',`images/${item.img}_0.png`);
-  msImg.addEventListener('click', () => showInfoSplash(specID, 3));
+  msImg.addEventListener('click', () => showPokeSplash(specID, 3, null));
   const headerText = quickElement('div','',speciesNames[specID]); headerText.style.maxHeight = '46px';
   headerText.append(quickElement('span','',`<br>${fidToName[item.t1]}`,typeColors[item.t1]));
   if ('t2' in item) headerText.append(quickElement('span','',` / ${fidToName[item.t2]}`,typeColors[item.t2]));
@@ -534,7 +534,7 @@ function makeMovesetHeader(specID) { // Create the moveset/info splash *********
   const movesetButtons = quickElement('div','moveset-buttons');
   [catToName[10],infoText[15],infoText[16]].forEach((thisCat, index) => {
     const splashButton = quickElement('div','splash-button',thisCat);
-    splashButton.addEventListener('click', () => showInfoSplash(specID, index) );
+    splashButton.addEventListener('click', () => showPokeSplash(specID, index, null) );
     movesetButtons.appendChild(splashButton);
   });
   movesetHeader.appendChild(movesetButtons);
@@ -548,8 +548,9 @@ function createArrow(isRight) {
   arrow.addEventListener('click', () => changeMoveset(isRight ? 1 : -1));
   return arrow;
 }
-function showInfoSplash(specID, forcePage=null, forceShiny=null, forceFem=null) {
+function showPokeSplash(specID, forcePage=null, forceList=null, forceShiny=null, forceFem=null) {
   if (forcePage != null) splashState.page = forcePage;
+  if (forceList != null) splashState.list = forceList;
   splashState.speciesID = specID;
   const item = items[specID];
   makeMovesetHeader(specID);
@@ -573,8 +574,7 @@ function showInfoSplash(specID, forcePage=null, forceShiny=null, forceFem=null) 
       movesetScrollable.style.height = splashState.zoomImgh + "px";
       zoomImg.classList.remove("hidden");
     };
-    movesetScrollable.appendChild(zoomImg);
-    movesetScrollable.appendChild(quickElement('br'));
+    movesetScrollable.append(zoomImg, quickElement('br'));
     movesetScrollable.stars = [];
     for (let i = 1; i < 4; i++) { // Create up to 3 shiny stars
       if (item.sh >= i) {
@@ -664,8 +664,7 @@ function showInfoSplash(specID, forcePage=null, forceShiny=null, forceFem=null) 
     const msHeaderText = quickElement('div','moveset-row-header');
     msHeaderText.innerHTML = `<div>${altText[17]}</div><div>${catToName[2]}</div>
       <div>${altText[5]}</div><div>${altText[6]}</div><div>${altText[7]}</div>`;
-    movesetHeader.appendChild(msHeaderText); 
-    movesetHeader.appendChild(quickElement('hr'));
+    movesetHeader.append(msHeaderText, quickElement('hr'));
     const moveList = [[],[]]; // Assemble list of moves
     for (const [key, value] of Object.entries(item)) {
       const intKey = Number(key);
@@ -684,15 +683,19 @@ function showInfoSplash(specID, forcePage=null, forceShiny=null, forceFem=null) 
       thisList.forEach(move => makeMovesetRow(move, item, tableIndex));
     });
   } else { // Show family (splashState.page == 0)
-    possibleSID.filter(SID => items[SID].fa == item.fa).forEach(SID => {
+    const famList = possibleSID.filter(SID => items[SID].fa == item.fa);
+    famList.forEach(SID => {
       const famRow = quickElement('div','moveset-fam-row');
       const famImg = quickElement('img','moveset-image',`images/${items[SID].img}_0.png`);
-      const famText = quickElement('div','',speciesNames[SID]); // Name, type, and passive
-      famText.append(quickElement('span','',`<br>${fidToName[items[SID].t1]}`,typeColors[items[SID].t1]));
-      if ('t2' in items[SID]) famText.append(quickElement('span','',` / ${fidToName[items[SID].t2]}`,typeColors[items[SID].t2]));
-      const passiveText = quickElement('span','clickable-name',fidToName[items[SID].pa],col.pu);
-      passiveText.addEventListener('click', () => showDescSplash(items[SID].pa));
-      famText.append(quickElement('br'),passiveText);
+      famImg.addEventListener('click', () => showPokeSplash(SID, 3, famList)); // Show big image of relative
+      const famText = quickElement('div'); // Name, type, and passive
+      const famSpec = quickElement('span','clickable-name',speciesNames[SID]);
+      famSpec.addEventListener('click', () => showPokeSplash(SID, 1, famList)); // Show moveset of relative
+      const famType = quickElement('span','',`${fidToName[items[SID].t1]}`,typeColors[items[SID].t1]);
+      if ('t2' in items[SID]) famType.append(quickElement('span','',` / ${fidToName[items[SID].t2]}`,typeColors[items[SID].t2]));
+      const famPassive = quickElement('span','clickable-name',fidToName[items[SID].pa],col.pu);
+      famPassive.addEventListener('click', () => showDescSplash(items[SID].pa));
+      famText.append(famSpec, quickElement('br'), famType, quickElement('br'), famPassive);
       famRow.append(famImg, famText);
       movesetScrollable.appendChild(famRow);
     });
@@ -727,10 +730,12 @@ function moveSrcText(src, table) {
   return `${tmColors[src%4-1]};">${(altText[16].length > 2 ? 'TM' : altText[16])}`
 }
 function changeMoveset(indexChange) {
-  const index = filteredItemIDs.findIndex(ID => ID == splashState.speciesID) + indexChange;
-    if (index >= 0 && index < filteredItemIDs.length) {
-      window.scrollTo({top:(89+68*isMobile)*(index-2*!isMobile)});
-      showInfoSplash(filteredItemIDs[index]);
+  const index = splashState.list.findIndex(ID => ID == splashState.speciesID) + indexChange;
+    if (index >= 0 && index < splashState.list.length) {
+      if (splashState.list == filteredItemIDs) { // Scroll the main list, if needed
+        window.scrollTo({top:(89+68*isMobile)*(index-2*!isMobile)});
+      }
+      showPokeSplash(splashState.list[index]);
     }
 }
 
