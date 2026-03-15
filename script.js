@@ -1254,6 +1254,8 @@ function showFiltersInCategory(index) {
     }
     movesetScrollable.appendChild(splashButton);
   });
+  movesetContent.style.width = '330px';
+  movesetScrollable.style.height = 'auto';
   movesetScrollable.appendChild(tagList);
   movesetScreen.classList.add("show");
   movesetScrollable.scrollTo({ top: 0 });
