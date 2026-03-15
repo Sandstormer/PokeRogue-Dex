@@ -222,7 +222,7 @@ h1 {
   .container {
     padding: 20px;
     padding-top: 10px;
-    margin-top: 20px;
+    margin: 20px auto;
     min-height: calc(100vh - 70px);
   }
   #header-container {
@@ -245,14 +245,11 @@ h1 {
     height: 36px;
     grid-template-columns: 50px 107px 120px 79px 2.5fr 2.5fr 0.82fr repeat(7, 0.67fr);
   }
+  #itemList {
+    margin-bottom: 0px;
+  }
   #itemList li {
-    align-items: center;
-    justify-content: space-between;
     padding: 5px;
-    border: 1px solid #ffffff;
-    margin-bottom: 5px;
-    border-radius: 4px;
-    background-color: #151019;
     max-height: 82px;
     min-width: 988px;
     max-width: 988px;
@@ -360,15 +357,7 @@ h1 {
     grid-template-columns: 69px 48px repeat(7, 0.5fr);
   }
   #itemList li {
-    align-items: center; /* Center items vertically */
-    justify-content: space-between; /* Evenly space the columns */
-    padding: 10px;
-    padding-top: 3px;
-    padding-bottom: 5px;
-    border: 1px solid #ffffff;
-    margin-bottom: 5px;
-    border-radius: 4px;
-    background-color: #151019;  
+    padding: 3px 10px 5px 8px;
     max-height: 168px;
   }
   .row {
@@ -432,8 +421,19 @@ h1 {
   text-align: center;
   font-weight: bold;
 }
+#itemList li {
+  align-items: center; /* Center items vertically */
+  justify-content: space-between; /* Evenly space the columns */
+  background-color: #151019;
+  border: 1px solid #ffffff;
+  border-radius: 4px;
+  margin-bottom: 5px;
+}
 #itemList li:nth-child(odd) {
   background-color: #252129; /* Alternate row color */
+}
+#itemList li:last-child {
+  margin-bottom: 0px;
 }
 .clickable-name {
   font-weight: bold;
