@@ -1225,7 +1225,11 @@ function showFiltersInCategory(index) {
   if (thisColor == col.ga) thisColor = fidToColor((fidThreshold[index-1]??0)+4)[1];
   movesetScrollable.innerHTML = `<div style="margin-top: 5px"><b>${infoText[10]}: <span style="color:${thisColor}; display:inline;">${catToName[index]}</span></b></div><hr>`; // Name header
   const tagList = quickElement('div','splash-move-tags');
-  possibleFID.slice(fidThreshold[index-1]??0,fidThreshold[index]).forEach(fid => { // For each filter in category
+  const filtersToShow = possibleFID.slice(fidThreshold[index-1]??0,fidThreshold[index]);
+  if (index < 3) { // Sort by name in first 3 categories
+    filtersToShow.sort((a, b) => (fidToName[a] > fidToName[b] ? 1 : (fidToName[a] < fidToName[b] ? -1 : 0 )));
+  }
+  filtersToShow.forEach(fid => { // For each filter in category
     const splashButton = quickElement('div','splash-button');
     splashButton.style.margin = '5px';
     let thisColor = fidToColor(fid)[1]; // Show the standard category color
