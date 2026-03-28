@@ -7,20 +7,20 @@ You can see which Pokémon learn a move and when they learn it, who has variant 
 
 ❔ See the help screen for instructions and a list of available filters.
 
-🌐 The UI is available in 6 languages, with nearly complete translations.
+🌐 The UI is available in 7 languages, with nearly complete translations.
 
-⭐ If you enjoy my Pokedex, please share the link with other players, and leave me a star on Github!
+⭐ If you enjoy my Pokedex, please share the link with other players, and leave me a star on GitHub!
 
 
 ## Development
 
-🔧 I regularly update this project with new features, and to reflect changes made to [the game](https://pokerogue.net/). If you have comments, message me on Github or the PokeRogue Discord.
+🔧 I regularly update this project with new features, and to reflect changes made to [the game](https://pokerogue.net/). If you have comments or suggestions, message me on the PokeRogue [Discord Server](https://discord.com/invite/pokerogue).
 
 
 ## Disclaimer
 
-I worked really hard on this project, so if you want to use any part of my code in your own project, please let me know first. Do not host a copy of this project.
+I worked really hard on this project, so please do not host a copy of this project or claim it as your own. However, you are allowed to use part of my code (such as pokedex_data.js) in your own derivative project. Feel free to message me on the PokeRogue Discord Server, to ask questions or show off what you made.
 
-I do not collect any personal data or have any way to identify repeat visitors. The site uses local storage only to remember your language selection. I use analytics on the site to see basic anonymized metrics. This helps me see how many people use the site, as well as things like screen size or browser language, so that I can prioritize developing new features. I do not distribute this data to third parties. If you do not wish to be counted in the stats, a simple adblocker will completely disable the analytics.
+I do not collect any personal data or have any way to identify repeat visitors. The site uses local storage only (not cookies) to remember your language selection and other settings. I use privacy-respecting analytics on the site to see basic anonymized metrics. This helps me see how many people use the site (number go up!), as well as things like screen size or browser language, so that I can prioritize developing new features. I do not distribute this data to third parties. If you do not wish to be counted in the stats, a simple adblocker will completely disable the analytics.
 
-Images and game data are from the [Pokerogue Github](https://github.com/pagefaultgames/pokerogue). All asset rights are retained by their original creators.
+Images and game data are from the [PokeRogue GitHub](https://github.com/pagefaultgames/pokerogue). All asset rights are retained by their original creators.
