@@ -131,7 +131,7 @@ function loadFromStorage(key) {
   if (localStorage.getItem(key) !== null) return JSON.parse(localStorage.getItem(key));
 }
 function makeSearchable(input) { // Remove punctuation, accents, and compound characters
-  return input.normalize("NFD").replace(/[\u0300-\u036f\u2019.:'\s-]/g,"") // Dash must be at end of regex group
+  return input.normalize("NFD").replace(/[\u0300-\u036f’.:'\s-]/g,"") // Dash must be at end of regex group
     .toLowerCase().replace(/ß/g,"ss").replace(/œ/g,"oe").replace(/æ/g,"ae");
 }
 
@@ -232,7 +232,7 @@ function refreshAllItems() { // Display items based on query and locked filters 
   toShowMovesBiomes = lockedFilters.filter(f => [2,9].includes(fidToCategory(f)));
   // For the move tag filters, add the associated FIDs to that shown list
   // lockedFilters.filter(f => f>fidThreshold[11]+x && f<fidThreshold[12]).forEach(f => 
-  //   toShowMovesBiomes.push(...tagToFID[f].filter(fid => !toShowMovesBiomes.some(ff => ff == fid))));
+  //   toShowMovesBiomes.push(...tagToFID[f].filter(fid => !toShowMovesBiomes.includes(fid))));
     
   // Remove the pinned items for now ==============
   if (pinnedRows) filteredItemIDs = filteredItemIDs.filter((thisID) => !pinnedRows.includes(thisID));
@@ -240,7 +240,7 @@ function refreshAllItems() { // Display items based on query and locked filters 
   // Sort items if a column is specified ==============
   if (sortState.sortAttr) {
     let effectiveSort = sortState.sortAttr;
-    if (lockedFilters.some((f) => f == fidThreshold[5]+2) && sortState.sortAttr in flipStats) { // If flipped mode
+    if (lockedFilters.includes(fidThreshold[5]+2) && sortState.sortAttr in flipStats) { // If flipped mode
       effectiveSort = flipStats[sortState.sortAttr]
     }
     filteredItemIDs.sort((a, b) => {
@@ -262,7 +262,7 @@ function refreshAllItems() { // Display items based on query and locked filters 
         }, 0);
         aValue = getLearnLevel(a); bValue = getLearnLevel(b);
       } else if (sortState.sortAttr == 'type') { // Sort by type combinations
-        const typeMult = (lockedFilters.some((f) => f < fidThreshold[0]) ? 2 : 36 );
+        const typeMult = (lockedFilters.some(f => f < fidThreshold[0]) ? 2 : 36 );
         const aEntry = items[a]; const bEntry = items[b];
         aValue = (aEntry.t1+1)*(typeMult*!lockedFilters.includes(aEntry.t1));
         bValue = (bEntry.t1+1)*(typeMult*!lockedFilters.includes(bEntry.t1));
@@ -320,7 +320,7 @@ function renderMoreItems() { // Create each list item, with columns of info ****
     const pokeImg = quickElement('img','item-image');  
     pokeImg.stars = []; // Keep a list of stars that can change the pokemon image 
     pokeImg.shinyOverride = Math.min(item.sh, headerState.shiny);  
-    pokeImg.femOverride = (item?.fe == 1 ? +lockedFilters.some((f) => f == fidThreshold[7]+5) : 0);
+    pokeImg.femOverride = (item?.fe == 1 ? +lockedFilters.includes(fidThreshold[7]+5) : 0);
     pokeImg.src = `images/${item.img}_${pokeImg.shinyOverride}${(pokeImg.femOverride ? 'f' : '')}.png`; 
     pokeImg.addEventListener('click', () => showPokeSplash(thisID, 3, filteredItemIDs, pokeImg.shinyOverride, pokeImg.femOverride));
     
@@ -845,11 +845,10 @@ function displaySuggestions() {
       if (fid == fidThreshold[7]+2 || fid == fidThreshold[9]+1) return false; // Hide new mega filters until launch
       if (lockedFilters.some((f) => f%fidThreshold[12] == fid)) return false; // Don't suggest if already locked
       if (fid >= fidThreshold[9] && offerFamilies.includes(fid)) return true; // Suggest matching families
-      // if (fid >= fidThreshold[11] && tagToFID[fid].some(f => fidToSearch[f].includes(query))) return true; // Suggest related tags
       return fidToSearch[fid].includes(query); // Suggest if it contains the search query
     });
     if (matchingFID.length < 10 && !isExclusion) {
-      const tagsToAdd = possibleFID.filter(fid => fid >= fidThreshold[11] && tagToFID[fid].some(f => fidToSearch[f].includes(query)) && !matchingFID.some(f => f == fid));
+      const tagsToAdd = possibleFID.filter(fid => fid >= fidThreshold[11] && tagToFID[fid].some(f => fidToSearch[f].includes(query)) && !matchingFID.includes(fid));
       matchingFID.push(...tagsToAdd);
     }
     // Erase the list of suggestions if it is too large, and no exact matches
@@ -973,8 +972,8 @@ function updateHeader(clickTarget = null, ignoreFlip = false) {
   // Find the new sorting attribute, and update the headers
   if (sortAttribute == 'shiny') { // Toggle the global shiny state
     // Cap the selector to T1 if the "None" filter is selected or if the entire list only has T1
-    const shinyCap = lockedFilters.some(f => f == fidThreshold[10]+2) 
-    || (!filteredItemIDs.some(specID => items[specID].sh>1) && !!filteredItemIDs.length);
+    const shinyCap = lockedFilters.includes(fidThreshold[10]+2)
+      || (!filteredItemIDs.some(specID => items[specID].sh>1) && !!filteredItemIDs.length);
     headerState.shiny = (headerState.shiny+3)%(shinyCap?2:4);
   } else if (sortAttribute == 'ab') { // Toggle the global ability state
     headerState.ability = (headerState.ability+1)%4;
