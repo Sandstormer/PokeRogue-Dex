@@ -805,11 +805,14 @@ function fidToColor(fid) {
   else return [col.ga, col.or];
 }
 function abToColor(src, fid) {
-  const tagFilters = lockedFilters.filter(f => f >= fidThreshold[11] && f < fidThreshold[12]);
-  const isLit = (tagFilters.length ? tagFilters.some(t => tagToFID[t].some(f => f == fid)) : true );
-  if (src == 'ha') return ([0,2].includes(headerState.ability) && isLit ? col.ye:col.dg);
-  if (src == 'pa') return ([0,3].includes(headerState.ability) && isLit ? col.pu:col.ga);
-  return ([0,1].includes(headerState.ability) && isLit ? col.wh:col.ga);
+  const tagFilters = [ // List of abilities that 'light up' that slot
+    ...lockedFilters.filter(f => f >= fidThreshold[ 0] && f < fidThreshold[ 1]),
+    ...lockedFilters.filter(f => f >= fidThreshold[11] && f < fidThreshold[12]).flatMap(f => tagToFID[f])
+  ]; // If there isn't a tag filter active, light up all abilities
+  const isLit = (tagFilters.length ? tagFilters.includes(fid) : true );
+  if (src == 'ha') return ([0,2].includes(headerState.ability) && isLit ? col.ye : col.dg);
+  if (src == 'pa') return ([0,3].includes(headerState.ability) && isLit ? col.pu : col.ga);
+  return ([0,1].includes(headerState.ability) && isLit ? col.wh : col.ga);
 }
 function eggTierColors(fid) {
   if (fid >= fidThreshold[4]) fid -= fidThreshold[4];
