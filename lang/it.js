@@ -4566,25 +4566,26 @@ fidToName = [
 'Crea Sole'
 ];
 helpMenuText = [
-`Un <span style="color:rgb(140, 130, 240);">potente strumento di ricerca</span> per PokéRogue`,
-`Usa la <span style="color:rgb(140, 130, 240);">Barra di Ricerca</span> per aggiungere filtri:`,
-`Combina diversi filtri per ottenere ciò che vuoi`,
-`Clicca tra i filtri per usare la condizione "OR"`,
-`Clicca le <span style="color:rgb(140, 130, 240);">Intestazioni</span> per ordinare i risultati:`,
+'Un <span style="color:rgb(140, 130, 240);">potente strumento di ricerca</span> per PokéRogue',
+'Usa la <span style="color:rgb(140, 130, 240);">Barra di Ricerca</span> per aggiungere filtri:',
+'Combina diversi filtri per ottenere ciò che vuoi',
+'Clicca tra i filtri per usare la condizione "OR"',
+'Clicca le <span style="color:rgb(140, 130, 240);">Intestazioni</span> per ordinare i risultati:',
 `Clicca su <b>${headerNames[1]}</b> per vedere le varianti cromatiche`,
 `Clicca su <b>${headerNames[4]}</b> per restringere solo a un tipo:`,
-`Abilità Principali`,
+'Abilità Principali',
 `${infoText[4]}`,
 `${infoText[1]}`,
 `<b>${headerNames[5]}</b> sono mostrate come <b>${fidToName[fidThreshold[4]]}</b> e <span style="color:rgb(240, 230, 140); font-weight: bold;">${fidToName[fidThreshold[4]+1]}</span>`,
 `Clicca l’intestazione per passare ai <b>${infoText[9]}</b>`,
 `Questa colonna mostrerà anche <b>filtrati ${altText[0]}/${infoText[9]}</b>`,
 `<b>${catToName[4]}</b> indica la rarità delle <b>${catToName[5]}</b>:`,
-`Clicca su una voce per vedere i dettagli di:`,
+'Clicca su una voce per vedere i dettagli di:',
 `Clicca su un <b>${headerNames[2]}</b> per vedere tutte le mosse.`,
 `Il colore di <b>Pot</b> indica <span style="color:${col.or}; font-weight: bold;">Fisico</span> o <span style="color:${col.bl}; font-weight: bold;">Speciale</span> danno`,
 `Il colore di <b>Prec</b> indica <span style="color:${col.re}; font-weight: bold;">le Mosse Multicolpo</span>`,
-`Questo sito è stato creato da Sandstorm e tradotto in italiano con un po’ di aiuto. Non memorizzo cookie né raccolgo dati personali. Le immagini e i dati di gioco provengono dal GitHub di PokeRogue. Tutti i diritti sugli asset appartengono ai rispettivi creatori originali.`,
-`Versione del Gioco`,
-`Data`,
-`Filtri persistenti`,];
+'Questo sito è stato creato da Sandstorm e tradotto in italiano con un po’ di aiuto. Non memorizzo cookie né raccolgo dati personali. Le immagini e i dati di gioco provengono dal GitHub di PokeRogue. Tutti i diritti sugli asset appartengono ai rispettivi creatori originali.',
+'Versione del Gioco',
+'Data',
+'Filtri persistenti'
+];

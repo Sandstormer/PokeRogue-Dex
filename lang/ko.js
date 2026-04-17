@@ -4548,25 +4548,26 @@ fidToName = [
 '햇빛 생성'
 ];
 helpMenuText = [
-`포켓로그용 <span style="color:rgb(140, 130, 240);">빠르고 강력한 검색</span> 사이트입니다`,
-`<span style="color:rgb(140, 130, 240);">검색 창</span> 으로 필터를 추가할 수 있습니다:`,
-`여러 필터를 조합하여 원하는 결과를 얻으세요`,
-`잠긴 필터 사이를 클릭하여 "OR" 조건을 사용하세요`,
-`결과를 정렬하려면 <span style="color:rgb(140, 130, 240);">헤더</span> 를 클릭하세요:`,
+'포켓로그용 <span style="color:rgb(140, 130, 240);">빠르고 강력한 검색</span> 사이트입니다',
+'<span style="color:rgb(140, 130, 240);">검색 창</span> 으로 필터를 추가할 수 있습니다:',
+'여러 필터를 조합하여 원하는 결과를 얻으세요',
+'잠긴 필터 사이를 클릭하여 "OR" 조건을 사용하세요',
+'결과를 정렬하려면 <span style="color:rgb(140, 130, 240);">헤더</span> 를 클릭하세요:',
 `<b>${headerNames[1]}</b> 열은 색이 다른 포켓몬만 표시할 수 있어요`,
 `<b>${headerNames[4]}</b> 열은 특정 슬롯으로 제한할 수 있습니다:`,
-`주요 특성`,
+'주요 특성',
 `${infoText[4]}`,
 `${infoText[1]}`,
 `<b>${headerNames[5]}</b>는 <b>${fidToName[fidThreshold[4]]}</b> 및 <span style="color:rgb(240, 230, 140); font-weight: bold;">${fidToName[fidThreshold[4]+1]}</span>로 표시됩니다.`,
 `헤더를 클릭하여 <b>${infoText[9]}</b>(으)로 전환하세요`,
 `이 열에는 <b>필터된 ${altText[0]}/${infoText[9]}</b>도 표시됩니다`,
 `<b>${catToName[4]}</b> 열은 <b>${catToName[5]}</b>의 색상을 표시합니다:`,
-`항목을 클릭해 상세 정보를 확인하세요:`,
+'항목을 클릭해 상세 정보를 확인하세요:',
 `<b>${headerNames[2]}</b>를 클릭하여 전체 기술 구성을 확인하세요.`,
 `<b>${altText[5]}</b>의 색상은 <span style="color:${col.or}; font-weight: bold;">물리</span> 또는 <span style="color:${col.bl}; font-weight: bold;">특수</span> 데미지를 나타냅니다`,
 `<b>${altText[6]}</b>의 색상은 <span style="color:${col.re}; font-weight: bold;">다중 대상</span> 기술을 나타냅니다`,
-`이 사이트는 Sandstorm 이 만들었으며, Misdreavus 가 번역을 도왔습니다. 쿠키를 저장하거나 개인 데이터를 수집하지 않습니다. 이미지와 게임 데이터는 PokeRogue GitHub 에서 제공되며, 자산 권리는 원 제작자에게 있습니다.`,
-`게임 버전`,
-`날짜`,
-`필터 유지`,];
+'이 사이트는 Sandstorm 이 만들었으며, Misdreavus 가 번역을 도왔습니다. 쿠키를 저장하거나 개인 데이터를 수집하지 않습니다. 이미지와 게임 데이터는 PokeRogue GitHub 에서 제공되며, 자산 권리는 원 제작자에게 있습니다.',
+'게임 버전',
+'날짜',
+'필터 유지'
+];

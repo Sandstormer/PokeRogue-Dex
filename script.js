@@ -1,7 +1,7 @@
 // Main script for handling all functionality
 // Some variables are imported from other scripts
 // pokedex_data.js: items
-// filter_data.js: typeColors, fidThreshold, fidToProc
+// filter_data.js: gameVersion, latestDate, typeColors, fidThreshold, upgradeCosts, tagToFID, fidToProc
 // lang/en.js: headerNames, altText, catToName, infoText, biomeText, biomeLongText,
 //             warningText, procTodesc, tagToDesc, fidToDesc, speciesNames, fidToName, helpMenuText
     

@@ -4548,25 +4548,26 @@ fidToName = [
 'Invoque Soleil'
 ];
 helpMenuText = [
-`<span style="color:rgb(140, 130, 240);">Recherche rapide et puissante</span> pour PokeRogue`,
-`Ajoutez des filtres via la <span style="color:rgb(140, 130, 240);">barre de recherche</span>:`,
-`Combinez plusieurs filtres pour affiner la recherche`,
-`Cliquez entre eux pour correspondre à l’un ou l’autre`,
-`Cliquez sur les <span style="color:rgb(140, 130, 240);">Entêtes</span> pour trier les résultats:`,
+'<span style="color:rgb(140, 130, 240);">Recherche rapide et puissante</span> pour PokeRogue',
+'Ajoutez des filtres via la <span style="color:rgb(140, 130, 240);">barre de recherche</span>:',
+'Combinez plusieurs filtres pour affiner la recherche',
+'Cliquez entre eux pour correspondre à l’un ou l’autre',
+'Cliquez sur les <span style="color:rgb(140, 130, 240);">Entêtes</span> pour trier les résultats:',
 `Cliquez <b>${headerNames[1]}</b> pour voir les variantes chromatique`,
 `<b>${headerNames[4]}</b> peut filtrer un seul slot de talents:`,
-`Talents principaux`,
+'Talents principaux',
 `${infoText[4]}`,
 `${infoText[1]}`,
 `<b>${headerNames[5]}</b> affichées comme <b>${fidToName[fidThreshold[4]]}</b> et <span style="color:rgb(240, 230, 140); font-weight: bold;">${fidToName[fidThreshold[4]+1]}</span>`,
 `Cliquez sur l’en-tête pour passer à <b>${infoText[9]}</b>`,
 `Affichera également <b>${altText[0]}/${infoText[9]} filtré</b>`,
 `<b>${catToName[4]}</b> montre la couleur de <b>Rareté de ${catToName[5]}</b>:`,
-`Cliquez sur une entrée pour voir les détails de:`,
+'Cliquez sur une entrée pour voir les détails de:',
 `Cliquez sur <b>${headerNames[2]}</b> pour voir toutes ses capacités.`,
 `Couleur de <b>${altText[6]}</b> indique les attaques <span style="color:${col.re}; font-weight: bold;">Multi-Cibles</span>`,
 `<b>${altText[5]}</b> indique des dégâts <span style="color:${col.or}; font-weight: bold;">Physiques</span> ou <span style="color:${col.bl}; font-weight: bold;">Spéciaux</span>`,
-`Site créé par Sandstorm, et traduit de l’anglais. Aucune donnée personnelles collectées. Les images et données proviennent du GitHub de PokéRogue. Tous droits sont réservés à leurs créateurs respectifs.`,
-`Version du Jeu`,
-`Date`,
-`Filtres Persistants`,];
+'Site créé par Sandstorm, et traduit de l’anglais. Aucune donnée personnelles collectées. Les images et données proviennent du GitHub de PokéRogue. Tous droits sont réservés à leurs créateurs respectifs.',
+'Version du Jeu',
+'Date',
+'Filtres Persistants'
+];

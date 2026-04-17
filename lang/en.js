@@ -4548,25 +4548,26 @@ fidToName = [
 'Creates Sun'
 ];
 helpMenuText = [
-`This is a <span style="color:rgb(140, 130, 240);">fast and powerful search</span> for PokeRogue`,
-`Use the <span style="color:rgb(140, 130, 240);">Search Bar</span> to add filters:`,
-`Combine multiple filters to get what you want`,
-`Click between locked filters to use the "OR" condition`,
-`Click the <span style="color:rgb(140, 130, 240);">Headers</span> to sort results:`,
+'This is a <span style="color:rgb(140, 130, 240);">fast and powerful search</span> for PokeRogue',
+'Use the <span style="color:rgb(140, 130, 240);">Search Bar</span> to add filters:',
+'Combine multiple filters to get what you want',
+'Click between locked filters to use the "OR" condition',
+'Click the <span style="color:rgb(140, 130, 240);">Headers</span> to sort results:',
 `Click the <b>${headerNames[1]}</b> column to see shiny variants`,
 `Click the <b>${headerNames[4]}</b> column to restrict to one slot:`,
-`Main Abilities`,
+'Main Abilities',
 `${infoText[4]}`,
 `${infoText[1]}`,
 `<b>${headerNames[5]}</b> are shown as <b>${fidToName[fidThreshold[4]]}</b> and <span style="color:rgb(240, 230, 140); font-weight: bold;">${fidToName[fidThreshold[4]+1]}</span>`,
 `Click the header to switch to <b>${infoText[9]}</b> instead`,
 `That column will also show <b>filtered ${altText[0]}/${infoText[9]}</b>`,
 `<b>${catToName[4]}</b> column shows rarity color of <b>${catToName[5]}</b>:`,
-`Click on an entry to see details for:`,
+'Click on an entry to see details for:',
 `Click a <b>${headerNames[2]}</b> to see their full moveset.`,
 `Color of <b>${altText[5]}</b> shows <span style="color:${col.or}; font-weight: bold;">Physical</span> or <span style="color:${col.bl}; font-weight: bold;">Special</span> damage`,
 `Color of <b>${altText[6]}</b> shows <span style="color:${col.re}; font-weight: bold;">Multi-Target</span> moves`,
-`This site was created by Sandstorm, with a lot of hard work. I do not store any cookies or collect any personal data. Images and game data are from the PokeRogue GitHub. All asset rights are retained by their original creators.`,
-`Game Version`,
-`Date`,
-`Persistent Filters`,];
+'This site was created by Sandstorm, with a lot of hard work. I do not store any cookies or collect any personal data. Images and game data are from the PokeRogue GitHub. All asset rights are retained by their original creators.',
+'Game Version',
+'Date',
+'Persistent Filters'
+];
