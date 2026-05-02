@@ -31,7 +31,7 @@ const languageNames  = ["English","Français","Español (España)","Italiano","�
 const col = {pu:'rgb(140, 130, 240)', wh:'rgb(255, 255, 255)', ga:'rgb(145, 145, 145)', dg:'rgb(105, 105, 105)',
              bl:'rgb(131, 182, 239)', ye:'rgb(240, 230, 140)', re:'rgb(239, 131, 131)', pi:'rgb(216, 143, 205)',
              ge:'rgb(143, 214, 154)', or:'rgb(251, 173, 124)', cy:'rgb( 83, 237, 229)', dr:'rgb(247, 82,  49)'};
-const tagColors = {0:col.pi, 1:col.re, 2:col.dr, 57:col.ye, 58:col.re, 61:col.ye, 62:col.re};
+const tagColors = {0:col.pi, 1:col.re, 2:col.dr, 69:col.ye, 70:col.re, 73:col.ye, 74:col.re};
 const biomeColors = [col.wh, col.bl, col.ye, col.re, col.pi];
 const moveCatColor = [col.or, col.bl, col.wh];
 const tmColors = [col.wh, col.bl, col.ye];
@@ -809,7 +809,8 @@ function abToColor(src, fid) {
     ...lockedFilters.filter(f => f >= fidThreshold[ 0] && f < fidThreshold[ 1]),
     ...lockedFilters.filter(f => f >= fidThreshold[11] && f < fidThreshold[12]).flatMap(f => tagToFID[f])
   ]; // If there isn't a tag filter active, light up all abilities
-  const isLit = (tagFilters.length ? tagFilters.includes(fid) : true );
+  const isLit = ( lockedFilters.some(f => f >= fidThreshold[11] && f < fidThreshold[12]) ?
+    tagFilters.includes(fid) : true );
   if (src == 'ha') return ([0,2].includes(headerState.ability) && isLit ? col.ye : col.dg);
   if (src == 'pa') return ([0,3].includes(headerState.ability) && isLit ? col.pu : col.ga);
   return ([0,1].includes(headerState.ability) && isLit ? col.wh : col.ga);
