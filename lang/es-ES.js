@@ -231,7 +231,7 @@ fidToDesc = [
 'Crea un campo eléctrico al entrar en combate. Si hay un campo eléctrico, su ataque especial aumenta un 33% gracias a su motor futurista.<br><br><span style="color:rgb(145, 145, 145);">Durante cinco turnos, se potencian los movimientos de tipo Eléctrico y los Pokémon que están en contacto con el suelo no pueden quedarse dormidos.</span>',
 '50% de posibilidad de regenerar una baya tras usarla. Incrementa a 100% de posibilidad cuando haga sol.',
 '30% de posibilidad de curar los problemas de estado de un aliado al final del turno.',
-'Su cuerpo, resistente al calor, reduce a la mitad el daño recibido por movimientos de tipo Fuego e impide que pueda ser quemado.',
+'Su cuerpo, resistente al calor, reduce a la mitad el daño recibido por movimientos de tipo Fuego y por el quemado.',
 'Duplica su peso.',
 'El Pokémon recoge miel tras cada batalla aún sin participar en el combate. La miel se vende inmediatamente por ₽.',
 'Al entrar en combate, restaura ¼ PS de los PS máximos de su aliado como muestra de hospitalidad.',

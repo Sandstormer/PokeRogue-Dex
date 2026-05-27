@@ -230,7 +230,7 @@ fidToDesc = [
 'The Pokémon is so gutsy that when it has a status condition, its Attack stat is boosted by 50%. Being burned does not halve the damage dealt by the Pokémon’s physical moves.',
 'Turns the ground into Electric Terrain for 5 turns when the Pokémon enters a battle. The futuristic engine within the Pokémon also boosts its Sp. Atk stat by 33% on Electric Terrain.<br><br><span style="color:rgb(145, 145, 145);">The user electrifies the ground for five turns, powering up Electric-type moves. Pokémon on the ground no longer fall asleep.</span>',
 'If the Pokémon has used a Berry, it has a 50% chance of creating another one at the end of every turn. In harsh sunlight, the Pokémon is guaranteed to create a Berry.',
-'Allies next to the Pokémon in battle have a 50% chance to be cured of their status conditions at the end of every turn.',
+'Allies next to the Pokémon in battle have a 30% chance to be cured of their status conditions at the end of every turn.',
 'The Pokémon’s heatproof body halves the damage taken from burns and Fire-type moves.',
 'Doubles the Pokémon’s weight.',
 'The Pokémon gathers Honey which is then sold for money after a battle is won, even if it did not participate.',
