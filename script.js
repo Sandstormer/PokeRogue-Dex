@@ -146,7 +146,16 @@ function refreshAllItems() { // Display items based on query and locked filters 
   // Filter from query ==============
   if (query.length) {
     if (/^\d+$/.test(query)) { // If query is only digits
-      filteredItemIDs = filteredItemIDs.filter(specID => items[specID].dex >= parseInt(query,10));
+      if (sortState.sortAttr == "row") {
+        if (sortState.ascending) {
+          filteredItemIDs = filteredItemIDs.filter(specID => items[specID].dex >= parseInt(query,10));
+        } else {
+          filteredItemIDs = filteredItemIDs.filter(specID => items[specID].dex <= parseInt(query,10));
+        }
+      } else {
+        const shownFamilies = [...new Set(filteredItemIDs.filter(specID => items[specID].dex == parseInt(query,10)).map(specID => items[specID].fa))];
+        filteredItemIDs = filteredItemIDs.filter(specID => shownFamilies.includes(items[specID].fa));
+      }
     } else { // For a standard query
       filteredItemIDs = filteredItemIDs.filter(specID => 
         specToSearch[specID].includes(query) ||
@@ -834,7 +843,7 @@ function displaySuggestions() {
   if (query.length) {
     // Filter by species name, to suggest families
     let filteredSID = possibleSID.filter(ID => items[ID].dex.toString().includes(query) || specToSearch[ID].includes(query));
-    if (filteredSID.length > 20) filteredSID = [];
+    if (filteredSID.length > 20) filteredSID = possibleSID.filter(ID => items[ID].dex.toString() == query);
     let offerFamilies = [...new Set(filteredSID.map(ID => items[ID].fa))];
     if (offerFamilies.length > 4) offerFamilies = [];
     // Filter suggestions based on query and exclude already locked filters
@@ -859,7 +868,7 @@ function displaySuggestions() {
       if (tabSelect) tabSelect = (tabSelect+matchingFID.length)%matchingFID.length;
       filterToEnter = matchingFID[tabSelect ?? 0];
     }
-    matchingFID.forEach(fid => { // Create the suggestion tag elements
+    matchingFID.forEach(fid => { // Create the suggestion clickable elements
       let newSugg = quickElement('div','suggestion',`${isExclusion?'<img src="ui/x.png">':''}
         <span style="color:${fidToColor(fid)[0]}; display:inline;">${catToName[fidToCategory(fid)]}:
         <span style="color:${fidToColor(fid)[1]}; display:inline;">${fidToName[fid]}</span></span>`);
