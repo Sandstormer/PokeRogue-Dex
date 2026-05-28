@@ -546,8 +546,7 @@ function makeMovesetHeader(specID) { // Create the moveset/info splash *********
     splashButton.addEventListener('click', () => showPokeSplash(specID, index, null) );
     movesetButtons.appendChild(splashButton);
   });
-  movesetHeader.appendChild(movesetButtons);
-  movesetHeader.appendChild(quickElement('hr'));
+  movesetHeader.append(movesetButtons,quickElement('hr'));
 }
 function createArrow(isRight) {
   const arrow = quickElement('img','moveset-arrow','ui/arrow.png');
@@ -645,15 +644,12 @@ function showPokeSplash(specID, forcePage=null, forceList=null, forceShiny=null,
         if (!lockedFilters.some((f) => f%fidThreshold[12] == fid)) { // Button to add biome directly to filters
           const splashButton = quickElement('div','splash-button',altText[8]);  
           splashButton.addEventListener('click', () => { lockFilter(fid); closeAllOverlays(); });
-          biomeDesc.appendChild(quickElement('br'));
-          biomeDesc.appendChild(splashButton);
+          biomeDesc.append(quickElement('br'),splashButton);
         }
-        biomeRow.appendChild(biomeLink);
-        biomeRow.appendChild(biomeDesc);
+        biomeRow.append(biomeLink,biomeDesc);
         movesetScrollable.appendChild(biomeRow);
       }
     });
-    movesetScrollable.appendChild(quickElement('hr'));
     const splashCostInfo = quickElement('div','splash-move-tags');
     const HAtext = ('ha' in item ? `<br>${infoText[4]}: 1 in 8` : '');
     // Info on friendship and candy
@@ -668,7 +664,7 @@ function showPokeSplash(specID, forcePage=null, forceList=null, forceShiny=null,
       <br>${altText[12]}: 1 in ${REMchance[item.et]}${HAtext}
       <br>${altText[10]}: 1 in 12</span></p>
       `;
-    movesetScrollable.appendChild(splashCostInfo);
+    movesetScrollable.append(quickElement('hr'), splashCostInfo);
   } else if (splashState.page == 1) { // Show moveset (splashState.page == 1)
     const msHeaderText = quickElement('div','moveset-row-header');
     msHeaderText.innerHTML = `<div>${altText[17]}</div><div>${catToName[2]}</div>
@@ -760,7 +756,7 @@ function showDescSplash(fid) { // Create the ability/move details splash *******
       else splashMoveCol.innerHTML = `${attName}<br>${(thisProcs[3+index]==-1 ? '-' : thisProcs[3+index])}`;
       splashMoveRow.appendChild(splashMoveCol);
     });
-    splashContent.appendChild(splashMoveRow);  splashContent.appendChild(quickElement('hr'));
+    splashContent.append(splashMoveRow,quickElement('hr'));
   }
   splashContent.innerHTML += fidToDesc[fid-fidThreshold[0]]; // Description of ability/move
   if (thisProcs[0] || thisProcs[1] || thisProcs[7]) {
