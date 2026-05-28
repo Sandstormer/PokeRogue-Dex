@@ -24,11 +24,11 @@ const openLangButton = document.getElementById("lang-img");
 const patchButton = document.getElementById("patch-button");
 const clearIcon = document.getElementById("clearIcon");
 const sortAttributes = ['row','shiny','sp','type','ab','moves','co','bst','hp','atk','def','spa','spd','spe'];
-const possibleFID = [...Array(fidThreshold[fidThreshold.length-1]).keys()];
-const possibleSID = [...Array(items.length).keys()];
+const allFID = [...Array(fidThreshold[fidThreshold.length-1]).keys()];
+const allSID = [...Array(items.length).keys()];
 const supportedLangs = ["en","fr","es-ES","it","ko","zh-Hans","ja"];//"pt-BR","de"];
 const languageNames  = ["English","Français","Español (España)","Italiano","한국어 (Hangugeo)","简体中文 (Jiǎntǐ Zhōngwén)","日本語 (Nihongo)"];//,"Português (Brasil)","Deutsch"];
-const col = {pu:'rgb(140, 130, 240)', wh:'rgb(255, 255, 255)', ga:'rgb(145, 145, 145)', dg:'rgb(105, 105, 105)',
+const col = {pu:'rgb(140, 130, 240)', wh:'rgb(255, 255, 255)', ga:'rgb(145, 145, 145)', dg:'rgb(100, 100, 100)',
              bl:'rgb(131, 182, 239)', ye:'rgb(240, 230, 140)', re:'rgb(239, 131, 131)', pi:'rgb(216, 143, 205)',
              ge:'rgb(143, 214, 154)', or:'rgb(251, 173, 124)', cy:'rgb( 83, 237, 229)', dr:'rgb(247, 82,  49)'};
 const tagColors = {0:col.pi, 1:col.re, 2:col.dr, 69:col.ye, 70:col.re, 73:col.ye, 74:col.re};
@@ -55,9 +55,9 @@ let headerState = { shiny: 0, ability: 0, biome: 0, move: 0 }
 let sortState = { sortAttr: 'row', ascending: true, index: 0 }; // State of sorting order
 let persistentState = false; // Whether filters are reloaded upon refresh
 const formToFamily = {
-  [fidThreshold[9]]:   new Set(possibleSID.filter(s => items[s].fx <= 2).map(s => items[s].fa)),
-  [fidThreshold[9]+1]: new Set(possibleSID.filter(s => items[s].fx == 2).map(s => items[s].fa)),
-  [fidThreshold[9]+2]: new Set(possibleSID.filter(s => items[s].fx == 3).map(s => items[s].fa)),
+  [fidThreshold[9]]:   new Set(allSID.filter(s => items[s].fx <= 2).map(s => items[s].fa)),
+  [fidThreshold[9]+1]: new Set(allSID.filter(s => items[s].fx == 2).map(s => items[s].fa)),
+  [fidThreshold[9]+2]: new Set(allSID.filter(s => items[s].fx == 3).map(s => items[s].fa)),
 };
   
 // Perform initial display with detected language
@@ -142,7 +142,7 @@ function refreshAllItems() { // Display items based on query and locked filters 
   itemList.querySelectorAll('li').forEach(li => li.replaceWith(li.cloneNode(true))); // Clones without listeners
   while (itemList.firstChild) itemList.firstChild.remove();
 
-  filteredItemIDs = possibleSID;
+  filteredItemIDs = allSID;
   // Filter from query ==============
   if (query.length) {
     if (/^\d+$/.test(query)) { // If query is only digits
@@ -464,7 +464,7 @@ function renderMoreItems() { // Create each list item, with columns of info ****
         clickableRow.addEventListener('click', () => showPokeSplash(thisID,2,filteredItemIDs));
         moveColumn.appendChild(clickableRow);
       } else { // Show biomes if toggled, and if column is empty or if peeking over a move
-        possibleFID.slice(fidThreshold[8],fidThreshold[9]).forEach((fid) => {
+        allFID.slice(fidThreshold[8],fidThreshold[9]).forEach((fid) => {
           if (fid in item) {
             if (numMovesShown < 4) {
               const clickableRow = quickElement('div','clickable-name',fidToName[fid],biomeColors[~~(Math.min(item[fid][0],item[fid][1]??200)/40)]);
@@ -626,7 +626,7 @@ function showPokeSplash(specID, forcePage=null, forceList=null, forceShiny=null,
     if (item?.fx) movesetScrollable.innerHTML += biomeLongText[0]; // Description of form exclusivity
     if (item?.fx && item?.ex) movesetScrollable.innerHTML += '<br><br>';
     if (item?.ex) movesetScrollable.innerHTML += biomeLongText[item.ex]; // Description of species exclusivity
-    possibleFID.slice(fidThreshold[8],fidThreshold[9]).forEach((fid) => {
+    allFID.slice(fidThreshold[8],fidThreshold[9]).forEach((fid) => {
       if (fid in item) {
         const biomeRow = quickElement('div','biome-row');
         if (!movesetScrollable.innerHTML) biomeRow.style.marginTop = '4px'; // Add margin if empty
@@ -692,7 +692,7 @@ function showPokeSplash(specID, forcePage=null, forceList=null, forceShiny=null,
       thisList.forEach(move => makeMovesetRow(move, item, tableIndex));
     });
   } else { // Show family (splashState.page == 0)
-    const famList = possibleSID.filter(SID => items[SID].fa == item.fa);
+    const famList = allSID.filter(SID => items[SID].fa == item.fa);
     famList.forEach(SID => {
       const famRow = quickElement('div','moveset-fam-row');
       const famImg = quickElement('img','moveset-image',`images/${items[SID].img}_0.png`);
@@ -841,31 +841,32 @@ function displaySuggestions() {
   const isExclusion = searchBox.value.startsWith('-');
   const query = makeSearchable(searchBox.value); // Get search query
   if (query.length) {
-    // Filter by species name, to suggest families
-    let filteredSID = possibleSID.filter(ID => items[ID].dex.toString().includes(query) || specToSearch[ID].includes(query));
-    if (filteredSID.length > 20) filteredSID = possibleSID.filter(ID => items[ID].dex.toString() == query);
+    // Filter by species that match query, to suggest families (the family name does not have to match query)
+    let filteredSID = allSID.filter(ID => specToSearch[ID].includes(query));
+    if (/^\d+$/.test(query)) filteredSID = allSID.filter(ID => items[ID].dex == query); // If query is a number, only show dex number matches
     let offerFamilies = [...new Set(filteredSID.map(ID => items[ID].fa))];
-    if (offerFamilies.length > 4) offerFamilies = [];
-    // Filter suggestions based on query and exclude already locked filters
-    let matchingFID = possibleFID.filter(fid => {
+    if (offerFamilies.length > 4) offerFamilies = []; // Limit to 4 families
+    // Filter suggestions that match query, and exclude filters that are invalid or already locked
+    let matchingFID = allFID.filter(fid => {
       if (isExclusion && ( fid>=fidThreshold[9]
         || (fid>=fidThreshold[5] && fid<fidThreshold[6]) 
         || (fid>=fidThreshold[3]+10 && fid<fidThreshold[4]) 
-      )) return false; // Only some categories can be exclusion filters
+      )) return false; // Reject categories that can't be exclusion filters
       if (fid == fidThreshold[7]+2 || fid == fidThreshold[9]+1) return false; // Hide new mega filters until launch
-      if (lockedFilters.some((f) => f%fidThreshold[12] == fid)) return false; // Don't suggest if already locked
+      if (lockedFilters.some((f) => f%fidThreshold[12] == fid)) return false; // Reject if already locked
       if (fid >= fidThreshold[9] && offerFamilies.includes(fid)) return true; // Suggest matching families
       return fidToSearch[fid].includes(query); // Suggest if it contains the search query
     });
-    if (matchingFID.length < 10 && !isExclusion) {
-      const tagsToAdd = possibleFID.filter(fid => fid >= fidThreshold[11] && tagToFID[fid].some(f => fidToSearch[f].includes(query)) && !matchingFID.includes(fid));
-      matchingFID.push(...tagsToAdd);
+    // Add tag filters, if any associated ability name matches the query
+    if (matchingFID.length < 10 && !isExclusion) { // Only if the list is small enough
+      const tagsToAdd = allFID.filter(fid => fid >= fidThreshold[11] && tagToFID[fid].some(f => fidToSearch[f].includes(query)) && !matchingFID.includes(fid));
+      matchingFID.push(...tagsToAdd); 
     }
     // Erase the list of suggestions if it is too large, and no exact matches
     if (matchingFID.length > 25 + 2*query.length && !matchingFID.filter(f => fidToSearch[f]==query).length) matchingFID = [];
     // Highlight a suggestion if tab is hit
     if (matchingFID.length) {
-      if (tabSelect) tabSelect = (tabSelect+matchingFID.length)%matchingFID.length;
+      if (tabSelect) tabSelect = (tabSelect + matchingFID.length) % matchingFID.length;
       filterToEnter = matchingFID[tabSelect ?? 0];
     }
     matchingFID.forEach(fid => { // Create the suggestion clickable elements
@@ -910,7 +911,7 @@ function lockFilter(newLockFID, clearQuery = true, forceOR = null) {
     } else if (sortState.sortAttr === 'row' && [2,9].includes(fidToCategory(newLockFID+isExclusion))) {
       updateHeader(headerColumns[5]); // Sort by Move/Biome for those new filters
     } else {
-      updateHeader(null, true);
+      updateHeader(null);
     }
   }
 }
@@ -945,7 +946,7 @@ function removeFilter(fidToRemove, tagToRemove, modToRemove) {
   if (sortState.sortAttr === 'moves' && !lockedFilters.some(f => [2,9].includes(fidToCategory(f)))) { 
     updateHeader(headerColumns[0]); 
   } else { 
-    updateHeader(null, true); // Update header, then refresh items and suggestions
+    updateHeader(null); // Update header, then refresh items and suggestions
   }
   if (!lockedFilters.length) { // Reset the animation of the page title
     pageTitle.classList.remove('colorful-text');  void pageTitle.offsetWidth;
@@ -973,44 +974,40 @@ function toggleOR(filterMod) { // Click a filter to toggle it between AND and OR
 }
 
 // Click on the header row to sort/filter by an attribute **************************
-function updateHeader(clickTarget = null, ignoreFlip = false) {
-  if (clickTarget == null) { clickTarget = headerColumns[sortState.index]; ignoreFlip = true; }
-  const sortAttribute = clickTarget?.sortattr;
+function updateHeader(clickTarget = null) {
+  const ignoreFlip = (clickTarget == null); // Ignore sort flipping if not targeted
+  if (clickTarget == null) clickTarget = headerColumns[sortState.index]; // Set to current target
+  const clickAttribute = clickTarget.sortattr;
   const hasMovesBiomes = lockedFilters.some(f => [2,9].includes(fidToCategory(f)));
-  // If clicking move column, with no moves/biomes filtered, toggle between egg moves and biomes
-  if (sortAttribute == 'moves' && !hasMovesBiomes && !ignoreFlip) headerState.biome = !headerState.biome;
-  // Find the new sorting attribute, and update the headers
-  if (sortAttribute == 'shiny') { // Toggle the global shiny state
-    // Cap the selector to T1 if the "None" filter is selected or if the entire list only has T1
-    const shinyCap = lockedFilters.includes(fidThreshold[10]+2)
-      || (!filteredItemIDs.some(specID => items[specID].sh>1) && !!filteredItemIDs.length);
-    headerState.shiny = (headerState.shiny+3)%(shinyCap?2:4);
-  } else if (sortAttribute == 'ab') { // Toggle the global ability state
-    headerState.ability = (headerState.ability+1)%4;
-  } else {
-    // If the clicked header can actually be sorted
-    // (The "Moves" column can only be sorted if there is a filtered move/biome)
-    if (sortAttribute && (sortAttribute != 'moves' || hasMovesBiomes)) { 
-      if (sortState.sortAttr === sortAttribute) {
-        if (sortAttribute == 'moves' && lockedFilters.some(f => fidToCategory(f)==2) && !ignoreFlip) {
-          headerState.move = ( ( headerState.move ?? 0 ) + 1 ) % 4; // Cycle the move restrictions
-        } else if (!ignoreFlip) {
-          sortState.ascending = !sortState.ascending; // Toggle sort direction if sorting by the same column
-        }
-      } else {
-        sortState.sortAttr = sortAttribute;
-        // Sort ascending on some columns, but descending by default on others
-        sortState.ascending = ['row','sp','type','moves'].includes(sortState.sortAttr);
-        if (headerColumns[sortState.index]?.textDef) { // Clear arrow from previous target
-          headerColumns[sortState.index].innerHTML = headerColumns[sortState.index]?.textDef;
-        }
+  // Handle clicking on the special (non-sorting) columns
+  if (clickAttribute == 'moves' && !hasMovesBiomes && !ignoreFlip) { // Toggle global move column state
+    headerState.biome = !headerState.biome; // If no moves/biomes filtered, toggle between egg moves and biomes
+  } else if (clickAttribute == 'shiny') { // Toggle global shiny column state
+    const shinyCap = lockedFilters.includes(fidThreshold[10]+2) // Cap shiny state to T1 if "None" filter is selected
+      || (filteredItemIDs.every(specID => items[specID].sh==1) && filteredItemIDs.length); // Or if entire list only has T1
+    headerState.shiny = ( headerState.shiny + 3 ) % ( shinyCap ? 2 : 4 );
+  } else if (clickAttribute == 'ab') { // Toggle global ability column state
+    headerState.ability = ( headerState.ability + 1 ) % 4;
+  } else if (clickAttribute && !(clickAttribute == 'moves' && !hasMovesBiomes) && !ignoreFlip) {
+    // Activate a clicked header that can actually be sorted
+    // If "Moves" column is clicked without filtered move/biome, it can't be sorted
+    if (sortState.sortAttr === clickAttribute) {
+      if (clickAttribute == 'moves' && lockedFilters.some(f => fidToCategory(f)==2) && !ignoreFlip) {
+        headerState.move = ( ( headerState.move ?? 0 ) + 1 ) % 4; // Cycle the move restrictions
+      } else if (!ignoreFlip) {
+        sortState.ascending = !sortState.ascending; // Toggle sort direction if sorting by the same column
       }
-      sortState.index = clickTarget.index; // Draw arrow on new target
-      clickTarget.innerHTML = `${clickTarget.textDef}<span style="color:${col.pu}; font-family: serif;">${(sortState.ascending?"&#9650;":"&#9660;")}</span>`;
+    } else {
+      headerColumns[sortState.index].innerHTML = headerColumns[sortState.index].textDef; // Clear the arrow from previous target
+      sortState.index = clickTarget.index; // Set index to new target
+      sortState.sortAttr = clickAttribute; // Set the new sorting attribute
+      sortState.ascending = ['row','sp','type','moves'].includes(sortState.sortAttr); // Sort ascending on some columns, but descending by default on others
     }
   }
+  // Draw the arrow on the current target, either up or down
+  clickTarget.innerHTML = `${clickTarget.textDef}<span style="color:${col.pu}; font-family: serif;">${(sortState.ascending?"&#9650;":"&#9660;")}</span>`;
   
-  // Set the text of all the columns, depending on the header state
+  // Set the text of special (non-sorting) columns columns, depending on the header state
   if (hasMovesBiomes) { // Update the "Moves" column text
     const sortArrow = ( sortState.sortAttr != 'moves' ? '' :
       `<span style="color:${col.pu}; font-size:16px"> ${sortState.ascending?"&#9650;":"&#9660;"}</span>` );
@@ -1032,7 +1029,8 @@ function updateHeader(clickTarget = null, ignoreFlip = false) {
   if (headerState.shiny == 3 && !lockedFilters.some(f => f == fidThreshold[10] || f == fidThreshold[10]+1)) {
     lockFilter(fidThreshold[10]+1,false);
   }
-  if (headerState.ability) { // Update the "Ability" column text
+  // Update the "Ability" column text
+  if (headerState.ability) {
     headerColumns[4].innerHTML = `<span style="color:${col.pu};">${headerNames[4]}</span>`;
     if      (headerState.ability == 1) headerColumns[4].innerHTML += `<span style="color:${col.wh}; font-size:12px;">(${altText[1]})</span>`;
     else if (headerState.ability == 2) headerColumns[4].innerHTML += `<span style="color:${col.ye}; font-size:12px;">(${altText[2]})</span>`;
@@ -1051,22 +1049,17 @@ function adjustLayout(forceAdjust = false, headerClick = null) {
     isMobile = (window.innerWidth <= 768);
     // Redraw all the header columns into the header container
     headerContainer.innerHTML = '';
-    const thisRow = quickElement('div','header-row');
-    if (isMobile) {
-      thisRow.appendChild(headerColumns[0]);  thisRow.appendChild(headerColumns[1]);
-      thisRow.appendChild(headerColumns[4]);  thisRow.appendChild(headerColumns[2]);
-      thisRow.appendChild(headerColumns[5]);
-      headerContainer.appendChild(thisRow);
-      const row2 = quickElement('div','header-row');
-      row2.appendChild(headerColumns[3]);
-      for (const thisColumn of headerColumns.slice(6,14)) row2.appendChild(thisColumn);  
-      headerContainer.appendChild(row2);
-    } else {
-      for (const thisColumn of headerColumns) thisRow.appendChild(thisColumn);  
-      headerContainer.appendChild(thisRow);
-    }
+    const layoutOrder = {
+      false: [ [ ...headerColumns.keys() ] ], // Desktop layout
+      true:  [ [ 0, 1, 4, 2, 5 ], [ 3, 6, 7, 8, 9, 10, 11, 12, 13 ] ] // Mobile layout
+    };
+    layoutOrder[isMobile].forEach(rowEntries => {
+      const row = quickElement('div', 'header-row');
+      rowEntries.forEach(i => row.appendChild(headerColumns[i]));
+      headerContainer.appendChild(row);
+    });
     increment = (isMobile ? 10 : 30);
-    updateHeader(headerClick, true);
+    updateHeader(null);
   }
 }
 
@@ -1237,7 +1230,7 @@ function showFiltersInCategory(index) {
   if (thisColor == col.ga) thisColor = fidToColor((fidThreshold[index-1]??0)+4)[1];
   movesetScrollable.innerHTML = `<div style="margin-top: 5px"><b>${infoText[10]}: <span style="color:${thisColor}; display:inline;">${catToName[index]}</span></b></div><hr>`; // Name header
   const tagList = quickElement('div','splash-move-tags');
-  const filtersToShow = possibleFID.slice(fidThreshold[index-1]??0,fidThreshold[index]);
+  const filtersToShow = allFID.slice(fidThreshold[index-1]??0,fidThreshold[index]);
   if (index < 3) { // Sort by name in first 3 categories
     filtersToShow.sort((a, b) => (fidToName[a] > fidToName[b] ? 1 : (fidToName[a] < fidToName[b] ? -1 : 0 )));
   }
