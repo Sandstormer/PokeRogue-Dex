@@ -470,12 +470,12 @@ h1 {
   align-items: center;
   z-index: 999;
 }
-#movesetScreen, #helpScreen {
-  z-index: 990;
-}
 .show {
   display: flex !important;
   flex-direction: column;
+}
+.hidden {
+  visibility: hidden;
 }
 #splashContent, #movesetContent, #helpContent {
   text-align: center;
@@ -611,9 +611,6 @@ h1 {
   height: 44px;
   padding: 5px;
   margin: -3px 0;
-}
-.hidden {
-  visibility: hidden;
 }
 
 hr {
