@@ -64,7 +64,7 @@ const formToFamily = {
 let pageLang = detectLanguage();
 console.log(pageLang);
 loadAndApplyLanguage(pageLang);
-
+// region Apply Language
 function detectLanguage() { // Try to load the language from local storage or browser
   const langFromStorage = localStorage.getItem("preferredLang");
   if (langFromStorage && supportedLangs.includes(langFromStorage)) return langFromStorage 
@@ -134,7 +134,7 @@ function makeSearchable(input) { // Remove punctuation, accents, and compound ch
   return input.normalize("NFD").replace(/[\u0300-\u036f’.:'\s-]/g,"") // Dash must be at end of regex group
     .toLowerCase().replace(/ß/g,"ss").replace(/œ/g,"oe").replace(/æ/g,"ae");
 }
-
+// region Refresh All Items
 function refreshAllItems() { // Display items based on query and locked filters **************************
   const query = makeSearchable(searchBox.value);
   clearIcon.style.display = (searchBox.value.length && isMobile ? 'inline' : 'none'); // Show clear button on mobile
@@ -261,9 +261,9 @@ function refreshAllItems() { // Display items based on query and locked filters 
               return total + (items[ID][FID][1] ? ~~(items[ID][FID][0]/20)*0.9+~~(items[ID][FID][1]/20)/10 : ~~(items[ID][FID][0]/20));
             } else { // For moves
               if (headerState.move == 0) return total + items[ID][FID];
-              if (headerState.move == 1) return total + ( items[ID][FID] <= 200 ? items[ID][FID] : 500 );
-              if (headerState.move == 2) return total + ( items[ID][FID] > 200 && items[ID][FID] < 209 ? items[ID][FID] : 500 );
-              if (headerState.move == 3) return total + ( items[ID][FID] > 200 && ![204,208].includes(items[ID][FID]) ? items[ID][FID] : 500 );
+              if (headerState.move == 1) return total + ( items[ID][FID] <= 200 ? items[ID][FID] : 500 ); // Level only
+              if (headerState.move == 2) return total + ( items[ID][FID] > 200 && items[ID][FID] < 209 ? items[ID][FID] : 500 ); // Egg only
+              if (headerState.move == 3) return total + ( items[ID][FID] > 200 && ![204,208].includes(items[ID][FID]) ? items[ID][FID] : 500 ); // TM only
             }
           } else {
             return total + 500;
@@ -316,7 +316,7 @@ function refreshAllItems() { // Display items based on query and locked filters 
     itemList.appendChild(helpMessage)
   }
 }
-
+// region Render Poke List
 function renderMoreItems() { // Create each list item, with columns of info **************************
   // console.log('Rendering more items');
   renderLimit += increment;
@@ -556,7 +556,8 @@ function createArrow(isRight) {
   arrow.addEventListener('click', () => changeMoveset(isRight ? 1 : -1));
   return arrow;
 }
-function showPokeSplash(specID, forcePage=null, forceList=null, forceShiny=null, forceFem=null) {
+// region Show Poke Splash
+function showPokeSplash(specID, forcePage=null, forceList=null, forceShiny=null, forceFem=null) { 
   if (forcePage != null) splashState.page = forcePage;
   if (forceList != null) splashState.list = forceList;
   splashState.speciesID = specID;
@@ -743,7 +744,7 @@ function changeMoveset(indexChange) {
       showPokeSplash(splashState.list[index]);
     }
 }
-
+// region Description Splash
 function showDescSplash(fid) { // Create the ability/move details splash **************************
   splashContent.style.width = '300px';
   splashContent.innerHTML = `<b>${fidToName[fid]}</b><hr>`; // Name header
@@ -785,7 +786,7 @@ function showDescSplash(fid) { // Create the ability/move details splash *******
   }
   splashScreen.classList.add("show");
 }
-
+// region Helper Functions
 function fidToCategory(fid) {
   for (let i = 0; i < catToName.length; i++) {
     if (fid < fidThreshold[i]) return i;
@@ -848,7 +849,6 @@ function displaySuggestions() {
         || (fid>=fidThreshold[5] && fid<fidThreshold[6]) 
         || (fid>=fidThreshold[3]+10 && fid<fidThreshold[4]) 
       )) return false; // Reject categories that can't be exclusion filters
-      if (fid == fidThreshold[7]+2 || fid == fidThreshold[9]+1) return false; // Hide new mega filters until launch
       if (lockedFilters.some((f) => f%fidThreshold[12] == fid)) return false; // Reject if already locked
       if (fid >= fidThreshold[9] && offerFamilies.includes(fid)) return true; // Suggest matching families
       return fidToSearch[fid].includes(query); // Suggest if it contains the search query
@@ -875,8 +875,8 @@ function displaySuggestions() {
     });
   }
 }
-
 // Lock a filter *************************
+// region Lock Filter
 function lockFilter(newLockFID, clearQuery = true, forceOR = null) {
   if (newLockFID == null || newLockFID < 0 || newLockFID > fidThreshold[fidThreshold.length-1]) return;
   if (!lockedFilters.some((f) => f%fidThreshold[12] == newLockFID)) {
@@ -911,8 +911,8 @@ function lockFilter(newLockFID, clearQuery = true, forceOR = null) {
     }
   }
 }
-
 // Remove a filter **************************
+// #region Remove Filter
 function removeFilter(fidToRemove, tagToRemove, modToRemove) {
   if (!lockedMods.includes(modToRemove)) { // Try to find a mod to remove
     // If removing first filter, target the mod to the right
@@ -968,8 +968,8 @@ function toggleOR(filterMod) { // Click a filter to toggle it between AND and OR
   updateFilterGroups();
   refreshAllItems();
 }
-
 // Click on the header row to sort/filter by an attribute **************************
+// #region Click Header
 function updateHeader(clickTarget = null) {
   const ignoreFlip = (clickTarget == null); // Ignore sort flipping if not targeted
   if (clickTarget == null) clickTarget = headerColumns[sortState.index]; // Set to current target
@@ -1058,8 +1058,8 @@ function adjustLayout(forceAdjust = false, headerClick = null) {
     updateHeader(null);
   }
 }
-
 // All event listeners **************************
+// #region Event Listeners
 window.addEventListener("resize", () => adjustLayout()); // Run on page load and when resizing the window
 window.addEventListener("scroll", () => { // Load more items on scroll
   if (window.scrollY + window.innerHeight >= document.body.scrollHeight * 0.8 - 1000) renderMoreItems();
@@ -1161,7 +1161,7 @@ function openLangMenu() {
   });
   splashScreen.classList.add("show"); // Make the language screen visible
 }
-// Open the help menu splash
+// #region Help Menu
 openHelpButton.addEventListener('mouseover', () => openHelpButton.src = `ui/helph.png`);
 openHelpButton.addEventListener('mouseout',  () => openHelpButton.src = `ui/help.png` ); 
 openHelpButton.addEventListener('click',     () => openHelpMenu());
