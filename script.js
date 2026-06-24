@@ -209,10 +209,13 @@ function refreshAllItems() { // Display items based on query and locked filters 
             if (fid === fidThreshold[10]+1) return item.sh == 3;   // All variants
             if (fid === fidThreshold[10]+2) return item.sh == 1;   // No variants
           } else if (fid < fidThreshold[12]) { // Tags[12]
-            if (headerState.ability) // Restricted ability tag filter
-              return tagToFID[fid].some(f => item?.[f] == 309+headerState.ability 
-                || (headerState.ability == 1 && item?.[f] == 309));
-            return tagToFID[fid].some(f => f in item); // Regular tag filter
+            // if (fid === fidThreshold[11]) { // Move tag filter
+            //   return tagToFID[fid].some(f => f in item);
+            // } else { // Ability tag filter
+              if (headerState.ability) // Restricted ability tag filter
+                return tagToFID[fid].some(f => item?.[f] == 309+headerState.ability || (headerState.ability == 1 && item?.[f] == 309));
+              return tagToFID[fid].some(f => f in item); // Regular tag filter
+            // }
           } else if (fid >= fidThreshold[12]) { // Exclusion filters
             const excFID = fid-fidThreshold[12];
             if (excFID < fidThreshold[4]) {
@@ -832,8 +835,8 @@ function eggTierColors(fid) {
   else { console.log('Invalid egg tier'); return null; }
 }
 
-// Display the filter suggestions *************************
-function displaySuggestions() {
+// region Suggest Filters
+function displaySuggestions() { // **************************
   filterToEnter = null;   suggestions.innerHTML = ''; // Clear the list
   const isExclusion = searchBox.value.startsWith('-');
   const query = makeSearchable(searchBox.value); // Get search query
@@ -875,9 +878,9 @@ function displaySuggestions() {
     });
   }
 }
-// Lock a filter *************************
+
 // region Lock Filter
-function lockFilter(newLockFID, clearQuery = true, forceOR = null) {
+function lockFilter(newLockFID, clearQuery = true, forceOR = null) { // **************************
   if (newLockFID == null || newLockFID < 0 || newLockFID > fidThreshold[fidThreshold.length-1]) return;
   if (!lockedFilters.some((f) => f%fidThreshold[12] == newLockFID)) {
     const isExclusion = searchBox.value.startsWith('-')*fidThreshold[12];
@@ -911,9 +914,9 @@ function lockFilter(newLockFID, clearQuery = true, forceOR = null) {
     }
   }
 }
-// Remove a filter **************************
+
 // #region Remove Filter
-function removeFilter(fidToRemove, tagToRemove, modToRemove) {
+function removeFilter(fidToRemove, tagToRemove, modToRemove) { // **************************
   if (!lockedMods.includes(modToRemove)) { // Try to find a mod to remove
     // If removing first filter, target the mod to the right
     if (lockedFilters.length > 1 && fidToRemove == lockedFilters[0]) modToRemove = lockedMods[0];
