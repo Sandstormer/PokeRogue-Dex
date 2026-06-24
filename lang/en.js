@@ -4610,7 +4610,7 @@ fidToName = [
 'Alola Meowth',
 'Alola Geodude',
 'Alola Grimer',
-'Greninja',
+'Battle Bond Greninja',
 'Eternal Floette',
 'Galar Meowth',
 'Galar Ponyta',
