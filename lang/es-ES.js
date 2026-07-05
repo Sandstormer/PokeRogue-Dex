@@ -999,7 +999,7 @@ fidToDesc = [
 'Ataca al objetivo con cuchillas formadas por energía psíquica. Aumenta 1 nivel la probabilidad de asestar golpes críticos del usuario durante este ataque.',
 'Usa su poder mental para transferir al objetivo sus problemas de estado.',
 'El usuario ataca envuelto en una energía psíquica que además aumenta su defensa.',
-'Crea una onda psíquica. A pesar de ser un ataque especial, el daño que inflige se calculacon el valor de la Defensa del objetivo.',
+'Crea una onda psíquica. A pesar de ser un ataque especial, el daño que inflige se calcula con el valor de la Defensa del objetivo.',
 'Crea una onda psíquica. A pesar de ser un ataque especial, el daño que inflige se calculacon el valor de la Defensa del objetivo.',
 'Ataque con una onda de energía de intensidad variable. Causa un daño entre 50% y 150% del nivel del usuario.',
 'La potencia del ataque aumenta en 20 por cada nivel que hayan aumentado las características del objetivo.',
