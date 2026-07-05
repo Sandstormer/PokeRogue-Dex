@@ -247,7 +247,7 @@ function refreshAllItems() { // Display items based on query and locked filters 
   //   toShowMovesBiomes.push(...tagToFID[f].filter(fid => !toShowMovesBiomes.includes(fid))));
     
   // Remove the pinned items for now ==============
-  if (pinnedRows) filteredItemIDs = filteredItemIDs.filter((thisID) => !pinnedRows.includes(thisID));
+  filteredItemIDs = filteredItemIDs.filter((thisID) => !pinnedRows.includes(thisID));
 
   // Sort items if a column is specified ==============
   if (sortState.sortAttr) {
@@ -259,14 +259,15 @@ function refreshAllItems() { // Display items based on query and locked filters 
       let aValue = a; let bValue = b; // Set default attribute of row number
       if (sortState.sortAttr == 'moves') { // Sort by source of moves and biomes
         const getLearnLevel = (ID) => toShowMovesBiomes.reduce((total, FID) => {
-          if (FID in items[ID]) { 
+          if (FID in items[ID]) {
+            const entry = items[ID][FID];
             if (FID >= fidThreshold[8]) { // For biomes
-              return total + (items[ID][FID][1] ? ~~(items[ID][FID][0]/20)*0.9+~~(items[ID][FID][1]/20)/10 : ~~(items[ID][FID][0]/20));
+              return total + (entry[1] ? ~~(entry[0]/20)*0.9+~~(entry[1]/20)/10 : ~~(entry[0]/20));
             } else { // For moves
-              if (headerState.move == 0) return total + items[ID][FID];
-              if (headerState.move == 1) return total + ( items[ID][FID] <= 200 ? items[ID][FID] : 500 ); // Level only
-              if (headerState.move == 2) return total + ( items[ID][FID] > 200 && items[ID][FID] < 209 ? items[ID][FID] : 500 ); // Egg only
-              if (headerState.move == 3) return total + ( items[ID][FID] > 200 && ![204,208].includes(items[ID][FID]) ? items[ID][FID] : 500 ); // TM only
+              if (headerState.move == 0) return total + entry;
+              if (headerState.move == 1) return total + ( entry <= 200 ? entry : 500 ); // Level only
+              if (headerState.move == 2) return total + ( entry > 200 && entry < 209 ? entry : 500 ); // Egg only
+              if (headerState.move == 3) return total + ( entry > 200 && ![204,208].includes(entry) ? entry : 500 ); // TM only
             }
           } else {
             return total + 500;
@@ -274,12 +275,12 @@ function refreshAllItems() { // Display items based on query and locked filters 
         }, 0);
         aValue = getLearnLevel(a); bValue = getLearnLevel(b);
       } else if (sortState.sortAttr == 'type') { // Sort by type combinations
-        const typeMult = (lockedFilters.some(f => f < fidThreshold[0]) ? 2 : 36 );
+        const typeMult = ( lockedFilters.some(f => f < fidThreshold[0]) ? 2 : 36 );
         const aEntry = items[a]; const bEntry = items[b];
-        aValue = (aEntry.t1+1)*(typeMult*!lockedFilters.includes(aEntry.t1));
-        bValue = (bEntry.t1+1)*(typeMult*!lockedFilters.includes(bEntry.t1));
-        if ('t2' in aEntry) aValue += (aEntry.t2*2+1)*!lockedFilters.includes(aEntry.t2);
-        if ('t2' in bEntry) bValue += (bEntry.t2*2+1)*!lockedFilters.includes(bEntry.t2);
+        aValue = (aEntry.t1+1) * typeMult * !lockedFilters.includes(aEntry.t1);
+        bValue = (bEntry.t1+1) * typeMult * !lockedFilters.includes(bEntry.t1);
+        if ('t2' in aEntry) aValue += (aEntry.t2*2+1) * !lockedFilters.includes(aEntry.t2);
+        if ('t2' in bEntry) bValue += (bEntry.t2*2+1) * !lockedFilters.includes(bEntry.t2);
       } else if (sortState.sortAttr == 'sp') { // Sort by species names alphabetically
         aValue = speciesNames[a]; bValue = speciesNames[b];
       } else if (sortState.sortAttr != 'row') { // If anything OTHER than row number
@@ -292,11 +293,8 @@ function refreshAllItems() { // Display items based on query and locked filters 
   }
 
   // Add pinned rows, they are not sorted ==============
-  if (pinnedRows) {
-    let rowsToAdd = pinnedRows.filter((ID) => !filteredItemIDs.includes(ID));
-    filteredItemIDs = [...rowsToAdd, ...filteredItemIDs];
-  }
-
+  if (pinnedRows) filteredItemIDs = [...pinnedRows, ...filteredItemIDs];
+  
   // Render suggestions and the first few items ==============
   displaySuggestions();
   renderLimit = 0;
