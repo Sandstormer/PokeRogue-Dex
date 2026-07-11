@@ -41,7 +41,7 @@ let increment = 10;  // Number of items to load at a time
 let renderLimit = 0; // This value is updated when scrolling down (starts at 0)
 let toShowMovesBiomes = []; // Filtered moves/biomes to show sources
 let filterToEnter = null; // Filter to apply when hitting Enter
-let tabSelect = null;     // Filter that is tab selected
+let tabSelect = null;     // Position of tab selected filter
 let lockedFilters = [];   // List of all locked filters IDs
 let lockedMods = []; // List of filter mod objects
 let lockedFilterGroups = [[]]; // Filter IDs grouped together with "OR" condition
@@ -319,11 +319,10 @@ function refreshAllItems() { // Display items based on query and locked filters 
 }
 // region Render Poke List
 function renderMoreItems() { // Create each list item, with columns of info **************************
-  // console.log('Rendering more items');
   renderLimit += increment;
   let slicedItemIDs = filteredItemIDs.slice(renderLimit-increment,renderLimit)
   slicedItemIDs.forEach((thisID) => { // Generate each list item dynamically
-    const li = document.createElement('li'); // Entry of one Pokemon
+    const thisElement = document.createElement('li'); // Entry of one Pokemon
     const item = items[thisID]; // Grab the actual item from its ID
     
     // Show image of the pokemon
@@ -436,7 +435,7 @@ function renderMoreItems() { // Create each list item, with columns of info ****
           // biomeText = ['Common','Uncommon','Rare','Super Rare','Ultra Rare','Boss','Com','Unc','Rare','SR','UR','Dawn','Day','Dusk','Night']
         } else { // For moves
           if (src == -1) srcText += `rgb(251, 173, 124);">${altText[9]}`;
-          else if (src == 0) srcText += `rgb(131, 182, 239);">${catToName[7]}`;
+          else if (src == 0  ) srcText += `rgb(131, 182, 239);">${catToName[7]}`;
           else if (src == 201) srcText += `rgb(255, 255, 255);">${altText[19]} / ${altText[16]}`;
           else if (src == 202) srcText += `rgb(255, 255, 255);">${altText[19]} / </span><span style="color:rgb(131, 182, 239);">${altText[16]}`;
           else if (src == 203) srcText += `rgb(255, 255, 255);">${altText[19]} / </span><span style="color:rgb(240, 230, 140);">${altText[16]}`;
@@ -509,9 +508,9 @@ function renderMoreItems() { // Create each list item, with columns of info ****
     layoutColumns.forEach(thisRow => {
       const newRow = quickElement('div','row');
       thisRow.forEach(thisColumn => newRow.appendChild(thisColumn));
-      li.appendChild(newRow);
+      thisElement.appendChild(newRow);
     });
-    itemList.appendChild(li); // Append the current entry to the list of Pokemon
+    itemList.appendChild(thisElement); // Append the current entry to the list of Pokemon
   });
 }
 
@@ -558,7 +557,8 @@ function createArrow(isRight) {
   return arrow;
 }
 // region Show Poke Splash
-function showPokeSplash(specID, forcePage=null, forceList=null, forceShiny=null, forceFem=null) { 
+function showPokeSplash(specID, forcePage=null, forceList=null, forceShiny=null, forceFem=null) {
+  // Page can be: family [0], moveset [1], biomes [2], zoom image [3]
   if (forcePage != null) splashState.page = forcePage;
   if (forceList != null) splashState.list = forceList;
   splashState.speciesID = specID;
