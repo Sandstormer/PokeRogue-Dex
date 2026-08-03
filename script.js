@@ -46,7 +46,7 @@ let lockedFilters = [];   // List of all locked filters IDs
 let lockedMods = []; // List of filter mod objects
 let lockedFilterGroups = [[]]; // Filter IDs grouped together with "OR" condition
 let pinnedRows = [];  // List of pinned row numbers
-let isMobile = false; // Change display for mobile devices
+let isMobile = null; // Whether display is altered for mobile devices
 let filteredItemIDs = null; // List of all displayed row numbers
 // State of info screen: species shown, page(moveset,biome,family,zoom), shiny(0,1,2,3), fem(0,1), zoomImageHeight
 let splashState = { speciesID: -1, list: [], page: 0, shiny: 0, fem: 0, back: 0, zoomImgh: 300 }
@@ -110,7 +110,7 @@ function loadAndApplyLanguage(lang) {
           const loadedGroups = loadFromStorage("lockedFilterGroups") ?? [[]];
           loadedGroups.forEach(group => group.forEach((fid,i) => lockFilter(fid, false, (i>0))));
         }
-        adjustLayout(true, headerColumns[sortState.index ?? 0]); // Do initial display of pokemon
+        adjustLayout(); // Do initial display of pokemon
       } catch (error) { // Catch any corruption of persistent filters
         const alreadyTried = sessionStorage.getItem("recoveryAttempted");
         if (!alreadyTried) {
@@ -1041,8 +1041,8 @@ function updateHeader(clickTarget = null) {
   refreshAllItems(); 
 }
 
-function adjustLayout(forceAdjust = false, headerClick = null) {
-  if (isMobile != (window.innerWidth <= 768) || forceAdjust) {
+function adjustLayout() {
+  if (isMobile != (window.innerWidth <= 768)) {
     isMobile = (window.innerWidth <= 768);
     // Redraw all the header columns into the header container
     headerContainer.innerHTML = '';
@@ -1056,7 +1056,7 @@ function adjustLayout(forceAdjust = false, headerClick = null) {
       headerContainer.appendChild(row);
     });
     increment = (isMobile ? 10 : 30);
-    updateHeader(null);
+    updateHeader();
   }
 }
 // All event listeners **************************
