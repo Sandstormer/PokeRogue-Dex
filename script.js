@@ -110,6 +110,7 @@ function loadAndApplyLanguage(lang) {
           const loadedGroups = loadFromStorage("lockedFilterGroups") ?? [[]];
           loadedGroups.forEach(group => group.forEach((fid,i) => lockFilter(fid, false, (i>0))));
         }
+        isMobile = null;
         adjustLayout(); // Do initial display of pokemon
       } catch (error) { // Catch any corruption of persistent filters
         const alreadyTried = sessionStorage.getItem("recoveryAttempted");
@@ -580,8 +581,8 @@ function showPokeSplash(specID, forcePage=null, forceList=null, forceShiny=null,
     zoomImg.onload = () => { // Image needs to load before reading dimensions
       zoomImg.style.width  = zoomImg.naturalWidth*factor + "px";
       zoomImg.style.height = zoomImg.naturalHeight*factor + "px";
-      splashState.zoomImgh = zoomImg.naturalHeight*factor + 56;
-      movesetScrollable.style.height = splashState.zoomImgh + "px";
+      splashState.zoomImgh = zoomImg.naturalHeight*factor + 60;
+      movesetScrollable.style.height = "auto";
       zoomImg.classList.remove("hidden");
     };
     movesetScrollable.append(zoomImg, quickElement('br'));

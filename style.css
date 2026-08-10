@@ -485,28 +485,29 @@ h1 {
   background-color: #151019;
   width: 330px;
   position: relative;
-  overflow: scroll;
-  -ms-overflow-style: none;
-}
-#movesetScrollable {
-  overflow: scroll;
-  -ms-overflow-style: none;
 }
 #splashContent, #helpContent {
   max-height: calc(100vh - 200px);
 }
 
+.scrollable {
+  overflow: scroll;
+  -ms-overflow-style: none;
+  scrollbar-width: thin;
+  scrollbar-color: #91919180 transparent;
+}
 .scrollable::-webkit-scrollbar {
   width: 5px;
   height: 0px;
 }
-.scrollable::-webkit-scrollbar-track {
+/* .scrollable::-webkit-scrollbar-track {
   background: transparent;
 }  
 .scrollable::-webkit-scrollbar-thumb {
   background-color: rgba(145, 145, 145, 0.5);
   border-radius: 3px;
-}
+} */
+
 .splash-move-row {
   display: grid;
   grid-template-columns: 2fr 1fr 1fr 1fr;
