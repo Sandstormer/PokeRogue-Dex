@@ -577,7 +577,7 @@ function showPokeSplash(specID, forcePage=null, forceList=null, forceShiny=null,
     zoomImg.update = () => zoomImg.src = `images/${item.img}_${splashState.shiny}${(splashState.fem?'f':'')}${(splashState.back?'b':'')}.png`;
     zoomImg.update();
     movesetScrollable.style.height = splashState.zoomImgh + "px"; // Use prev height to prevent jumping
-    const imgScaleFactor = ( isMobile ? 3 : Math.max(3,Math.min(7,~~(window.innerHeight/150))) );
+    const imgScaleFactor = ( isMobile ? 3 : Math.max(4,Math.min(8,~~((window.innerHeight-100)/140))) );
     zoomImg.onload = () => { // Image needs to load before reading dimensions
       zoomImg.style.width  = zoomImg.naturalWidth*imgScaleFactor + "px";
       zoomImg.style.height = zoomImg.naturalHeight*imgScaleFactor + "px";
