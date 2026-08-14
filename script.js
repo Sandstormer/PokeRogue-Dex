@@ -577,11 +577,11 @@ function showPokeSplash(specID, forcePage=null, forceList=null, forceShiny=null,
     zoomImg.update = () => zoomImg.src = `images/${item.img}_${splashState.shiny}${(splashState.fem?'f':'')}${(splashState.back?'b':'')}.png`;
     zoomImg.update();
     movesetScrollable.style.height = splashState.zoomImgh + "px"; // Use prev height to prevent jumping
-    factor = (isMobile ? 3:6);
+    const imgScaleFactor = ( isMobile ? 3 : Math.max(3,Math.min(7,~~(window.innerHeight/150))) );
     zoomImg.onload = () => { // Image needs to load before reading dimensions
-      zoomImg.style.width  = zoomImg.naturalWidth*factor + "px";
-      zoomImg.style.height = zoomImg.naturalHeight*factor + "px";
-      splashState.zoomImgh = zoomImg.naturalHeight*factor + 60;
+      zoomImg.style.width  = zoomImg.naturalWidth*imgScaleFactor + "px";
+      zoomImg.style.height = zoomImg.naturalHeight*imgScaleFactor + "px";
+      splashState.zoomImgh = zoomImg.naturalHeight*imgScaleFactor + 60;
       movesetScrollable.style.height = "auto";
       zoomImg.classList.remove("hidden");
     };
@@ -1168,7 +1168,7 @@ openHelpButton.addEventListener('mouseover', () => openHelpButton.src = `ui/help
 openHelpButton.addEventListener('mouseout',  () => openHelpButton.src = `ui/help.png` ); 
 openHelpButton.addEventListener('click',     () => openHelpMenu());
 function openHelpMenu() { // Show the help screen with instructions and options
-  helpContent.style.width = '382px';
+  helpContent.style.width = `${392-isMobile*10}px`;
   helpContent.innerHTML = '';
   helpContent.appendChild(quickElement('div','', // First half of instructions
     `<b>${helpMenuText[0]}</b>

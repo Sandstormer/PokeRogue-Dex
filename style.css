@@ -286,7 +286,7 @@ h1 {
     cursor: pointer;
   }
   #movesetScrollable {
-    max-height: 700px;
+    max-height: min(800px, calc(100vh - 300px));
   }
   .clickable-name:hover {
     color: rgb(140, 130, 240) !important;
