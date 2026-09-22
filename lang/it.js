@@ -1132,7 +1132,7 @@ fidToDesc = [
 'Chi la usa lancia una pietra o un simile proiettile per attaccare il bersaglio. Questa mossa può colpire i Pokémon che sono nell’aria, anche quelli che stanno usando Volo, Rimbalzo, o Cadutalibera, facendoli cadere nel suolo.',
 'Chi la usa colpisce il bersaglio con un corno appuntito. Questa mossa va sempre a segno.',
 'Infligge un danno doppio ad un bersaglio paralizzato, ma ne cura anche la paralisi.',
-'Il bersaglio viene attaccato con una scarica di gas sporchi. Questa mossa ha un 30% di chance di avvelenare il bersaglio.',
+'Il bersaglio viene attaccato con una scarica di gas sporchi. Questa mossa ha un 40% di chance di avvelenare il bersaglio.',
 'Il Pokémon rilascia un’oscura cortina di fumo che riduce la precisione del nemico.',
 'Chi la usa intrappola il bersaglio in una trappola a tenaglia. Per 4-5 turni, il bersaglio subisce danno pari a 1/8 dei suoi PS massimi alla fine di ogni turno.',
 'Chi la usa urla con rabbia ai bersagli, riducendo la statistica di Attacco Speciale dei Pokémon avversari.',

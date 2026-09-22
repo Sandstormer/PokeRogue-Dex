@@ -1114,7 +1114,7 @@ fidToDesc = [
 'The user throws a stone or similar projectile to attack the target. This move can hit opposing Pokémon that are in the air, including those using Fly, Bounce, or Sky Drop, knocking them down to the ground.',
 'The user stabs the target with a sharp horn. This attack never misses.',
 'This attack’s power is doubled when used on a target with paralysis. This also cures the target’s paralysis, however.',
-'The target is attacked with a discharge of filthy gases. This move has a 30% chance of poisoning the target.',
+'The target is attacked with a discharge of filthy gases. This move has a 40% chance of poisoning the target.',
 'The user releases an obscuring cloud of smoke or ink. This lowers the target’s accuracy.',
 'The user snares the target in a snap trap. For 4-5 turns, the target takes damage equal to ⅛ of its max HP at the end of every turn.',
 'The user snarls incessantly at targets, lowering the Sp. Atk stats of opposing Pokémon.',
