@@ -441,8 +441,8 @@ h1 {
   object-fit: none;
 }
 .item-image {
-  width: 117px; 
-  height: 82px; 
+  width: 117px;
+  height: 82px;
   margin-top: -5px;
   margin-bottom: -5px;
   object-fit: none;
@@ -499,7 +499,7 @@ h1 {
 }
 /* .scrollable::-webkit-scrollbar-track {
   background: transparent;
-}  
+}
 .scrollable::-webkit-scrollbar-thumb {
   background-color: rgba(145, 145, 145, 0.5);
   border-radius: 3px;
@@ -590,8 +590,8 @@ h1 {
   margin-top: -15px;
   margin-bottom: -15px;
   margin-left: 7px;
-  width: 117px; 
-  height: 76px; 
+  width: 117px;
+  height: 76px;
   object-fit: none;
   cursor: pointer;
 }
@@ -599,8 +599,8 @@ h1 {
   margin-top: -15px;
   margin-bottom: -15px;
   margin-left: 2px;
-  width: 20px; 
-  height: 76px; 
+  width: 20px;
+  height: 76px;
   object-fit: contain;
   cursor: pointer;
 }

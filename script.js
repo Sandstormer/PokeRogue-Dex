@@ -4,7 +4,7 @@
 // filter_data.js: gameVersion, latestDate, typeColors, fidThreshold, upgradeCosts, tagToFID, fidToProc
 // lang/en.js: headerNames, altText, catToName, infoText, biomeText, biomeLongText,
 //             warningText, procTodesc, tagToDesc, fidToDesc, speciesNames, fidToName, helpMenuText
-    
+
 const itemList = document.getElementById('itemList');
 const searchBox = document.getElementById('searchBox');
 const pageTitle = document.getElementById('page-title');
@@ -51,7 +51,7 @@ let filteredItemIDs = null; // List of all displayed row numbers
 // State of info screen: species shown, page(moveset,biome,family,zoom), shiny(0,1,2,3), fem(0,1), zoomImageHeight
 let splashState = { speciesID: -1, list: [], page: 0, shiny: 0, fem: 0, back: 0, zoomImgh: 300 }
 // State of header toggles: shiny(0,1,2,3), ability(0,1,2,3), biome(0,1), move(0,1,2,3)
-let headerState = { shiny: 0, ability: 0, biome: 0, move: 0 } 
+let headerState = { shiny: 0, ability: 0, biome: 0, move: 0 }
 let sortState = { sortAttr: 'row', ascending: true, index: 0 }; // State of sorting order
 let persistentState = false; // Whether filters are reloaded upon refresh
 const formToFamily = {
@@ -59,7 +59,7 @@ const formToFamily = {
   [fidThreshold[9]+1]: new Set(allSID.filter(s => items[s].fx == 2).map(s => items[s].fa)),
   [fidThreshold[9]+2]: new Set(allSID.filter(s => items[s].fx == 3).map(s => items[s].fa)),
 };
-  
+
 // Perform initial display with detected language
 let pageLang = detectLanguage();
 console.log(pageLang);
@@ -67,7 +67,7 @@ loadAndApplyLanguage(pageLang);
 // region Apply Language
 function detectLanguage() { // Try to load the language from local storage or browser
   const langFromStorage = localStorage.getItem("preferredLang");
-  if (langFromStorage && supportedLangs.includes(langFromStorage)) return langFromStorage 
+  if (langFromStorage && supportedLangs.includes(langFromStorage)) return langFromStorage
   if (navigator.language) { // Detect language from browser
     const lang = navigator.language; const langOpt = [lang, lang.slice(0,5), lang.slice(0,2), lang.split('-')[0]];
     langOpt.forEach((thisLang) => { if (supportedLangs.includes(thisLang)) return thisLang });
@@ -76,7 +76,7 @@ function detectLanguage() { // Try to load the language from local storage or br
 }
 function loadAndApplyLanguage(lang) {
   pageLang = lang; // Remember the current language
-  
+
   const oldScript = document.querySelector(`script[src^="lang/"]`);
   if (oldScript) oldScript.remove(); // Remove existing script if it exists
 
@@ -84,23 +84,23 @@ function loadAndApplyLanguage(lang) {
   const script = document.createElement("script"); script.src = `lang/${lang}.js`;
   script.onload = () => {
     console.log(`${lang}.js loaded successfully`);
-    
+
     // Initialize the searchable names
     fidToSearch = fidToName.map((thisName, fid) => makeSearchable( // Search via category for later categories
       (fid >= fidThreshold[2] && fid < fidThreshold[11])||(fid >= fidThreshold[10]) ? `${catToName[fidToCategory(fid)]}${thisName}` : thisName
     ));
     specToSearch = speciesNames.map(s => makeSearchable(s));
     searchBox.placeholder = `${altText[4]} ${headerNames[2]} / ${headerNames[3]} / ${headerNames[4]} / ${altText[0]} ...`;
-    
+
     // Set up the header columns
     headerColumns = [];
     headerNames.forEach((thisHeaderName, index) => {
-      const newColumn = quickElement('div','header-column',thisHeaderName);  
+      const newColumn = quickElement('div','header-column',thisHeaderName);
       newColumn.textDef = thisHeaderName;  newColumn.index = index; newColumn.sortattr = sortAttributes[index];
       newColumn.addEventListener('click', () => updateHeader(newColumn));
       headerColumns.push(newColumn); // Push the column element into the array
-    });      
-    
+    });
+
     try { // Load persistent settings if enabled, and catch any corruption errors
         persistentState = JSON.parse(localStorage.getItem("persistentState")) ?? false;
         if (persistentState) { // If persistent filters are enabled
@@ -158,7 +158,7 @@ function refreshAllItems() { // Display items based on query and locked filters 
         filteredItemIDs = filteredItemIDs.filter(specID => shownFamilies.includes(items[specID].fa));
       }
     } else { // For a standard query
-      filteredItemIDs = filteredItemIDs.filter(specID => 
+      filteredItemIDs = filteredItemIDs.filter(specID =>
         specToSearch[specID].includes(query) ||
         fidToSearch[items[specID].t1]?.includes(query) ||
         fidToSearch[items[specID].t2]?.includes(query) ||
@@ -166,7 +166,7 @@ function refreshAllItems() { // Display items based on query and locked filters 
         ([0,2].includes(headerState.ability) && fidToSearch[items[specID].ha]?.includes(query)) ||
         ([0,3].includes(headerState.ability) && fidToSearch[items[specID].pa]?.includes(query)) );
     }
-  } 
+  }
   // Filter from headers ==============
   if (headerState.ability == 2) filteredItemIDs = filteredItemIDs.filter(fid => 'ha' in items[fid]);
   // Filter from locked filters ==============
@@ -244,9 +244,9 @@ function refreshAllItems() { // Display items based on query and locked filters 
   // Add moves/biomes to track in the move column  ==============
   toShowMovesBiomes = lockedFilters.filter(f => [2,9].includes(fidToCategory(f)));
   // For the move tag filters, add the associated FIDs to that shown list
-  // lockedFilters.filter(f => f>fidThreshold[11]+x && f<fidThreshold[12]).forEach(f => 
+  // lockedFilters.filter(f => f>fidThreshold[11]+x && f<fidThreshold[12]).forEach(f =>
   //   toShowMovesBiomes.push(...tagToFID[f].filter(fid => !toShowMovesBiomes.includes(fid))));
-    
+
   // Remove the pinned items for now ==============
   filteredItemIDs = filteredItemIDs.filter((thisID) => !pinnedRows.includes(thisID));
 
@@ -295,23 +295,23 @@ function refreshAllItems() { // Display items based on query and locked filters 
 
   // Add pinned rows, they are not sorted ==============
   if (pinnedRows) filteredItemIDs = [...pinnedRows, ...filteredItemIDs];
-  
+
   // Render suggestions and the first few items ==============
   displaySuggestions();
   renderLimit = 0;
   renderMoreItems();
-  
+
   // Show error messages if there are no results
   if (!filteredItemIDs.length) { // No pokemon
     const helpMessage = quickElement('div','item-help-message','<hr>');
-    if (lockedFilters.some(f => f == fidThreshold[10] || f == fidThreshold[10]+1)) helpMessage.innerHTML += 
+    if (lockedFilters.some(f => f == fidThreshold[10] || f == fidThreshold[10]+1)) helpMessage.innerHTML +=
       `<img src="ui/shiny2.png"> <img src="ui/shiny3.png"> <b><span style="color:${col.pu};">${warningText[0]}</b><br><br></span>`;
     if (headerState.ability && (query.length || lockedFilters.some(f => fidToCategory(f)==1) || headerState.ability==2)) {
       // Show ability warning if toggled, and an ability filter or search query
       helpMessage.innerHTML += `<b><span style="color:${col.pu};">${warningText[headerState.ability]}</b><br><br></span>`;
     }
-    helpMessage.innerHTML += (suggestions.innerHTML 
-      ? (lockedFilters.length ? warningText[4] : warningText[5]) 
+    helpMessage.innerHTML += (suggestions.innerHTML
+      ? (lockedFilters.length ? warningText[4] : warningText[5])
       : (lockedFilters.length ? (query ? warningText[6] : warningText[7]) : warningText[8]));
     helpMessage.innerHTML += `<br><span style="color:rgb(145, 145, 145);">${warningText[9]}</span><hr>`;
     helpMessage.addEventListener('click', () => openHelpMenu());
@@ -325,21 +325,21 @@ function renderMoreItems() { // Create each list item, with columns of info ****
   slicedItemIDs.forEach((thisID) => { // Generate each list item dynamically
     const thisElement = document.createElement('li'); // Entry of one Pokemon
     const item = items[thisID]; // Grab the actual item from its ID
-    
+
     // Show image of the pokemon
-    const pokeImg = quickElement('img','item-image');  
-    pokeImg.stars = []; // Keep a list of stars that can change the pokemon image 
-    pokeImg.shinyOverride = Math.min(item.sh, headerState.shiny);  
+    const pokeImg = quickElement('img','item-image');
+    pokeImg.stars = []; // Keep a list of stars that can change the pokemon image
+    pokeImg.shinyOverride = Math.min(item.sh, headerState.shiny);
     pokeImg.femOverride = (item?.fe == 1 ? +lockedFilters.includes(fidThreshold[7]+5) : 0);
-    pokeImg.src = `images/${item.img}_${pokeImg.shinyOverride}${(pokeImg.femOverride ? 'f' : '')}.png`; 
+    pokeImg.src = `images/${item.img}_${pokeImg.shinyOverride}${(pokeImg.femOverride ? 'f' : '')}.png`;
     pokeImg.addEventListener('click', () => showPokeSplash(thisID, 3, filteredItemIDs, pokeImg.shinyOverride, pokeImg.femOverride));
-    
+
     // Create the dex column, with stars and pin only on desktop
     const dexColumn  = quickElement('div','item-column');
     const starColumn = quickElement('div','item-column');
     const pinColumn  = quickElement('div','item-column');
-    const pinImg = quickElement('img','pin-img');   
-    const femImg = quickElement('img','pin-img');   
+    const pinImg = quickElement('img','pin-img');
+    const femImg = quickElement('img','pin-img');
     pinImg.src = `ui/pin${pinnedRows.includes(thisID)*1}.png`; femImg.src = `ui/fem${pokeImg.femOverride}.png`;
     if (!isMobile) pinImg.addEventListener('mouseover', () => pinImg.src = `ui/pinh.png`);
     if (!isMobile) pinImg.addEventListener('mouseout',  () => pinImg.src = `ui/pin${pinnedRows.includes(thisID)*1}.png`);
@@ -358,7 +358,7 @@ function renderMoreItems() { // Create each list item, with columns of info ****
       if (!isMobile) femImg.addEventListener('mouseout',  () => femImg.src = `ui/fem${pokeImg.femOverride}.png`);
       femImg.addEventListener('click', () => { // Add click event to the fem button
         pokeImg.femOverride = 1-pokeImg.femOverride; // Flip the fem state
-        pokeImg.src = `images/${item.img}_${pokeImg.shinyOverride}${(pokeImg.femOverride ? 'f' : '')}.png`; 
+        pokeImg.src = `images/${item.img}_${pokeImg.shinyOverride}${(pokeImg.femOverride ? 'f' : '')}.png`;
         femImg.src = `ui/fem${pokeImg.femOverride}.png`;
       });
     }
@@ -370,7 +370,7 @@ function renderMoreItems() { // Create each list item, with columns of info ****
         starImg.addEventListener('click', () => { // Add click events to all the stars, changing the poke image
           pokeImg.stars.forEach((thisStar) => thisStar.src = 'ui/shiny0.png');
           pokeImg.shinyOverride = (pokeImg.shinyOverride==i?0:i);
-          pokeImg.src = `images/${item.img}_${pokeImg.shinyOverride}${(pokeImg.femOverride ? 'f' : '')}.png`;  
+          pokeImg.src = `images/${item.img}_${pokeImg.shinyOverride}${(pokeImg.femOverride ? 'f' : '')}.png`;
           starImg.src = `ui/shiny${(pokeImg.shinyOverride==i?i:0)}.png`;
         });
         pokeImg.stars.push(starImg);
@@ -392,14 +392,14 @@ function renderMoreItems() { // Create each list item, with columns of info ****
       dexColumn.appendChild(dexText);
       pokeImg.stars.forEach((thisStar) => dexColumn.appendChild(thisStar));
     }
-    
+
     const specColumn = quickElement('div','clickable-name',speciesNames[thisID]); // Show species name
     specColumn.addEventListener('click', () => showPokeSplash(thisID, 1, filteredItemIDs));
-    
+
     const typeColumn = quickElement('div','item-column'); // Show both types
     typeColumn.innerHTML = `<p style="color:${typeColors[item.t1]}; margin: 0;">${fidToName[item.t1]}</p>`;
     if ('t2' in item) typeColumn.innerHTML += `<p style="color:${typeColors[item.t2]}; margin: 0;">${fidToName[item.t2]}</p>`;
-    
+
     // Show all four abilities
     const abilityColumn = quickElement('div','item-column');
     ['a1','a2','ha','pa'].forEach((name) => {
@@ -407,10 +407,10 @@ function renderMoreItems() { // Create each list item, with columns of info ****
         const fid = item[name];
         const clickableRow = quickElement('div','clickable-name',fidToName[fid],abToColor(name,fid));
         clickableRow.addEventListener('click', () => showDescSplash(fid));
-        abilityColumn.appendChild(clickableRow); 
+        abilityColumn.appendChild(clickableRow);
       }
     });
-    
+
     // Show the column of egg moves, biomes, or filtered moves/biomes and their sources
     const moveColumn = quickElement('div','item-column');
     let numMovesShown = 0;
@@ -479,7 +479,7 @@ function renderMoreItems() { // Create each list item, with columns of info ****
           }
         });
         // Vertically center if only one biome is peeking over a move
-        if (numMovesShown == 3 && toShowMovesBiomes.length) moveColumn.lastChild.style.marginTop = '6px'; 
+        if (numMovesShown == 3 && toShowMovesBiomes.length) moveColumn.lastChild.style.marginTop = '6px';
       }
     } else if (!toShowMovesBiomes.length) { // Show egg moves if there are no filtered moves/biomes
       ['e1','e2','e3','e4'].forEach((name) => { // Show the move name, with click event for splash screen
@@ -491,7 +491,7 @@ function renderMoreItems() { // Create each list item, with columns of info ****
 
     // Show the cost, colored by the egg tier
     const costColumn = quickElement('div','clickable-name');
-          costColumn.innerHTML = `${headerNames[6]}<br><span style="color:${eggTierColors(item.et)};">${item.co}</span>`;  
+          costColumn.innerHTML = `${headerNames[6]}<br><span style="color:${eggTierColors(item.et)};">${item.co}</span>`;
           costColumn.addEventListener('click', () => showPokeSplash(thisID,2,filteredItemIDs));
     // Create the stats columns
     const statColumns = [];
@@ -531,7 +531,7 @@ function makeBiomeDesc(src, isSmall=0) {
 function makeMovesetHeader(specID) { // Create the moveset/info splash **************************
   movesetHeader.innerHTML = '';
   const item = items[specID];
-  
+
   const headerRow = quickElement('div','moveset-banner');
   const msImg = quickElement('img','moveset-image',`images/${item.img}_0.png`);
   msImg.addEventListener('click', () => showPokeSplash(specID, 3, null));
@@ -540,7 +540,7 @@ function makeMovesetHeader(specID) { // Create the moveset/info splash *********
   if ('t2' in item) headerText.append(quickElement('span','',` / ${fidToName[item.t2]}`,typeColors[item.t2]));
   headerRow.append(createArrow(false), msImg, headerText, createArrow(true));
   movesetHeader.append(headerRow, quickElement('hr'));
-  
+
   const movesetButtons = quickElement('div','moveset-buttons');
   [catToName[10],infoText[15],infoText[16]].forEach((thisCat, index) => {
     const splashButton = quickElement('div','splash-button',thisCat);
@@ -634,7 +634,7 @@ function showPokeSplash(specID, forcePage=null, forceList=null, forceShiny=null,
         if (!movesetScrollable.innerHTML) biomeRow.style.marginTop = '4px'; // Add margin if empty
         const biomeLink = document.createElement('a');
         biomeLink.href = `https://wiki.pokerogue.net/biomes:biomes#interactive_map`;  biomeLink.target = '_blank'; // Open in new tab
-        const biomeImg = quickElement('img','biome-img',`ui/biomes/${fid}.png`);  
+        const biomeImg = quickElement('img','biome-img',`ui/biomes/${fid}.png`);
         biomeLink.appendChild(biomeImg);
         const biomeDesc = quickElement('div','',`<b>${fidToName[fid]}:</b>`);
         item[fid].forEach(src => {
@@ -645,7 +645,7 @@ function showPokeSplash(specID, forcePage=null, forceList=null, forceShiny=null,
           }
         });
         if (!lockedFilters.some((f) => f%fidThreshold[12] == fid)) { // Button to add biome directly to filters
-          const splashButton = quickElement('div','splash-button',altText[8]);  
+          const splashButton = quickElement('div','splash-button',altText[8]);
           splashButton.addEventListener('click', () => { lockFilter(fid); closeAllOverlays(); });
           biomeDesc.append(quickElement('br'),splashButton);
         }
@@ -682,9 +682,9 @@ function showPokeSplash(specID, forcePage=null, forceList=null, forceShiny=null,
       }
     }
     // Sort the moves by rarity, then by name
-    moveList[0].sort((a, b) => item[a] > item[b] ? 1 : (item[a] < item[b]) ? -1 : 
+    moveList[0].sort((a, b) => item[a] > item[b] ? 1 : (item[a] < item[b]) ? -1 :
       (fidToName[a] > fidToName[b] ? 1 : (fidToName[a] < fidToName[b] ? -1 : 0 ))); // Level moves
-    moveList[1].sort((a, b) => item[a]%4 > item[b]%4 ? 1 : (item[a]%4 < item[b]%4) ? -1 : 
+    moveList[1].sort((a, b) => item[a]%4 > item[b]%4 ? 1 : (item[a]%4 < item[b]%4) ? -1 :
       (fidToName[a] > fidToName[b] ? 1 : (fidToName[a] < fidToName[b] ? -1 : 0 ))); // TM rarity is mod 4
     [moveList[0],[item.e1,item.e2,item.e3,item.e4],moveList[1]].forEach((thisList, tableIndex) => {
       if (thisList != moveList[0]) movesetScrollable.appendChild(quickElement('hr'));
@@ -709,7 +709,7 @@ function showPokeSplash(specID, forcePage=null, forceList=null, forceShiny=null,
     });
   }
   if (!movesetScreen.classList.contains('show')) {
-    movesetScreen.classList.add("show"); 
+    movesetScreen.classList.add("show");
     movesetScrollable.scrollTop = 0;
   }
 }
@@ -782,7 +782,7 @@ function showDescSplash(fid) { // Create the ability/move details splash *******
     splashContent.appendChild(splashMoveTags);
   }
   if (!lockedFilters.some((f) => f%fidThreshold[12] == fid)) { // Button to add ability/move directly to filters
-    const splashButton = quickElement('div','splash-button',altText[8]);  
+    const splashButton = quickElement('div','splash-button',altText[8]);
     splashButton.addEventListener('click', () => { lockFilter(fid); closeAllOverlays(); });
     splashContent.appendChild(splashButton);
   }
@@ -848,8 +848,8 @@ function displaySuggestions() { // **************************
     // Filter suggestions that match query, and exclude filters that are invalid or already locked
     let matchingFID = allFID.filter(fid => {
       if (isExclusion && ( fid>=fidThreshold[9]
-        || (fid>=fidThreshold[5] && fid<fidThreshold[6]) 
-        || (fid>=fidThreshold[3]+10 && fid<fidThreshold[4]) 
+        || (fid>=fidThreshold[5] && fid<fidThreshold[6])
+        || (fid>=fidThreshold[3]+10 && fid<fidThreshold[4])
       )) return false; // Reject categories that can't be exclusion filters
       if (lockedFilters.some((f) => f%fidThreshold[12] == fid)) return false; // Reject if already locked
       if (fid >= fidThreshold[9] && offerFamilies.includes(fid)) return true; // Suggest matching families
@@ -858,7 +858,7 @@ function displaySuggestions() { // **************************
     // Add tag filters, if any associated ability name matches the query
     if (matchingFID.length < 10 && !isExclusion) { // Only if the list is small enough
       const tagsToAdd = allFID.filter(fid => fid >= fidThreshold[11] && tagToFID[fid].some(f => fidToSearch[f].includes(query)) && !matchingFID.includes(fid));
-      matchingFID.push(...tagsToAdd); 
+      matchingFID.push(...tagsToAdd);
     }
     // Erase the list of suggestions if it is too large, and no exact matches
     if (matchingFID.length > 25 + 2*query.length && !matchingFID.filter(f => fidToSearch[f]==query).length) matchingFID = [];
@@ -887,7 +887,7 @@ function lockFilter(newLockFID, clearQuery = true, forceOR = null) { // ********
     let filterMod = null;
     if (lockedFilters.length > 1) {
       // Default to "OR" for certain categories if matching previous filter category
-      const defaultOR = ([3,4,9,10].includes(fidToCategory(newLockFID)) 
+      const defaultOR = ([3,4,9,10].includes(fidToCategory(newLockFID))
         && fidToCategory(newLockFID) == fidToCategory(lockedFilters[lockedFilters.length-2]));
       filterMod = quickElement("span","filter-mod");
       filterMod.toggleOR = forceOR ?? defaultOR; filterMod.innerHTML = filterMod.toggleOR?'OR':'&';
@@ -899,8 +899,8 @@ function lockFilter(newLockFID, clearQuery = true, forceOR = null) { // ********
     filterTag.addEventListener('click', () => removeFilter(newLockFID+isExclusion, filterTag, filterMod));
     filterContainer.appendChild(filterTag);
     // Clear the search bar after locking
-    if (clearQuery) searchBox.value = ""; 
-    updateFilterGroups();   
+    if (clearQuery) searchBox.value = "";
+    updateFilterGroups();
     // Update sorting if required, then refresh items and suggestions
     if ((newLockFID == fidThreshold[10] || newLockFID == fidThreshold[10]+1) && !headerState.shiny) { // Has variants
       updateHeader(headerColumns[1]);
@@ -931,19 +931,19 @@ function removeFilter(fidToRemove, tagToRemove, modToRemove) { // **************
       }
     }
     // Remove the mod from the mod list, and remove the actual mod
-    lockedMods = lockedMods.filter((f) => f != modToRemove); 
+    lockedMods = lockedMods.filter((f) => f != modToRemove);
     modToRemove.remove();
   }
-  // Remove the fid from the filter list, and remove the actual filter tag 
+  // Remove the fid from the filter list, and remove the actual filter tag
   lockedFilters = lockedFilters.filter((f) => f != fidToRemove);  tagToRemove.remove();
-  updateFilterGroups();  
-  if ((fidToRemove == fidThreshold[10] || fidToRemove == fidThreshold[10]+1) && headerState.shiny > 1) { 
+  updateFilterGroups();
+  if ((fidToRemove == fidThreshold[10] || fidToRemove == fidThreshold[10]+1) && headerState.shiny > 1) {
     headerState.shiny = 0; // Reset shiny header if removing shiny filter
   }
   // Reset the sorting if there aren't any more locked moves/biomes
-  if (sortState.sortAttr === 'moves' && !lockedFilters.some(f => [2,9].includes(fidToCategory(f)))) { 
-    updateHeader(headerColumns[0]); 
-  } else { 
+  if (sortState.sortAttr === 'moves' && !lockedFilters.some(f => [2,9].includes(fidToCategory(f)))) {
+    updateHeader(headerColumns[0]);
+  } else {
     updateHeader(null); // Update header, then refresh items and suggestions
   }
   if (!lockedFilters.length) { // Reset the animation of the page title
@@ -958,7 +958,7 @@ function updateFilterGroups() { // Updates the grouping of filters based on AND/
   let group = 0;
   lockedFilterGroups[group].push(lockedFilters[0]);
   for (let i = 0; i < lockedMods.length; i++) { // New group for AND, same group for OR
-    if (!lockedMods[i].toggleOR) { group += 1;  lockedFilterGroups.push([]); } 
+    if (!lockedMods[i].toggleOR) { group += 1;  lockedFilterGroups.push([]); }
     lockedFilterGroups[group].push(lockedFilters[i+1]);
   }
   localStorage.setItem("lockedFilterGroups",JSON.stringify(lockedFilterGroups));
@@ -1004,7 +1004,7 @@ function updateHeader(clickTarget = null) {
   }
   // Draw the arrow on the current target, either up or down
   clickTarget.innerHTML = `${clickTarget.textDef}<span style="color:${col.pu}; font-family: serif;">${(sortState.ascending?"&#9650;":"&#9660;")}</span>`;
-  
+
   // Set the text of special (non-sorting) columns columns, depending on the header state
   if (hasMovesBiomes) { // Update the "Moves" column text
     const sortArrow = ( sortState.sortAttr != 'moves' ? '' :
@@ -1039,7 +1039,7 @@ function updateHeader(clickTarget = null) {
   // Save the filters to local storage, then update the display
   localStorage.setItem("headerState",JSON.stringify(headerState));
   localStorage.setItem("sortState",JSON.stringify(sortState));
-  refreshAllItems(); 
+  refreshAllItems();
 }
 
 function adjustLayout() {
@@ -1071,7 +1071,7 @@ searchBox.addEventListener('input', (event) => { // Typing in search box
   refreshAllItems();
 });
 document.addEventListener('keydown', (event) => { // All key press events
-  const ignoredKeys = ["Escape", "Tab", "Shift", "PageDown", "PageUp", "Control", "Alt", "Meta", "CapsLock", 
+  const ignoredKeys = ["Escape", "Tab", "Shift", "PageDown", "PageUp", "Control", "Alt", "Meta", "CapsLock",
     "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"];
   if (!ignoredKeys.includes(event.key)) { // Ignore certain key presses
     // Ignore all key presses if 'Ctrl' is held, except when pasting
@@ -1116,7 +1116,7 @@ document.addEventListener('keydown', (event) => { // All key press events
       const lastMod = lockedMods[lockedMods.length - 1];
       removeFilter(lastFilter, lastTag, lastMod); // Remove last filter
     } else if (headerState.shiny || headerState.ability) { // Clear header restrictions
-      headerState.shiny = 0;  headerState.ability = 0; 
+      headerState.shiny = 0;  headerState.ability = 0;
       updateHeader();
     }
   }
@@ -1144,7 +1144,7 @@ helpScreen.addEventListener('click', (event) => {
 });
 // Open the language selector splash
 openLangButton.addEventListener('mouseover', () => openLangButton.src = `ui/globeh.png`);
-openLangButton.addEventListener('mouseout',  () => openLangButton.src = `ui/globe.png` ); 
+openLangButton.addEventListener('mouseout',  () => openLangButton.src = `ui/globe.png` );
 openLangButton.addEventListener('click',     () => openLangMenu());
 function openLangMenu() {
   splashContent.style.width = '270px';
@@ -1165,7 +1165,7 @@ function openLangMenu() {
 }
 // #region Help Menu
 openHelpButton.addEventListener('mouseover', () => openHelpButton.src = `ui/helph.png`);
-openHelpButton.addEventListener('mouseout',  () => openHelpButton.src = `ui/help.png` ); 
+openHelpButton.addEventListener('mouseout',  () => openHelpButton.src = `ui/help.png` );
 openHelpButton.addEventListener('click',     () => openHelpMenu());
 function openHelpMenu() { // Show the help screen with instructions and options
   helpContent.style.width = `${392-isMobile*10}px`;
@@ -1193,13 +1193,13 @@ function openHelpMenu() { // Show the help screen with instructions and options
     <p style="margin: 10px 0px; font-weight: bold;">${helpMenuText[4]}</p>
     ${helpMenuText[5]}
     <p style="margin: 10px 0px;">${helpMenuText[6]}<br>
-    <b>${helpMenuText[7]}</b>, 
-    <span style="color:rgb(240, 230, 140); font-weight: bold;">${helpMenuText[8]}</span>, 
+    <b>${helpMenuText[7]}</b>,
+    <span style="color:rgb(240, 230, 140); font-weight: bold;">${helpMenuText[8]}</span>,
     <span style="color:rgb(140, 130, 240); font-weight: bold;">${helpMenuText[9]}</span></p>
-    ${helpMenuText[10]}<br> 
+    ${helpMenuText[10]}<br>
     <span style="color:rgb(145, 145, 145);">${helpMenuText[11]}<br>
     ${helpMenuText[12]}</span>
-    <p style="margin: 10px 0px;">${helpMenuText[13]}<br> 
+    <p style="margin: 10px 0px;">${helpMenuText[13]}<br>
     <b>${fidToName[fidThreshold[4]]}</b>, <span style="color:rgb(131, 182, 239);"><b>${fidToName[fidThreshold[4]+1]}</b></span>, <span style="color:rgb(240, 230, 140);"><b>${fidToName[fidThreshold[4]+2]}</b></span>, <span style="color:rgb(239, 131, 131);"><b>${fidToName[fidThreshold[4]+3]}</b></span>, <span style="color:rgb(216, 143, 205);"><b>${fidToName[fidThreshold[4]+4]}</b></span></p>
     <hr>
     <p style="margin: 10px 0px; font-weight: bold;">${helpMenuText[14]}
@@ -1210,12 +1210,12 @@ function openHelpMenu() { // Show the help screen with instructions and options
     <br>${helpMenuText[19]}: ${gameVersion}&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp${helpMenuText[20]}: ${latestDate}</span><br>`
   ));
   // Create the button that toggles persistent filters
-  const persistentButton = quickElement('div','splash-button',`${helpMenuText[21]}: ${persistentState?"ON":"OFF"}`);  
+  const persistentButton = quickElement('div','splash-button',`${helpMenuText[21]}: ${persistentState?"ON":"OFF"}`);
   persistentButton.style.color = persistentState?col.pu:col.wh;  persistentButton.style.fontSize = "12px";
-  persistentButton.addEventListener('click', () => { 
+  persistentButton.addEventListener('click', () => {
     persistentState = !persistentState;
     localStorage.setItem("persistentState",persistentState);
-    persistentButton.innerHTML = `${helpMenuText[21]}: ${persistentState?"ON":"OFF"}`;  
+    persistentButton.innerHTML = `${helpMenuText[21]}: ${persistentState?"ON":"OFF"}`;
     persistentButton.style.color = persistentState?col.pu:col.wh;
   });
   helpContent.appendChild(persistentButton);
@@ -1269,13 +1269,13 @@ function showFiltersInCategory(index) {
 }
 // patchButton.innerHTML = `${gameVersion}`;
 patchButton.addEventListener('mouseover', () => patchButton.style.color = col.pu);
-patchButton.addEventListener('mouseout',  () => patchButton.style.color = col.dg); 
+patchButton.addEventListener('mouseout',  () => patchButton.style.color = col.dg);
 // patchButton.addEventListener('click',     () => showPatchSplash());
 function showPatchSplash() {
   // Will be enabled in a later version *****
   helpContent.style.width = '382px';
   helpContent.innerHTML = '';
-  
+
   for (const [specID, patchLine] of Object.entries(patchData)) {
     const patchItem = quickElement('div','patch-item',`<br><img src=images/${items[specID].img}_0.png>${speciesNames[specID]}`);
     for (const [attID, prePost] of Object.entries(patchLine)) {
