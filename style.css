@@ -52,30 +52,38 @@ h1 {
   text-align: center;
   font-family: Verdana, sans-serif;
 }
-.colorful-text-holiday span {
-  animation: colorChangeHoliday 2s step-start infinite, forceWhite 0s linear forwards;
+.colorful-text-winter span {
+  animation: colorChangeWinter 2s step-start infinite, forceWhite 0s linear forwards;
   animation-delay: calc(var(--i) * -0.5s), 3.5s; /* Delay each letter, then become white */
 }
-@keyframes colorChangeHoliday {
-  0% { color: rgb(255, 255, 255); }
-  25% { color: rgb(239, 131, 131); }
-  50% { color: rgb(255, 255, 255); }
-  75% { color: rgb(143, 214, 154); }
+@keyframes colorChangeWinter {
+  0%   { color: rgb(255, 255, 255); }
+  25%  { color: rgb(239, 131, 131); }
+  50%  { color: rgb(255, 255, 255); }
+  75%  { color: rgb(143, 214, 154); }
+  100% { color: rgb(255, 255, 255); }
+}
+.colorful-text-fall span {
+  animation: colorChangeFall 2.5s ease-in-out infinite, forceWhite 1.5s linear forwards;
+  animation-delay: calc((var(--i) - 20) * 0.5s), 2.7s; /* Delay each letter, then become white */
+}
+@keyframes colorChangeFall {
+  0%   { color: rgb(255, 255, 255); }
+  25%  { color: rgb(221, 210, 111); }
+  50%  { color: rgb(247,  82,  49); }
+  75%  { color: rgb(251, 173, 124); }
   100% { color: rgb(255, 255, 255); }
 }
 @keyframes forceWhite {
   to { color: white; }
 }
-.colorful-text span, .colorful-text.colorful-text-holiday span {
+.colorful-text span {
   animation: colorChange 2s ease-in-out;
   animation-delay: calc(var(--i) * 0.05s); /* Delay each letter */
 }
-.colorful-text {
-  display: inline;
-}
 @keyframes colorChange {
-  0% { color: rgb(255, 255, 255); }
-  50% { color: rgb(140, 130, 240); }
+  0%   { color: rgb(255, 255, 255); }
+  50%  { color: rgb(140, 130, 240); }
   100% { color: rgb(255, 255, 255); }
 }
 #patch-button {

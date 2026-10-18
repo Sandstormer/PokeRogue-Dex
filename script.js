@@ -948,7 +948,7 @@ function removeFilter(fidToRemove, tagToRemove, modToRemove) { // **************
   }
   if (!lockedFilters.length) { // Reset the animation of the page title
     pageTitle.classList.remove('colorful-text');  void pageTitle.offsetWidth;
-    pageTitle.classList.add('colorful-text');
+    pageTitle.classList = 'colorful-text';
   }
   if (!isMobile) searchBox.focus();
 }
