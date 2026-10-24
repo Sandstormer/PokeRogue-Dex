@@ -65,7 +65,7 @@ h1 {
 }
 .colorful-text-fall span {
   animation: colorChangeFall 2.5s ease-in-out infinite, forceWhite 1.5s linear forwards;
-  animation-delay: calc((var(--i) - 20) * 0.5s), 2.7s; /* Delay each letter, then become white */
+  animation-delay: calc((var(--i) - 20) * 0.5s), 2.5s; /* Delay each letter, then become white */
 }
 @keyframes colorChangeFall {
   0%   { color: rgb(255, 255, 255); }

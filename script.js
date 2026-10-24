@@ -36,7 +36,7 @@ const biomeColors = [col.wh, col.bl, col.ye, col.re, col.pi];
 const moveCatColor = [col.or, col.bl, col.wh];
 const tmColors = [col.wh, col.bl, col.ye];
 const flipStats = {bst:'bst',hp:'spe',atk:'spd',def:'spa',spa:'def',spd:'atk',spe:'hp'};
-const REMchance = [16,12,6,6,3];
+const REMchance = [12,8,6,6,4];
 let increment = 10;  // Number of items to load at a time
 let renderLimit = 0; // This value is updated when scrolling down (starts at 0)
 let toShowMovesBiomes = []; // Filtered moves/biomes to show sources
@@ -659,14 +659,13 @@ function showPokeSplash(specID, forcePage=null, forceList=null, forceShiny=null,
     splashCostInfo.innerHTML = `
       <p>${infoText[0]}: <span style="color:${col.re}";>${upgradeCosts[item.co-1][4]}</span> <img src="ui/fren.png"></p>
       <p>${infoText[1]}: <span style="color:${col.pu}";>${upgradeCosts[item.co-1][0]}</span> <img src="ui/candy.png" style="margin-bottom:-2px;"></p>
-      <p>${infoText[2]}: <span style="color:${col.bl}";>${upgradeCosts[item.co-1][1][0]}</span> &
-        <span style="color:${col.ye}";> ${upgradeCosts[item.co-1][1][1]}<span> <img src="ui/candy.png" style="margin-bottom:-2px;"></p>
-      <p>${infoText[3]}: ${upgradeCosts[item.co-1][2].join(' / ')} <img src="ui/candy.png" style="margin-bottom:-2px;">
+      <p>${infoText[2]}: <span style="color:${col.bl}";>${upgradeCosts[item.co-1][1]}</span> &
+        <span style="color:${col.ye}";> ${upgradeCosts[item.co-1][2]}<span> <img src="ui/candy.png" style="margin-bottom:-2px;"></p>
+      <p>${infoText[3]}: ${upgradeCosts[item.co-1][3]} <img src="ui/candy.png" style="margin-bottom:-2px;">
       <span style="color:${col.ga}; font-size:12px;">
-      <br>${infoText[11].replace('##',upgradeCosts[item.co-1][3].join(' / '))}
-      <br>${altText[12]}: 1 in ${REMchance[item.et]}${HAtext}
-      <br>${altText[10]}: 1 in 12</span></p>
-      `;
+        <br>${altText[12]}: 1 in ${REMchance[item.et]}${HAtext}
+        <br>${altText[10]}: 1 in 12
+      </span></p>`;
     movesetScrollable.append(quickElement('hr'), splashCostInfo);
   } else if (splashState.page == 1) { // Show moveset (splashState.page == 1)
     const msHeaderText = quickElement('div','moveset-row-header');
