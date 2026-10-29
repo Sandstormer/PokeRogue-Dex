@@ -85,9 +85,11 @@ function loadAndApplyLanguage(lang) {
   script.onload = () => {
     console.log(`${lang}.js loaded successfully`);
 
-    // Initialize the searchable names
-    fidToSearch = fidToName.map((thisName, fid) => makeSearchable( // Search via category for later categories
-      (fid >= fidThreshold[2] && fid < fidThreshold[11])||(fid >= fidThreshold[10]) ? `${catToName[fidToCategory(fid)]}${thisName}` : thisName
+    // Initialize the searchable names    
+    fidToSearch = fidToName.map((thisName, fid) => makeSearchable( // Search via category name for some categories
+      [3,4,5,6,7,8,9,12].includes(fidToCategory(fid)) ? `${catToName[fidToCategory(fid)]}${thisName}` :
+        ( fidToCategory(fid) == 11 ? `${thisName}${catToName[fidToCategory(fid)].replace(" ",thisName)}${catToName[fidToCategory(fid)]}${thisName}`
+        : thisName ) // Other categories like Type/Ability/Move are not searchable via category name
     ));
     specToSearch = speciesNames.map(s => makeSearchable(s));
     searchBox.placeholder = `${altText[4]} ${headerNames[2]} / ${headerNames[3]} / ${headerNames[4]} / ${altText[0]} ...`;
@@ -224,8 +226,8 @@ function refreshAllItems() { // Display items based on query and locked filters 
               if (excFID < fidThreshold[3])    return item.ge !== excFID - fidThreshold[2] + 1; // Gen exclusions
               if (excFID < fidThreshold[3]+10) return item.co !== excFID - fidThreshold[3] + 1; // Cost equal exclusions
             } else if (excFID < fidThreshold[6]) {
-              if (excFID < fidThreshold[5]-1) return item.et !== excFID - fidThreshold[4]; // Egg tier exclusions
-              if (excFID < fidThreshold[5])   return !('ex' in item); // Egg exclusive exclusion
+              if (excFID < fidThreshold[5]-1)  return item.et !== excFID - fidThreshold[4]; // Egg tier exclusions
+              if (excFID < fidThreshold[5])    return !('ex' in item); // Egg exclusive exclusion
             } else {
               if (excFID == fidThreshold[6])   return !('st' in item);   // Starter evolution filter
               if (excFID == fidThreshold[6]+1) return !('ev' in item);   // Fully evolved filter
@@ -789,9 +791,7 @@ function showDescSplash(fid) { // Create the ability/move details splash *******
 }
 // region Helper Functions
 function fidToCategory(fid) {
-  for (let i = 0; i < catToName.length; i++) {
-    if (fid < fidThreshold[i]) return i;
-  }
+  return fidThreshold.findIndex(threshold => fid < threshold);
 }
 function fidToColor(fid) {
   if (fid < fidThreshold[0])    return [col.wh, typeColors[fid]];
