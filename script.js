@@ -214,11 +214,10 @@ function refreshAllItems() { // Display items based on query and locked filters 
           } else if (fid < fidThreshold[12]) { // Tags[12]
             // if (fid === fidThreshold[11]) { // Move tag filter
             //   return tagToFID[fid].some(f => f in item);
-            // } else { // Ability tag filter
-              if (headerState.ability) // Restricted ability tag filter
-                return tagToFID[fid].some(f => item?.[f] == 309+headerState.ability || (headerState.ability == 1 && item?.[f] == 309));
-              return tagToFID[fid].some(f => f in item); // Regular tag filter
             // }
+            if (headerState.ability) // Restricted ability tag filter
+              return tagToFID[fid].some(f => item?.[f] == 309+headerState.ability || (headerState.ability == 1 && item?.[f] == 309));
+            return tagToFID[fid].some(f => f in item); // Standard ability tag filter
           } else if (fid >= fidThreshold[12]) { // Exclusion filters
             const excFID = fid-fidThreshold[12];
             if (excFID < fidThreshold[4]) {
@@ -229,13 +228,14 @@ function refreshAllItems() { // Display items based on query and locked filters 
               if (excFID < fidThreshold[5]-1)  return item.et !== excFID - fidThreshold[4]; // Egg tier exclusions
               if (excFID < fidThreshold[5])    return !('ex' in item); // Egg exclusive exclusion
             } else {
-              if (excFID == fidThreshold[6])   return !('st' in item);   // Starter evolution filter
-              if (excFID == fidThreshold[6]+1) return !('ev' in item);   // Fully evolved filter
-              if (excFID == fidThreshold[7])   return 'fx' in item;      // Base form filter
-              if (excFID == fidThreshold[7]+1) return !(item?.fx <= 2);  // Mega filter
+              if (excFID == fidThreshold[6])   return !('st' in item);    // Starter evolution filter
+              if (excFID == fidThreshold[6]+1) return !('ev' in item);    // Fully evolved filter
+              if (excFID == fidThreshold[7])   return 'fx' in item;       // Base form filter
+              if (excFID == fidThreshold[7]+1) return !(item?.fx <= 2);   // Mega filter
               if (excFID <  fidThreshold[7]+5) return item?.fx != excFID-fidThreshold[7]; // New mega, giga, transformed filters
-              if (excFID == fidThreshold[7]+5) return !('fe' in item);   // Female filter
-              if (excFID <  fidThreshold[9])   return !(excFID in item); // Biome exclusions
+              if (excFID == fidThreshold[7]+5) return !('fe' in item);    // Female filter
+              if (excFID <  fidThreshold[9])   return !(excFID in item);  // Biome exclusions
+              if (excFID <  fidThreshold[10])  return item.fa !== excFID; // Family exclusions
             }
           }
           return true; // General invalid filters
@@ -846,9 +846,9 @@ function displaySuggestions() { // **************************
     if (offerFamilies.length > 4) offerFamilies = []; // Limit to 4 families
     // Filter suggestions that match query, and exclude filters that are invalid or already locked
     let matchingFID = allFID.filter(fid => {
-      if (isExclusion && ( fid>=fidThreshold[9]
-        || (fid>=fidThreshold[5] && fid<fidThreshold[6])
-        || (fid>=fidThreshold[3]+10 && fid<fidThreshold[4])
+      if (isExclusion && ( fid >= fidThreshold[10]
+        || ( fid >= fidThreshold[5]    && fid < fidThreshold[6] )
+        || ( fid >= fidThreshold[3]+10 && fid < fidThreshold[4] )
       )) return false; // Reject categories that can't be exclusion filters
       if (lockedFilters.some((f) => f%fidThreshold[12] == fid)) return false; // Reject if already locked
       if (fid >= fidThreshold[9] && offerFamilies.includes(fid)) return true; // Suggest matching families
