@@ -296,7 +296,7 @@ fidToDesc = [
 'Il magma riveste il corpo del Pokémon impedendogli di venire congelato.',
 'La carica magnetica attrae i Pokémon di tipo Acciaio impedendogli la fuga o la sostituzione.',
 'Se il Pokémon è affetto da un problema di stato, le squame sulla sua pelle si induriscono aumentando la sua Difesa del 50%.',
-'Potenzia le mosse "pulsar", Forzasfera e Ondasana del 50%.',
+'Potenzia le mosse «pulsar», Forzasfera e Ondasana del 50%.',
 'Permette di usare le mosse come se lo stato Sole intenso fosse attivo.',
 'Gli attacchi sferrati su un bersaglio avvelenato producono sempre brutti colpi.',
 'Il tipo del Pokémon cambia a seconda dello stato del campo.',
