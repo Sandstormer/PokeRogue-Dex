@@ -710,7 +710,7 @@ fidToDesc = [
 'Colpisce il bersaglio con una frusta infuocata e ne riduce la Difesa.',
 'Una colonna di fuoco attacca il bersaglio. Se viene usata insieme a Acquapatto o Erbapatto, le mosse si combineranno con una potenza base di 150 ed evocherà un arcobaleno o un vasto mare di fuoco, a ripetizione, per 4 turni.',
 'Il bersaglio viene attaccato con un pugno ardente. La mossa ha un 10% di chance di bruciare il bersaglio.',
-'Chi la usa intrappola il bersaglio dentro un vortice di fuoco impetuoso. Per 4-5 turni, il bersaglio prende danno pari a 1/7 dei suoi PS massimi alla fine di ogni turno.',
+'Chi la usa intrappola il bersaglio dentro un vortice di fuoco impetuoso. Per 4-5 turni, il bersaglio prende danno pari a 1/8 dei suoi PS massimi alla fine di ogni turno.',
 'Chi la usa attacca con una forza tremenda, ma questa mossa funziona solo se viene usata per prima quando chi la usa entra in battaglia.',
 'Chi la usa lacera il bersaglio con le sue dure branchie. La potenza di questa mossa viene raddoppiata se chi la usa si muove prima del bersaglio.',
 'Chi la usa apre una fessura nel terreno che ci fa cadere il bersaglio. Il bersaglio perde tutte le energie se la mossa colpisce, a meno che non si tratta di un Pokémon Boss. L’accuratezza di questa mossa è fissa al 30%.',

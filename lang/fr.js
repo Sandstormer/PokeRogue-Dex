@@ -1211,7 +1211,7 @@ fidToDesc = [
 'Si le lanceur est téracristallisé, il libère l’énergie de son type Téracristal. La capacité utilise l’Attaque ou l’Atq Spé., selon ce qui infligera le plus de dégâts.',
 'Le lanceur bombarde la cible afin de l’éliminer grâce au pouvoir des cristaux. Si le lanceur est Terapagos sous sa Forme Stellaire, la capacité touche tous les ennemis. Cette capacité utilise la stat la plus élevée entre l’Attaque ou l’Attaque Spéciale quand le lanceur est téracristallisé.',
 'Une attaque qui utilise la force des champs pour projeter une aura. Son type et sa puissance varient selon le champ actif.',
-'Le lanceur attaque la cible et a 30% de chance de voler un de ses objets tenus.',
+'Le lanceur attaque la cible et a 30% de chances de voler un de ses objets tenus.',
 'Le lanceur attaque en puisant dans son énergie interne pour générer d’innombrables flèches qui s’abattent sur les cibles adverses. Touche même les Pokémon dans les airs. Dans ce cas, ceux-ci retombent au sol.',
 'Le lanceur attaque avec des vagues glissant au sol. Les cibles adverses y sont prises et ne peuvent pas quitter le terrain.',
 'Une attaque furieuse qui dure de 2 à 3 tours. Le lanceur devient confus.',
